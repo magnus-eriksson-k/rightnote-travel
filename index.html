@@ -97,6 +97,21 @@ button.tile{cursor:pointer;touch-action:manipulation}
 .pay-sum{display:flex;justify-content:space-between;gap:10px;font-size:.92rem;white-space:nowrap;min-height:1.4rem}
 .pay-sum > :last-child{overflow:hidden;text-overflow:ellipsis;min-width:0;color:var(--muted)}
 .pay-sum .back{color:var(--good)}
+/* "₫X back" opens a change checker: tap each note you're given and the total turns green when it's right */
+button.back{font:inherit;background:none;border:0;padding:8px 0 8px 8px;margin:-8px 0;cursor:pointer;touch-action:manipulation;text-decoration:underline dotted;text-underline-offset:3px}
+.change{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.change-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.change-head .linkbtn{padding:6px 2px}
+.change-grid{display:grid;gap:8px}
+.ctile{position:relative;min-width:0}
+.ctile .tile{cursor:pointer;touch-action:manipulation}
+.ctile .tile img,.ctile .tile .no-photo{opacity:.55;transition:opacity .15s}
+.ctile.on .tile img,.ctile.on .tile .no-photo{opacity:1;outline:3px solid var(--good);outline-offset:-1px}
+.ctile .minus{position:absolute;left:0;top:0;width:40px;height:40px;border:0;background:none;padding:4px;cursor:pointer;touch-action:manipulation;display:flex;align-items:flex-start;justify-content:flex-start}
+.ctile .minus span{display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:rgba(0,0,0,.75);color:#fff;font:800 1.1rem/1 var(--body)}
+.change-sum{display:flex;justify-content:space-between;align-items:center;gap:10px;border-radius:10px;padding:10px 12px;background:var(--key-op);font-size:.92rem;transition:background .2s,color .2s}
+.change-sum.ok{background:var(--good);color:var(--panel)}
+.change-sum.over b:last-child{color:var(--warn)}
 /* note colours: the darker shade on light backgrounds, the brighter one on dark */
 .tone{background:var(--c2,var(--line))}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tone{background:var(--c1,var(--line))}}
@@ -530,15 +545,46 @@ function renderPay(){
   const kinds=w.parts.length, cols=kinds===1?1:kinds<=4?2:kinds<=6?3:kinds<=8?4:5; // one note fills the area
   // the bar shows each note's share of the amount
   const bar=w.parts.map(([d,k])=>{const [,c1,c2]=noteRow(d);return `<span class="tone" style="flex:${d*k};${tone(c1,c2)}"></span>`}).join("");
-  const right=w.change?`<b class="back">₫${w.change.toLocaleString("en-AU")} back</b>`:`<span>${w.extra||"exact amount"}</span>`;
+  if(w.change!==changeFor){changeFor=w.change;got={};changeOpen=false} // a new amount starts a fresh count
+  const right=w.change?`<button type="button" class="back" id="backBtn" aria-expanded="${changeOpen}" aria-controls="changeBox">₫${w.change.toLocaleString("en-AU")} back ${changeOpen?"▴":"▾"}</button>`:`<span>${w.extra||"exact amount"}</span>`;
   $("payList").innerHTML=`<div class="tabs" role="tablist" aria-label="Ways to pay" style="grid-template-columns:repeat(${ws.length},minmax(0,1fr))">${tabs}</div>
     <div class="pay-body" id="payPanel" role="tabpanel">
       <div class="note-grid${cols>2?" small":""}" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${w.parts.map(([d,k])=>tile(d,k)).join("")}</div>
       <div class="bar" aria-hidden="true">${bar}</div>
       <div class="pay-sum"><span>Hand over <b>₫${(A+w.change).toLocaleString("en-AU")}</b></span>${right}</div>
+      ${w.change&&changeOpen?changeBox(w.change):""}
+    </div>`;
+}
+// ---- Checking your change: tap each note you're given; the total goes green when it matches ----
+let changeOpen=false, changeFor=0, got={}; // got: denomination → how many you've been given
+function changeBox(C){
+  const notes=PAY_NOTES.filter(n=>n<=C).reverse(); // smallest first, only notes that could be part of the change
+  const cols=notes.length<=4?2:3;
+  const tiles=notes.map(n=>{
+    const k=got[n]||0, [,c1,c2]=noteRow(n);
+    const art=photos[n]?`<img src="${photoSrc(photos[n])}" alt="">`
+      :`<span class="no-photo${c1?" tone":""}" style="${tone(c1,c2)}${c1?";color:#fff":""}">${n/1000}k</span>`;
+    return `<div class="ctile${k?" on":""}"><button type="button" class="tile" data-add="${n}" aria-label="Add a ${n/1000}k note${k?`, ${k} so far`:""}">${art}${k?`<span class="badge" aria-hidden="true">×${k}</span>`:""}</button>`
+      +(k?`<button type="button" class="minus" data-sub="${n}" aria-label="Remove a ${n/1000}k note"><span aria-hidden="true">−</span></button>`:"")+`</div>`;
+  }).join("");
+  const sum=Object.entries(got).reduce((a,[n,k])=>a+n*k,0), diff=C-sum;
+  const cls=diff===0?"ok":diff<0?"over":"";
+  const status=diff===0?"✓ Correct":diff>0?`₫${diff.toLocaleString("en-AU")} to go`:`₫${(-diff).toLocaleString("en-AU")} too much`;
+  return `<div class="change" id="changeBox">
+      <div class="change-head"><span>Tap each note you're given</span>${sum?`<button type="button" class="linkbtn" data-clear>Clear</button>`:""}</div>
+      <div class="change-grid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${tiles}</div>
+      <div class="change-sum ${cls}" aria-live="polite"><span>Got <b>₫${sum.toLocaleString("en-AU")}</b> of ₫${C.toLocaleString("en-AU")}</span><b>${status}</b></div>
     </div>`;
 }
 $("payList").addEventListener("click",e=>{
+  if(e.target.closest("#backBtn")){
+    changeOpen=!changeOpen; renderPay();
+    if(changeOpen)$("changeBox").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"nearest"});
+    return;
+  }
+  const add=e.target.closest("[data-add]"), sub=e.target.closest("[data-sub]");
+  if(add||sub){const d=+(add||sub).dataset[add?"add":"sub"];got[d]=Math.max(0,(got[d]||0)+(add?1:-1));renderPay();return}
+  if(e.target.closest("[data-clear]")){got={};renderPay();return}
   const n=e.target.closest("[data-note]"); if(n){goTo(`#n${n.dataset.note/1000}k`);return}
   const b=e.target.closest("[data-way]"); if(!b)return;
   payOpen=b.dataset.way; renderPay();

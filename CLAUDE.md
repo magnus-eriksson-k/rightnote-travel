@@ -40,6 +40,7 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - **Exact:** greedy fewest notes for the exact amount (greedy is optimal for these denominations).
   - **Exact, keep Nk:** the exact amount without the largest note used.
   - The selected tab shows full note photos (repeats as one photo with a ×N badge), a colour bar of each note's share, and what to hand over. The note area is always two rows of two-column tiles high; more kinds of note get more columns instead of more rows, so the card never changes height.
+  - **Checking change:** when an option gives change, "₫X back" is a button that opens a checker below it in the card (`changeBox()`). It shows every note up to the change amount; tap a note each time you're given one (×N badge, "−" to undo, "Clear" to start over). The total turns green with "✓ Correct" when it matches, and warns when it's too much. The count (`got`) resets when the change amount changes.
   - While you type, the card dims and waits until 1.5 s after the last key (`PAY_DELAY`) before updating. `render(true)` starts that wait; a plain `render()` during a wait leaves it running, so background updates such as a rate refresh don't cut it short.
 - **Rates:**
   - The default is a hard-coded snapshot from 3 Oct 2026.
