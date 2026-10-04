@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#15120f" media="(prefers-color-scheme: dark)">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="theme-color" content="#f1f2f3" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#121314" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Convert currencies and work out which notes to pay with.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
@@ -15,19 +15,19 @@
 /* Layout: one narrow column — price on top, keypad, how to pay, rate strip, then the notes in your wallet.
    Colours follow the phone's light or dark setting. */
 :root{
-  --bg:#f4f1ea; --panel:#ffffff; --ink:#1d1b16; --muted:#5c5649; --line:#e2dacb;
-  --accent:#0f7b6c; --accent-text:#0f7b6c; --accent-ink:#ffffff; --accent-soft:#dcefe9; --key:#ffffff; --key-op:#ebe5d8; --op-ink:#1d1b16;
-  --good:#1f7a3a; --warn:#a4462f; --card-shadow:0 1px 0 #e2dacb,0 8px 24px rgba(60,48,20,.08);
+  --bg:#f1f2f3; --panel:#ffffff; --ink:#1b1d1f; --muted:#5a5f64; --line:#dde0e3;
+  --accent:#0f7b6c; --accent-text:#0f7b6c; --accent-ink:#ffffff; --accent-soft:#dcefe9; --key:#ffffff; --key-op:#e4e7ea; --op-ink:#1b1d1f;
+  --good:#1f7a3a; --warn:#a4462f; --card-shadow:0 1px 0 #dde0e3,0 8px 24px rgba(20,24,28,.08);
   --body:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#15120f; --panel:#221d18; --ink:#f3ece2; --muted:#b9ad9c; --line:#3a322a;
-  --accent:#0f7b6c; --accent-text:#3cc1a9; --accent-ink:#ffffff; --accent-soft:#173a33; --key:#221d18; --key-op:#2e2720; --op-ink:#3cc1a9;
-  --good:#8fd19e; --warn:#e08a72; --card-shadow:inset 0 0 0 1px #3a322a; color-scheme:dark}}
+  --bg:#121314; --panel:#1e2022; --ink:#eceeef; --muted:#a6abb0; --line:#35383c;
+  --accent:#0f7b6c; --accent-text:#3cc1a9; --accent-ink:#ffffff; --accent-soft:#173a33; --key:#1e2022; --key-op:#2a2d31; --op-ink:#3cc1a9;
+  --good:#8fd19e; --warn:#e08a72; --card-shadow:inset 0 0 0 1px #35383c; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#15120f; --panel:#221d18; --ink:#f3ece2; --muted:#b9ad9c; --line:#3a322a;
-  --accent:#0f7b6c; --accent-text:#3cc1a9; --accent-ink:#ffffff; --accent-soft:#173a33; --key:#221d18; --key-op:#2e2720; --op-ink:#3cc1a9;
-  --good:#8fd19e; --warn:#e08a72; --card-shadow:inset 0 0 0 1px #3a322a; color-scheme:dark}
+  --bg:#121314; --panel:#1e2022; --ink:#eceeef; --muted:#a6abb0; --line:#35383c;
+  --accent:#0f7b6c; --accent-text:#3cc1a9; --accent-ink:#ffffff; --accent-soft:#173a33; --key:#1e2022; --key-op:#2a2d31; --op-ink:#3cc1a9;
+  --good:#8fd19e; --warn:#e08a72; --card-shadow:inset 0 0 0 1px #35383c; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums}
 .wrap{max-width:440px;margin:0 auto;padding-inline:16px;padding-block:16px 32px;display:flex;flex-direction:column;gap:14px}
