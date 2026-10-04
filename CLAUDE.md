@@ -40,6 +40,7 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - **Exact:** greedy fewest notes for the exact amount (greedy is optimal for these denominations).
   - **Exact, keep Nk:** the exact amount without the largest note used.
   - The selected tab shows full note photos (repeats as one photo with a ×N badge), a colour bar of each note's share, and what to hand over. The note area is always two rows of two-column tiles high; more kinds of note get more columns instead of more rows, so the card never changes height.
+  - While you type, the card dims and waits until 1.5 s after the last key (`PAY_DELAY`) before updating. `render(true)` starts that wait; a plain `render()` during a wait leaves it running, so background updates such as a rate refresh don't cut it short.
 - **Rates:**
   - The default is a hard-coded snapshot from 3 Oct 2026.
   - "Refresh rate" tries `open.er-api.com/v6/latest/AUD`, then the jsDelivr `@fawazahmed0/currency-api` as a fallback.
