@@ -51,6 +51,8 @@ select{font:600 .95rem var(--body);color:var(--ink);background:var(--key-op);bor
 .keys button.eq{background:var(--jade);color:var(--panel);border-color:var(--jade)}
 .keys button.wide{grid-column:span 2;font-family:var(--body);font-size:1rem;font-weight:600}
 .keys button:active{transform:translateY(1px)}
+.keys button.wide-c{grid-column:span 2}
+.cur-fixed{font:600 .88rem var(--body);color:var(--ink);background:var(--key-op);border:1px solid var(--line);border-radius:8px;padding:4px 10px}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
 h2{font-family:var(--display);font-size:1rem;margin:0 0 8px}
 .ref{display:flex;flex-direction:column}
@@ -110,7 +112,7 @@ h2{font-family:var(--display);font-size:1rem;margin:0 0 8px}
 
   <section class="panel compact" id="panel" aria-label="Conversion">
     <div class="row">
-      <select id="second" aria-label="Second currency (you type in this)"></select>
+      <span class="cur-fixed" id="second" aria-label="You type in Vietnamese đồng">VND</span>
       <div class="val"><div class="expr" id="expr"></div><div class="big" id="secondAmt">0</div><div class="hint" id="inHint"></div></div>
     </div>
     <div class="row out">
@@ -135,9 +137,8 @@ h2{font-family:var(--display);font-size:1rem;margin:0 0 8px}
   </div>
 
   <div class="keys" id="keys">
-    <button type="button" class="op" data-k="C">C</button>
+    <button type="button" class="op wide-c" data-k="C">C</button>
     <button type="button" class="op" data-k="back" aria-label="Delete">⌫</button>
-    <button type="button" class="op" data-k="swap" aria-label="Swap currencies">⇅</button>
     <button type="button" class="op" data-k="/">÷</button>
     <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
     <button type="button" class="op" data-k="*">×</button>
@@ -205,14 +206,13 @@ let photos={"10000": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUN
 const $=id=>document.getElementById(id);
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
-let base=store.get("base")||"AUD", second=store.get("second")||"VND";
-if(!CUR[base])base="AUD"; if(!CUR[second]||second===base)second=base==="VND"?"AUD":"VND";
+// You always type in đồng for now (note photos exist only for đồng); the other side is selectable
+const second="VND"; let base=store.get("base");
+if(!CUR[base]||base==="VND")base="AUD";
 let expr=second==="VND"?"200000":"100", custom=null; // custom rate overrides default for current pair
 try{custom=JSON.parse(store.get("custom")||"null")}catch(e){}
 
-for(const id of ["base","second"]){
-  $(id).innerHTML=Object.keys(CUR).map(c=>`<option value="${c}">${c}</option>`).join("");
-}
+$("base").innerHTML=Object.keys(CUR).filter(c=>c!=="VND").map(c=>`<option value="${c}">${c}</option>`).join("");
 
 function defaultRate(){return CUR[base].vnd/CUR[second].vnd}
 function rate(){return custom&&custom.pair===base+second?custom.r:defaultRate()}
@@ -246,7 +246,7 @@ function vnShort(n){ // how prices are written on Vietnamese menus and signs
 }
 
 function render(){
-  $("base").value=base; $("second").value=second;
+  $("base").value=base;
   const showExpr=/[+\-*/]/.test(expr.replace(/^-/,""));
   // you type in the second currency; the result is in the base currency
   const v=evaluate(expr), out=v/rate();
@@ -287,12 +287,6 @@ function renderRef(){
 function press(k){
   if(k==="C")expr="";
   else if(k==="back")expr=expr.slice(0,-1);
-  else if(k==="swap"){
-    const v=evaluate(expr)/rate();
-    if(custom&&custom.pair===base+second)custom={pair:second+base,r:1/custom.r};
-    [base,second]=[second,base];
-    expr=trimNum(v,second); save();
-  }
   else if(k==="="){expr=trimNum(evaluate(expr),second)}
   else if("+-*/".includes(k)){
     if(expr===""&&k!=="-")return;
@@ -318,8 +312,7 @@ document.addEventListener("keydown",e=>{
   const k=map[e.key]||e.key;
   if(/^[\d.+\-*/=]$/.test(k)||["back","C"].includes(k)){e.preventDefault();press(k)}
 });
-$("base").addEventListener("change",e=>{base=e.target.value;if(base===second)second=Object.keys(CUR).find(c=>c!==base);save();render()});
-$("second").addEventListener("change",e=>{second=e.target.value;if(second===base)base=Object.keys(CUR).find(c=>c!==second);save();render()});
+$("base").addEventListener("change",e=>{base=e.target.value;save();render()});
 $("rate").addEventListener("input",e=>{
   const r=parseFloat(e.target.value.replace(/,/g,""));
   if(r>0){custom={pair:base+second,r};save();render()}
