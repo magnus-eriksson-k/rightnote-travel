@@ -10,34 +10,36 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body>
 <title>RightNote Travel</title>
 <style>
+/* --accent fills buttons (white text on it); --accent-text is the same green for text, lighter in dark mode.
+   Both come from the app icon. */
 /* Layout: one narrow column — price on top, keypad, how to pay, rate strip, then the notes in your wallet.
    Colours follow the phone's light or dark setting. */
 :root{
   --bg:#f4f1ea; --panel:#ffffff; --ink:#1d1b16; --muted:#5c5649; --line:#e2dacb;
-  --accent:#0f7b6c; --accent-ink:#ffffff; --accent-soft:#dcefe9; --key:#ffffff; --key-op:#ebe5d8; --op-ink:#1d1b16;
+  --accent:#0f7b6c; --accent-text:#0f7b6c; --accent-ink:#ffffff; --accent-soft:#dcefe9; --key:#ffffff; --key-op:#ebe5d8; --op-ink:#1d1b16;
   --good:#1f7a3a; --warn:#a4462f; --card-shadow:0 1px 0 #e2dacb,0 8px 24px rgba(60,48,20,.08);
   --body:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#15120f; --panel:#221d18; --ink:#f3ece2; --muted:#b9ad9c; --line:#3a322a;
-  --accent:#e0b25a; --accent-ink:#15120f; --accent-soft:#3a2f1c; --key:#221d18; --key-op:#2e2720; --op-ink:#e0b25a;
+  --accent:#0f7b6c; --accent-text:#3cc1a9; --accent-ink:#ffffff; --accent-soft:#173a33; --key:#221d18; --key-op:#2e2720; --op-ink:#3cc1a9;
   --good:#8fd19e; --warn:#e08a72; --card-shadow:inset 0 0 0 1px #3a322a; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#15120f; --panel:#221d18; --ink:#f3ece2; --muted:#b9ad9c; --line:#3a322a;
-  --accent:#e0b25a; --accent-ink:#15120f; --accent-soft:#3a2f1c; --key:#221d18; --key-op:#2e2720; --op-ink:#e0b25a;
+  --accent:#0f7b6c; --accent-text:#3cc1a9; --accent-ink:#ffffff; --accent-soft:#173a33; --key:#221d18; --key-op:#2e2720; --op-ink:#3cc1a9;
   --good:#8fd19e; --warn:#e08a72; --card-shadow:inset 0 0 0 1px #3a322a; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums}
 .wrap{max-width:440px;margin:0 auto;padding-inline:16px;padding-block:16px 32px;display:flex;flex-direction:column;gap:14px}
 header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:4px}
-h1{font-size:1.1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:0}
+h1{font-size:1.1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-text);margin:0}
 /* Two views, switched in the header: the calculator, and Notes (notes, note card and exchange rate) */
 .views{display:flex;gap:2px;background:var(--key-op);border-radius:999px;padding:3px}
 .views button{border:0;background:none;color:var(--ink);font:700 .85rem var(--body);border-radius:999px;padding:0 14px;min-height:38px;cursor:pointer;touch-action:manipulation}
 .views button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
 .view{display:flex;flex-direction:column;gap:14px}
 .rate-sum{align-self:stretch;display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;background:none;border:0;padding:6px 2px;min-height:44px;font:inherit;font-size:.85rem;color:var(--muted);text-align:left;cursor:pointer}
-.rate-sum b{color:var(--accent)}
+.rate-sum b{color:var(--accent-text)}
 .rate-panel{display:flex;flex-direction:column;gap:8px;scroll-margin-top:12px}
 h2{font-size:1rem;font-weight:700;margin:0}
 .panel{background:var(--panel);border-radius:18px;padding:14px;box-shadow:var(--card-shadow)}
@@ -53,7 +55,7 @@ h2{font-size:1rem;font-weight:700;margin:0}
 .amt.long{font-size:2.3rem}
 .amt.longer{font-size:1.7rem}
 .out-row{display:flex;flex-wrap:nowrap;min-height:2.6rem;align-items:center;gap:8px 10px;margin-top:4px}
-.out{font-size:1.75rem;font-weight:700;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.out{font-size:1.75rem;font-weight:700;color:var(--accent-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .pill{flex:none;white-space:nowrap;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.85rem;color:var(--muted)}
 .hint{font-size:.8rem;color:var(--muted)}
 select{flex:none;font:600 .9rem var(--body);color:var(--ink);background:var(--key-op);border:0;border-radius:999px;padding:8px 12px;min-height:36px}
@@ -96,11 +98,11 @@ button.tile{cursor:pointer;touch-action:manipulation}
 .keys button.eq{background:var(--accent);color:var(--accent-ink);font-weight:800;box-shadow:none}
 .keys button.wide-c{grid-column:span 2}
 .keys button:active{transform:translateY(1px)}
-button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
 
 .rate{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:.85rem;color:var(--muted)}
 .rate input{width:9.5em;font:600 .9rem var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px;text-align:right}
-.linkbtn{background:none;border:0;color:var(--accent);font:600 .85rem var(--body);cursor:pointer;padding:8px 4px}
+.linkbtn{background:none;border:0;color:var(--accent-text);font:600 .85rem var(--body);cursor:pointer;padding:8px 4px}
 
 /* Your đồng: a 3-column grid of notes, then larger amounts */
 .wallet{display:flex;flex-direction:column;gap:10px}
@@ -115,7 +117,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .ref button.plain span{font-size:.8rem;color:var(--muted)}
 .ref button:active{background:var(--accent-soft)}
 .note{font-size:.78rem;color:var(--muted);margin:0}
-.note a{color:var(--accent)}
+.note a{color:var(--accent-text)}
 .err{color:var(--warn)}
 
 /* Note card (inline panel, not a modal) */
@@ -128,7 +130,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .big-note .tag{position:absolute;left:12px;bottom:8px;font-size:.62rem;opacity:.85}
 .photo{width:100%;max-width:100%;border-radius:10px}
 .dlg h3{font-size:1.15rem;margin:0}
-.dlg .val{font-weight:700;color:var(--accent);margin:0}
+.dlg .val{font-weight:700;color:var(--accent-text);margin:0}
 .facts{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.88rem}
 .facts dt{color:var(--muted)}
 .facts dd{margin:0;min-width:0}
@@ -137,7 +139,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .btn.primary{background:var(--accent);color:var(--accent-ink)}
 .file-btn{position:relative;overflow:hidden}
 .file-btn input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:100px}
-.file-btn:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.file-btn:focus-within{outline:2px solid var(--accent-text);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){.keys button:active{transform:none}.chev{transition:none}}
 </style>
 
