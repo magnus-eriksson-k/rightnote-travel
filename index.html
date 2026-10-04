@@ -53,29 +53,27 @@ select{flex:none;font:600 .9rem var(--body);color:var(--ink);background:var(--ke
 .flash{animation:flash .6s ease-out}
 @keyframes flash{from{background:var(--accent-soft)}to{background:transparent}}
 
-/* How to pay: options fold open one at a time */
-.pay-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.85rem;color:var(--muted);padding:2px 0 4px}
-.way + .way{border-top:1px solid var(--line)}
-.way-head{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding:6px 0;border:0;background:none;font:inherit;color:var(--ink);text-align:left;cursor:pointer;touch-action:manipulation}
-.way-t{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
-.way-t b{font-size:1rem}
-.way-t span{font-size:.82rem;color:var(--muted)}
-.mini{display:flex;gap:3px}
-.mini i{width:6px;height:18px;border-radius:2px}
-.chev{flex:none;color:var(--muted);transition:transform .2s}
-.way-head[aria-expanded="true"] .chev{transform:rotate(180deg)}
-.way-body{display:flex;flex-direction:column;gap:10px;padding-bottom:14px}
-.note-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.tile{position:relative}
+/* How to pay: the options are tabs; the area below keeps the same height whichever is picked */
+.pay-top{font-size:.85rem;color:var(--muted);padding-bottom:8px}
+.tabs{display:grid;gap:4px;background:var(--key-op);border-radius:12px;padding:4px}
+.tab{min-width:0;min-height:52px;border:0;border-radius:9px;background:transparent;color:var(--ink);font:inherit;line-height:1.25;padding:4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation}
+.tab b{font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tab span{font-size:.75rem;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tab[aria-selected="true"] span{color:inherit;opacity:.85}
+.pay-body{display:flex;flex-direction:column;gap:10px;padding-top:12px;container-type:inline-size}
+/* two rows of two-column tiles; more kinds of note get more columns, never more rows */
+.note-grid{display:grid;gap:8px;height:calc((100cqw - 8px)/2.1 + 8px);align-content:center}
+.tile{position:relative;min-width:0}
 .tile img,.tile .no-photo{display:block;width:100%;aspect-ratio:2.1/1;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
 .no-photo{display:flex!important;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;color:var(--ink);background:var(--key-op)}
-.badge{position:absolute;right:6px;top:6px;background:rgba(0,0,0,.75);color:#fff;border-radius:999px;padding:2px 9px;font-size:.9rem;font-weight:800}
-.change{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.92rem}
-.change b:last-child{color:var(--good)}
+.badge{position:absolute;right:5px;top:5px;background:rgba(0,0,0,.75);color:#fff;border-radius:999px;padding:1px 8px;font-size:.88rem;font-weight:800}
+.note-grid.small .badge{right:3px;top:3px;padding:0 5px;font-size:.72rem}
+.note-grid.small .no-photo{font-size:.9rem}
 .bar{display:flex;height:20px;border-radius:6px;overflow:hidden;gap:2px}
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem;font-weight:600;color:var(--muted)}
-.legend span{display:flex;align-items:center;gap:5px}
-.legend i{width:10px;height:10px;border-radius:3px}
+.pay-sum{display:flex;justify-content:space-between;gap:10px;font-size:.92rem;white-space:nowrap;min-height:1.4rem}
+.pay-sum > :last-child{overflow:hidden;text-overflow:ellipsis;min-width:0;color:var(--muted)}
+.pay-sum .back{color:var(--good)}
 /* note colours: the darker shade on light backgrounds, the brighter one on dark */
 .tone{background:var(--c2,var(--line))}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tone{background:var(--c1,var(--line))}}
@@ -161,7 +159,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
     <button type="button" class="eq" data-k="=">=</button>
   </div>
 
-  <section class="panel" id="payCard" aria-label="How to pay" style="padding-block:10px 4px">
+  <section class="panel" id="payCard" aria-label="How to pay">
     <div class="pay-top"><span id="payTitle">How to pay</span></div>
     <div id="payList"></div>
   </section>
@@ -378,9 +376,9 @@ function openFromHash(){
   const d=+m[1]*1000; if(NOTE_INFO[d]){openNote(d)}
 }
 window.addEventListener("hashchange",openFromHash);
-// ---- How to pay: up to three ways to hand over the đồng amount, folded open one at a time ----
+// ---- How to pay: up to three ways to hand over the đồng amount, shown as tabs ----
 const PAY_NOTES=[500000,200000,100000,50000,20000,10000,5000,2000,1000]; // 1k–5k are the small paper notes; 1k has no card or photo
-let payOpen, payShown=null; // payOpen: the option the user opened (undefined = the first, null = all folded)
+let payOpen; // the tab the user picked; the first option when unset or no longer offered
 function split(total,allowed){const out=[];let r=total;for(const n of allowed){const k=Math.floor(r/n);if(k){out.push([n,k]);r-=k*n}}return r===0?out:null}
 function count(parts){return parts.reduce((a,[,k])=>a+k,0)}
 function payAmount(){
@@ -397,7 +395,7 @@ function ways(A){
   out.push({key:"exact",title:"Exact",parts:fewest,change:0});
   // leave out the biggest note used, so you keep those for later or help a vendor short on change
   const top=fewest[0][0], alt=split(A,PAY_NOTES.filter(n=>n<top));
-  if(alt&&top>1000)out.push({key:"keep",title:`Exact, keep your ${top/1000}k`,extra:top===500000?"easier for small vendors":"",parts:alt,change:0});
+  if(alt&&top>1000)out.push({key:"keep",title:`Exact, keep ${top/1000}k`,extra:top===500000?"easier for small vendors":"",parts:alt,change:0});
   return out;
 }
 const noteRow=n=>VND_NOTES.find(x=>x[0]===n)||[];
@@ -407,35 +405,26 @@ function tile(n,k){
     :`<span class="no-photo${c1?" tone":""}" style="${tone(c1,c2)}${c1?";color:#fff":""}" role="img" aria-label="${label}">${n/1000}k</span>`;
   return `<div class="tile">${art}${k>1?`<span class="badge" aria-hidden="true">×${k}</span>`:""}</div>`;
 }
-const CHEV=`<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
 function renderPay(){
   const A=payAmount();
-  if(!A){$("payTitle").textContent="How to pay";$("payList").innerHTML=`<p class="note" style="padding-bottom:12px">Enter an amount to see which notes to hand over.</p>`;payShown=null;return}
+  if(!A){$("payTitle").textContent="How to pay";$("payList").innerHTML=`<p class="note">Enter an amount to see which notes to hand over.</p>`;return}
   $("payTitle").textContent=`Paying ₫${A.toLocaleString("en-AU")}`;
-  const ws=ways(A), keys=ws.map(w=>w.key);
-  const open=payOpen===null?null:keys.includes(payOpen)?payOpen:keys[0];
-  $("payList").innerHTML=ws.map(w=>{
-    const n=count(w.parts), on=w.key===open;
-    const sub=[`${n} note${n===1?"":"s"}`,w.change?`₫${w.change.toLocaleString("en-AU")} change`:w.key==="exact"?"exact amount":w.extra].filter(Boolean).join(" · ");
-    const tones=w.parts.map(([d,k])=>{const [,c1,c2]=noteRow(d);return {d,k,s:tone(c1,c2)}});
-    const mini=on?"":`<span class="mini" aria-hidden="true">${tones.map(t=>`<i class="tone" style="${t.s}"></i>`).join("")}</span>`;
-    // the bar shows each note's share of the amount
-    const bar=tones.length>1?`<div class="bar" aria-hidden="true">${tones.map(t=>`<span class="tone" style="flex:${t.d*t.k};${t.s}"></span>`).join("")}</div>
-        <div class="legend">${tones.map(t=>`<span><i class="tone" style="${t.s}"></i>${t.d/1000}k${t.k>1?" ×"+t.k:""}</span>`).join("")}</div>`:"";
-    return `<div class="way">
-      <button type="button" class="way-head" data-way="${w.key}" aria-expanded="${on}" aria-controls="way-${w.key}"><span class="way-t"><b>${w.title}</b><span>${sub}</span></span>${mini}${CHEV}</button>
-      <div class="way-body" id="way-${w.key}"${on?"":" hidden"}>
-        <div class="note-grid">${w.parts.map(([d,k])=>tile(d,k)).join("")}</div>
-        ${w.change?`<div class="change"><span>Hand over <b>₫${(A+w.change).toLocaleString("en-AU")}</b></span><b>₫${w.change.toLocaleString("en-AU")} back</b></div>`:""}
-        ${bar}
-      </div>
+  const ws=ways(A), w=ws.find(x=>x.key===payOpen)||ws[0];
+  const tabs=ws.map(x=>{const n=count(x.parts);return `<button type="button" role="tab" class="tab" data-way="${x.key}" aria-selected="${x===w}" aria-controls="payPanel"><b>${x.title}</b><span>${n} note${n===1?"":"s"}</span></button>`}).join("");
+  const kinds=w.parts.length, cols=kinds===1?1:kinds<=4?2:kinds<=6?3:kinds<=8?4:5; // one note fills the area
+  // the bar shows each note's share of the amount
+  const bar=w.parts.map(([d,k])=>{const [,c1,c2]=noteRow(d);return `<span class="tone" style="flex:${d*k};${tone(c1,c2)}"></span>`}).join("");
+  const right=w.change?`<b class="back">₫${w.change.toLocaleString("en-AU")} back</b>`:`<span>${w.extra||"exact amount"}</span>`;
+  $("payList").innerHTML=`<div class="tabs" role="tablist" aria-label="Ways to pay" style="grid-template-columns:${ws.some(x=>x.key==="keep")?ws.map(x=>x.key==="keep"?"minmax(0,1fr)":"auto").join(" "):`repeat(${ws.length},minmax(0,1fr))`}">${tabs}</div>
+    <div class="pay-body" id="payPanel" role="tabpanel">
+      <div class="note-grid${cols>2?" small":""}" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${w.parts.map(([d,k])=>tile(d,k)).join("")}</div>
+      <div class="bar" aria-hidden="true">${bar}</div>
+      <div class="pay-sum"><span>Hand over <b>₫${(A+w.change).toLocaleString("en-AU")}</b></span>${right}</div>
     </div>`;
-  }).join("");
-  payShown=open;
 }
 $("payList").addEventListener("click",e=>{
   const b=e.target.closest("[data-way]"); if(!b)return;
-  payOpen=b.dataset.way===payShown?null:b.dataset.way; renderPay();
+  payOpen=b.dataset.way; renderPay();
 });
 
 function closeNote(){$("noteDlg").hidden=true;openDenom=null}
