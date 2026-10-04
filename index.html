@@ -31,12 +31,16 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums}
 .wrap{max-width:440px;margin:0 auto;padding-inline:16px;padding-block:16px 32px;display:flex;flex-direction:column;gap:14px}
-header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:4px}
-h1{font-size:1.1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-text);margin:0}
-/* Two views, switched in the header: the calculator, and Notes (notes, note card and exchange rate) */
+header{display:flex;justify-content:space-between;align-items:center;gap:6px;padding-top:4px}
+h1{font-size:.95rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--accent-text);margin:0}
+/* Three views: Calculator and Notes from the header switch, Options (rate and appearance) from the gear */
 .views{display:flex;gap:2px;background:var(--key-op);border-radius:999px;padding:3px}
-.views button{border:0;background:none;color:var(--ink);font:700 .85rem var(--body);border-radius:999px;padding:0 14px;min-height:38px;cursor:pointer;touch-action:manipulation}
+.hdr-r{display:flex;align-items:center;gap:2px}
+.gear{flex:none;width:42px;height:42px;border:0;border-radius:999px;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+.gear[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.views button{border:0;background:none;color:var(--ink);font:700 .85rem var(--body);border-radius:999px;padding:0 10px;min-height:38px;cursor:pointer;touch-action:manipulation}
 .views button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+@media (max-width:350px){h1{font-size:.82rem;letter-spacing:0}.views button{padding:0 8px;font-size:.8rem}.gear{width:38px}}
 .view{display:flex;flex-direction:column;gap:14px}
 .rate-sum{align-self:stretch;display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;background:none;border:0;padding:6px 2px;min-height:44px;font:inherit;font-size:.85rem;color:var(--muted);text-align:left;cursor:pointer}
 .rate-sum b{color:var(--accent-text)}
@@ -148,10 +152,13 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 
 <div class="wrap">
   <header><h1>RightNote</h1>
-    <nav class="views" aria-label="Views">
-      <button type="button" id="toCalc" aria-current="page">Calculator</button>
-      <button type="button" id="toNotes" aria-current="false">Notes</button>
-    </nav>
+    <div class="hdr-r">
+      <nav class="views" aria-label="Views">
+        <button type="button" id="toCalc" aria-current="page">Calculator</button>
+        <button type="button" id="toNotes" aria-current="false">Notes</button>
+      </nav>
+      <button type="button" class="gear" id="toOptions" aria-label="Options" aria-current="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
   </header>
 
 <div class="view" id="calcView">
@@ -216,6 +223,9 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
     <p class="note">Tap a note for its details, or an amount to load it.</p>
   </section>
 
+</div>
+
+<div class="view" id="optionsView" hidden>
   <section class="panel rate-panel" id="ratePanel" aria-labelledby="rateTitle">
     <h2 id="rateTitle">Exchange rate</h2>
     <span class="note" id="asof">Rate as of 3 Oct 2026</span>
@@ -387,7 +397,7 @@ $("rate").addEventListener("blur",()=>render());
 $("resetRate").addEventListener("click",()=>{custom=null;save();render()});
 $("ref").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b)return;
-  if(b.dataset.note){goNotes(`#n${b.dataset.note/1000}k`);return}
+  if(b.dataset.note){goTo(`#n${b.dataset.note/1000}k`);return}
   goCalc(); loadAmount(+b.dataset.v);
 });
 function loadAmount(v){
@@ -419,34 +429,37 @@ function showPhoto(){
   $("photoBtnText").textContent=id?"Replace photo":"Add your photo";
 }
 // ---- Views: the URL hash picks the view, so the phone's back button returns to the calculator ----
-// #notes and #rate open Notes; #n2k … #n500k open Notes with that note's card
-let fromCalc=false; // Notes was opened from the calculator, so going back returns there
+// #notes opens Notes and #n2k … #n500k a note's card there; #options (or the older #rate) opens Options
+let fromCalc=false; // we left the calculator in this visit, so going back returns there
 function showView(v){
-  $("calcView").hidden=v!=="calc"; $("notesView").hidden=v==="calc";
+  $("calcView").hidden=v!=="calc"; $("notesView").hidden=v!=="notes"; $("optionsView").hidden=v!=="options";
   $("toCalc").setAttribute("aria-current",v==="calc"?"page":"false");
-  $("toNotes").setAttribute("aria-current",v==="calc"?"false":"page");
+  $("toNotes").setAttribute("aria-current",v==="notes"?"page":"false");
+  $("toOptions").setAttribute("aria-current",v==="options"?"page":"false");
 }
 function route(){
   const h=location.hash, m=/^#n(\d+)k$/.exec(h);
   if(m&&NOTE_INFO[+m[1]*1000]){showView("notes");openNote(+m[1]*1000);return}
   closeNote();
-  if(h==="#notes"||h==="#rate"){showView("notes");if(h==="#rate")$("ratePanel").scrollIntoView({block:"start"});else window.scrollTo(0,0);return}
-  showView("calc");
+  const v=h==="#notes"?"notes":h==="#options"||h==="#rate"?"options":"calc";
+  showView(v); if(v!=="calc")window.scrollTo(0,0);
 }
-function goNotes(hash){
-  // one history entry per visit to Notes; moving around inside Notes replaces it
-  if($("notesView").hidden){fromCalc=true;location.hash=hash}
+function goTo(hash){
+  // one history entry per trip away from the calculator; moving between Notes and Options replaces it
+  if(!$("calcView").hidden){fromCalc=true;location.hash=hash}
   else{history.replaceState(null,"",hash);route()}
 }
 function goCalc(){
-  if(!$("notesView").hidden){closeNote();showView("calc");window.scrollTo(0,0)}
+  if($("calcView").hidden){closeNote();showView("calc");window.scrollTo(0,0)}
   if(fromCalc){fromCalc=false;history.back()}
   else if(location.hash)history.replaceState(null,"",location.pathname+location.search);
 }
 window.addEventListener("hashchange",route);
-$("toNotes").addEventListener("click",()=>goNotes("#notes"));
+$("toNotes").addEventListener("click",()=>goTo("#notes"));
 $("toCalc").addEventListener("click",goCalc);
-$("rateSum").addEventListener("click",()=>goNotes("#rate"));
+// the gear opens Options, and closes it again when it's already open
+$("toOptions").addEventListener("click",()=>$("optionsView").hidden?goTo("#options"):goCalc());
+$("rateSum").addEventListener("click",()=>goTo("#options"));
 // ---- How to pay: up to three ways to hand over the đồng amount, shown as tabs ----
 const PAY_NOTES=[500000,200000,100000,50000,20000,10000,5000,2000,1000]; // 1k–5k are the small paper notes; 1k has no card or photo
 let payOpen; // the tab the user picked; the first option when unset or no longer offered
@@ -496,7 +509,7 @@ function renderPay(){
     </div>`;
 }
 $("payList").addEventListener("click",e=>{
-  const n=e.target.closest("[data-note]"); if(n){goNotes(`#n${n.dataset.note/1000}k`);return}
+  const n=e.target.closest("[data-note]"); if(n){goTo(`#n${n.dataset.note/1000}k`);return}
   const b=e.target.closest("[data-way]"); if(!b)return;
   payOpen=b.dataset.way; renderPay();
 });
