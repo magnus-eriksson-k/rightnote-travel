@@ -35,7 +35,7 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - `NOTE_INFO` holds the back image and colour description for each note.
   - `PAY_NOTES` is every denomination used for payment, including the paper 1k/2k/5k notes.
 - **Photos:** `photos` maps each denomination to a `data:` URI; `photoSrc()` also accepts asset ids. The photo-upload UI is still in the file but stays hidden, because it needs Claude-artifact storage that Pages doesn't have. To change photos, re-embed them in `photos`.
-- **How to pay:** `ways(A)` returns up to three options, in this order, shown as tabs below the keypad (the first is selected by default, and a picked tab stays picked while it's offered):
+- **How to pay:** `ways(A)` returns up to three options, in this order, shown as tabs below the keypad (Exact is selected by default, and a picked tab stays picked while it's offered):
   - **Quickest:** round up to whichever total within +100k needs the fewest notes, shown only if it beats the exact option.
   - **Exact:** greedy fewest notes for the exact amount (greedy is optimal for these denominations).
   - **Exact, keep Nk:** the exact amount without the largest note used.
@@ -46,9 +46,9 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - "Refresh rate" tries `open.er-api.com/v6/latest/AUD`, then the jsDelivr `@fawazahmed0/currency-api` as a fallback.
   - Results are sanity-checked against plausible VND ranges and cached in `localStorage["rates"]`.
   - The app refreshes automatically once a day when online, unless a custom rate is active.
-- **Views:** a Calculator | Notes switch in the header. The calculator has the price, keypad, payment tabs and a one-line rate summary. Notes has the note grid (with 1M/2M/5M amounts to load), the note card and the exchange rate controls. `route()` picks the view from the URL hash, so the phone's back button returns to the calculator; each visit to Notes adds one history entry, and moving around inside Notes replaces it.
+- **Views:** a Calculator | Notes switch in the header. The calculator has the price, keypad, payment tabs and a one-line rate summary. Notes has the note grid (with 1M/2M/5M amounts to load), the note card, the exchange rate controls and Appearance. `route()` picks the view from the URL hash, so the phone's back button returns to the calculator; each visit to Notes adds one history entry, and moving around inside Notes replaces it.
 - **Deep links:** `#notes` and `#rate` open Notes; `#n2k` … `#n500k` open Notes with that note's card. Tapping a note photo in the payment tabs does the same.
-- **Theme:** colours are CSS variables on `:root` and follow the phone's light or dark setting. The accent comes from the app icon: `--accent` (`#0f7b6c`) fills buttons, and `--accent-text` is the green for text, which in dark mode is the icon's lighter tick green (`#3cc1a9`) so it stays readable. Note colours are passed as `--c1` (brighter, used in dark mode) and `--c2` (darker, light mode) and applied by the `.tone` class.
+- **Theme:** colours are CSS variables on `:root`. By default they follow the phone's light or dark setting; the Appearance section in Notes can force light or dark, saved in `localStorage["theme"]` and applied as `data-theme` on `<html>` by a small script in `<head>` before the page draws. The accent comes from the app icon: `--accent` (`#0f7b6c`) fills buttons, and `--accent-text` is the green for text, which in dark mode is the icon's lighter tick green (`#3cc1a9`) so it stays readable. Note colours are passed as `--c1` (brighter, used in dark mode) and `--c2` (darker, light mode) and applied by the `.tone` class.
 - **UI:** views and the note card are in-page panels (`#notesView`, `#noteDlg`), not modals. Floating popups opened off-screen or didn't work inside app viewers on the owner's phone. Keep interactions inline.
 
 ## Constraints

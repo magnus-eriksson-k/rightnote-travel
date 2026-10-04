@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="RightNote">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body>
 <title>RightNote Travel</title>
 <style>
 /* --accent fills buttons (white text on it); --accent-text is the same green for text, lighter in dark mode.
@@ -41,6 +41,9 @@ h1{font-size:1.1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercas
 .rate-sum{align-self:stretch;display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;background:none;border:0;padding:6px 2px;min-height:44px;font:inherit;font-size:.85rem;color:var(--muted);text-align:left;cursor:pointer}
 .rate-sum b{color:var(--accent-text)}
 .rate-panel{display:flex;flex-direction:column;gap:8px;scroll-margin-top:12px}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--key-op);border-radius:12px;padding:4px}
+.seg button{min-height:44px;border:0;border-radius:9px;background:none;color:var(--ink);font:600 .88rem var(--body);cursor:pointer;touch-action:manipulation}
+.seg button[aria-checked="true"]{background:var(--accent);color:var(--accent-ink)}
 h2{font-size:1rem;font-weight:700;margin:0}
 .panel{background:var(--panel);border-radius:18px;padding:14px;box-shadow:var(--card-shadow)}
 
@@ -224,6 +227,15 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
       <button class="linkbtn" id="refreshRate" type="button">Refresh rate</button>
     </div>
     <p class="note">Rates are mid-market; cash and card rates in Vietnam typically sit 1–2% either side. Edit the rate to match your bank or money changer.</p>
+  </section>
+
+  <section class="panel rate-panel" aria-labelledby="themeTitle">
+    <h2 id="themeTitle">Appearance</h2>
+    <div class="seg" id="themeSeg" role="radiogroup" aria-labelledby="themeTitle">
+      <button type="button" role="radio" data-theme-opt="auto">Match phone</button>
+      <button type="button" role="radio" data-theme-opt="light">Light</button>
+      <button type="button" role="radio" data-theme-opt="dark">Dark</button>
+    </div>
   </section>
 </div>
 </div>
@@ -470,7 +482,7 @@ function renderPay(){
   const A=payAmount();
   if(!A){$("payTitle").textContent="How to pay";$("payList").innerHTML=`<p class="note">Enter an amount to see which notes to hand over.</p>`;return}
   $("payTitle").textContent=`Paying ₫${A.toLocaleString("en-AU")}`;
-  const ws=ways(A), w=ws.find(x=>x.key===payOpen)||ws[0];
+  const ws=ways(A), w=ws.find(x=>x.key===payOpen)||ws.find(x=>x.key==="exact");
   const tabs=ws.map(x=>{const n=count(x.parts);return `<button type="button" role="tab" class="tab" data-way="${x.key}" aria-selected="${x===w}" aria-controls="payPanel"><b>${x.title}</b><span>${n} note${n===1?"":"s"}</span></button>`}).join("");
   const kinds=w.parts.length, cols=kinds===1?1:kinds<=4?2:kinds<=6?3:kinds<=8?4:5; // one note fills the area
   // the bar shows each note's share of the amount
@@ -523,6 +535,21 @@ $("photoIn").addEventListener("change",async e=>{
     $("dlgMsg").textContent=`${why} (${code})`;
   }
 });
+// ---- Appearance: match the phone, or always light or dark ----
+const THEME_BG={light:"#f1f2f3",dark:"#121314"};
+function applyTheme(t){
+  if(t!=="light"&&t!=="dark")t="auto";
+  if(t==="auto")delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme=t;
+  // browser bar colour: follow the phone, or match the chosen theme
+  const metas=document.querySelectorAll('meta[name="theme-color"]');
+  metas.forEach((m,i)=>m.setAttribute("content",t==="auto"?(i?THEME_BG.dark:THEME_BG.light):THEME_BG[t]));
+  document.querySelectorAll("#themeSeg button").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.themeOpt===t)));
+}
+$("themeSeg").addEventListener("click",e=>{
+  const b=e.target.closest("[data-theme-opt]"); if(!b)return;
+  store.set("theme",b.dataset.themeOpt); applyTheme(b.dataset.themeOpt);
+});
+applyTheme(store.get("theme"));
 render();
 route();
 
