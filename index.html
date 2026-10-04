@@ -10,7 +10,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body>
 <title>RightNote Travel</title>
 <style>
-/* Layout: one narrow column — price on top, how to pay, keypad, rate strip, then the notes in your wallet.
+/* Layout: one narrow column — price on top, keypad, how to pay, rate strip, then the notes in your wallet.
    Colours follow the phone's light or dark setting. */
 :root{
   --bg:#f4f1ea; --panel:#ffffff; --ink:#1d1b16; --muted:#5c5649; --line:#e2dacb;
@@ -31,22 +31,25 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 .wrap{max-width:440px;margin:0 auto;padding-inline:16px;padding-block:16px 32px;display:flex;flex-direction:column;gap:14px}
 header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:4px}
 h1{font-size:1.1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:0}
-header span{font-size:.82rem;color:var(--muted);text-align:right}
+header span{font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 h2{font-size:1rem;font-weight:700;margin:0}
 .panel{background:var(--panel);border-radius:18px;padding:14px;box-shadow:var(--card-shadow)}
 
 /* Price: what they ask in đồng, and what it costs you */
 .price{display:flex;flex-direction:column;gap:2px;padding:4px 2px;border-radius:14px}
-.price .label{font-size:.85rem;font-weight:600;color:var(--muted)}
-.expr{font-size:.85rem;color:var(--muted);overflow-wrap:anywhere}
+/* fixed heights so the keypad below never moves while you type */
+.label-row{display:flex;justify-content:space-between;gap:12px;font-size:.85rem;color:var(--muted);min-height:1.3rem}
+.price .label{font-weight:600;white-space:nowrap}
+.expr{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .expr:empty,.hint:empty,.pill:empty{display:none}
-.amt{font-size:3.2rem;font-weight:300;letter-spacing:-.02em;line-height:1.1;overflow-wrap:anywhere}
+.amt{height:3.6rem;display:flex;align-items:flex-end;white-space:nowrap;font-size:3.2rem;font-weight:300;letter-spacing:-.02em;line-height:1.1}
 .amt.long{font-size:2.3rem}
-.out-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:4px}
-.out{font-size:1.75rem;font-weight:700;color:var(--accent);overflow-wrap:anywhere}
-.pill{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.85rem;color:var(--muted)}
+.amt.longer{font-size:1.7rem}
+.out-row{display:flex;flex-wrap:nowrap;min-height:2.6rem;align-items:center;gap:8px 10px;margin-top:4px}
+.out{font-size:1.75rem;font-weight:700;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.pill{flex:none;white-space:nowrap;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.85rem;color:var(--muted)}
 .hint{font-size:.8rem;color:var(--muted)}
-select{font:600 .9rem var(--body);color:var(--ink);background:var(--key-op);border:0;border-radius:999px;padding:8px 12px;min-height:36px}
+select{flex:none;font:600 .9rem var(--body);color:var(--ink);background:var(--key-op);border:0;border-radius:999px;padding:8px 12px;min-height:36px}
 .flash{animation:flash .6s ease-out}
 @keyframes flash{from{background:var(--accent-soft)}to{background:transparent}}
 
@@ -91,15 +94,16 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .rate input{width:9.5em;font:600 .9rem var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px;text-align:right}
 .linkbtn{background:none;border:0;color:var(--accent);font:600 .85rem var(--body);cursor:pointer;padding:8px 4px}
 
-/* Your đồng: notes scroll sideways */
+/* Your đồng: a 3-column grid of notes, then larger amounts */
 .wallet{display:flex;flex-direction:column;gap:10px}
-.ref{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x proximity}
-.ref button{flex:0 0 140px;scroll-snap-align:start;display:flex;flex-direction:column;border:0;padding:0;background:var(--panel);border-radius:10px;overflow:hidden;font:inherit;color:var(--ink);text-align:left;box-shadow:var(--card-shadow);cursor:pointer;touch-action:manipulation}
+.ref{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ref button{min-width:0;display:flex;flex-direction:column;border:0;padding:0;background:var(--panel);border-radius:10px;overflow:hidden;font:inherit;color:var(--ink);text-align:left;box-shadow:var(--card-shadow);cursor:pointer;touch-action:manipulation}
 .ref button img,.ref .art{display:block;width:100%;aspect-ratio:2.1/1;object-fit:cover}
-.ref .cap{display:flex;align-items:center;gap:5px;padding:6px 8px;font-size:.8rem;width:100%}
+.ref .cap{display:flex;flex-direction:column;padding:5px 8px 7px;font-size:.8rem;line-height:1.3;width:100%}
+.ref .cap b{display:flex;align-items:center;gap:5px}
 .ref .cap i{width:8px;height:8px;border-radius:2px;flex:none}
-.ref .cap span{margin-left:auto;color:var(--muted)}
-.ref button.plain{flex-basis:120px;justify-content:center;gap:2px;padding:10px}
+.ref .cap span{color:var(--muted);white-space:nowrap}
+.ref button.plain{justify-content:center;gap:2px;padding:10px 8px;min-height:64px;font-size:.85rem}
 .ref button.plain span{font-size:.8rem;color:var(--muted)}
 .ref button:active{background:var(--accent-soft)}
 .note{font-size:.78rem;color:var(--muted);margin:0}
@@ -133,8 +137,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
   <header><h1>RightNote</h1><span id="asof">Rate as of 3 Oct 2026</span></header>
 
   <section class="price" id="panel" aria-label="Conversion">
-    <span class="label" id="second">They ask, in đồng</span>
-    <div class="expr" id="expr"></div>
+    <div class="label-row"><span class="label" id="second">They ask, in đồng</span><span class="expr" id="expr"></span></div>
     <div class="amt" id="secondAmt">0</div>
     <div class="out-row">
       <span class="out" id="baseAmt">0</span>
@@ -142,11 +145,6 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
       <select id="base" aria-label="Your currency"></select>
     </div>
     <div class="hint" id="hint"></div>
-  </section>
-
-  <section class="panel" id="payCard" aria-label="How to pay" style="padding-block:10px 4px">
-    <div class="pay-top"><span id="payTitle">How to pay</span></div>
-    <div id="payList"></div>
   </section>
 
   <div class="keys" id="keys">
@@ -162,6 +160,11 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
     <button type="button" data-k="000">000</button><button type="button" data-k="0">0</button><button type="button" data-k=".">.</button>
     <button type="button" class="eq" data-k="=">=</button>
   </div>
+
+  <section class="panel" id="payCard" aria-label="How to pay" style="padding-block:10px 4px">
+    <div class="pay-top"><span id="payTitle">How to pay</span></div>
+    <div id="payList"></div>
+  </section>
 
   <div class="rate">
     <span id="rateLabel">1 AUD =</span>
@@ -276,7 +279,7 @@ function render(){
   const v=evaluate(expr), out=v/rate();
   $("expr").textContent=showExpr?expr.replace(/\*/g,"×").replace(/\//g,"÷"):"";
   const amt=$("secondAmt"); amt.textContent=CUR[second].sym+(showExpr?fmt(v,second):typed(expr));
-  amt.classList.toggle("long",amt.textContent.length>10);
+  const len=amt.textContent.length; amt.classList.toggle("long",len>10&&len<=14); amt.classList.toggle("longer",len>14);
   $("baseAmt").textContent=isFinite(out)?CUR[base].sym+fmt(out,base):"—";
   $("baseAmt").classList.toggle("err",!isFinite(out));
   $("inHint").textContent=second==="VND"?vnShort(v):"";
@@ -298,7 +301,7 @@ function renderRef(){
     const val=`${CUR[base].sym}${fmt(d/r,base)}`;
     if(!c1)return `<button type="button" class="plain" data-v="${d}"><b>₫${fmt(d,"VND")}</b><span>${val}</span></button>`;
     const art=photos[d]?`<img src="${photoSrc(photos[d])}" alt="">`:`<span class="art tone" style="${tone(c1,c2)}"></span>`;
-    return `<button type="button" data-v="${d}" data-note="${d}" aria-label="${d/1000}k note, ${val}">${art}<span class="cap"><i class="tone" style="${tone(c1,c2)}"></i><b>${d/1000}k</b><span>${val}</span></span></button>`;
+    return `<button type="button" data-v="${d}" data-note="${d}" aria-label="${d/1000}k note, ${val}">${art}<span class="cap"><b><i class="tone" style="${tone(c1,c2)}"></i>${d/1000}k</b><span>${val}</span></span></button>`;
   }).join("");
 }
 
@@ -497,7 +500,7 @@ openFromHash();
     let c=null;
     for(const src of [fromErApi,fromJsdelivr]){try{const r=await src();if(ok(r.vnd.AUD,r.vnd.USD)){c=r;break}}catch(e){}}
     btn.disabled=false;
-    if(!c){render();$("asof").textContent="No connection. Using rate as of "+asOf;return}
+    if(!c){render();$("asof").textContent="Offline · rate as of "+asOf;return}
     c.vnd.AUD=Math.round(c.vnd.AUD*100)/100; c.vnd.USD=Math.round(c.vnd.USD*100)/100;
     custom=null; save();
     try{localStorage.setItem("rates",JSON.stringify(c))}catch(e){}
