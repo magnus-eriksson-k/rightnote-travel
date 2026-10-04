@@ -102,7 +102,7 @@ button.back{font:inherit;background:none;border:0;padding:8px 0 8px 8px;margin:-
 .change{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
 .change-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
 .change-head .linkbtn{padding:6px 2px}
-.change-grid{display:grid;gap:8px}
+.change-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px} /* always two columns so each note is big enough to recognise */
 .ctile{position:relative;min-width:0}
 .ctile .tile{cursor:pointer;touch-action:manipulation}
 .ctile .tile img,.ctile .tile .no-photo{opacity:.55;transition:opacity .15s}
@@ -110,6 +110,7 @@ button.back{font:inherit;background:none;border:0;padding:8px 0 8px 8px;margin:-
 .ctile .minus{position:absolute;left:0;top:0;width:40px;height:40px;border:0;background:none;padding:4px;cursor:pointer;touch-action:manipulation;display:flex;align-items:flex-start;justify-content:flex-start}
 .ctile .minus span{display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:rgba(0,0,0,.75);color:#fff;font:800 1.1rem/1 var(--body)}
 .change-sum{display:flex;justify-content:space-between;align-items:center;gap:10px;border-radius:10px;padding:10px 12px;background:var(--key-op);font-size:.92rem;transition:background .2s,color .2s}
+.change-sum b:last-child{white-space:nowrap}
 .change-sum.ok{background:var(--good);color:var(--panel)}
 .change-sum.over b:last-child{color:var(--warn)}
 /* note colours: the darker shade on light backgrounds, the brighter one on dark */
@@ -559,7 +560,6 @@ function renderPay(){
 let changeOpen=false, changeFor=0, got={}; // got: denomination → how many you've been given
 function changeBox(C){
   const notes=PAY_NOTES.filter(n=>n<=C).reverse(); // smallest first, only notes that could be part of the change
-  const cols=notes.length<=4?2:3;
   const tiles=notes.map(n=>{
     const k=got[n]||0, [,c1,c2]=noteRow(n);
     const art=photos[n]?`<img src="${photoSrc(photos[n])}" alt="">`
@@ -572,7 +572,7 @@ function changeBox(C){
   const status=diff===0?"✓ Correct":diff>0?`₫${diff.toLocaleString("en-AU")} to go`:`₫${(-diff).toLocaleString("en-AU")} too much`;
   return `<div class="change" id="changeBox">
       <div class="change-head"><span>Tap each note you're given</span>${sum?`<button type="button" class="linkbtn" data-clear>Clear</button>`:""}</div>
-      <div class="change-grid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${tiles}</div>
+      <div class="change-grid" >${tiles}</div>
       <div class="change-sum ${cls}" aria-live="polite"><span>Got <b>₫${sum.toLocaleString("en-AU")}</b> of ₫${C.toLocaleString("en-AU")}</span><b>${status}</b></div>
     </div>`;
 }
