@@ -38,7 +38,7 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
 - **How to pay:** `ways(A)` returns up to three options, in this order. The card shows them as fold-out headers, with one open at a time (the first by default):
   - **Quickest:** round up to whichever total within +100k needs the fewest notes, shown only if it beats the exact option.
   - **Exact:** greedy fewest notes for the exact amount (greedy is optimal for these denominations).
-  - **Keep your Nk:** the exact amount without the largest note used.
+  - **Exact, keep your Nk:** the exact amount without the largest note used.
   - An open option shows full note photos in a 2-column grid (repeats as one photo with a ×N badge), plus a colour bar of each note's share when it uses more than one kind of note.
 - **Rates:**
   - The default is a hard-coded snapshot from 3 Oct 2026.

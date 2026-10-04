@@ -398,7 +398,7 @@ function ways(A){
   out.push({key:"exact",title:"Exact",parts:fewest,change:0});
   // leave out the biggest note used, so you keep those for later or help a vendor short on change
   const top=fewest[0][0], alt=split(A,PAY_NOTES.filter(n=>n<top));
-  if(alt&&top>1000)out.push({key:"keep",title:`Keep your ${top/1000}k`,extra:top===500000?"easier for small vendors":"exact amount",parts:alt,change:0});
+  if(alt&&top>1000)out.push({key:"keep",title:`Exact, keep your ${top/1000}k`,extra:top===500000?"easier for small vendors":"",parts:alt,change:0});
   return out;
 }
 const noteRow=n=>VND_NOTES.find(x=>x[0]===n)||[];
@@ -417,7 +417,7 @@ function renderPay(){
   const open=payOpen===null?null:keys.includes(payOpen)?payOpen:keys[0];
   $("payList").innerHTML=ws.map(w=>{
     const n=count(w.parts), on=w.key===open;
-    const sub=`${n} note${n===1?"":"s"} · `+(w.change?`₫${w.change.toLocaleString("en-AU")} change`:w.extra||"exact amount");
+    const sub=[`${n} note${n===1?"":"s"}`,w.change?`₫${w.change.toLocaleString("en-AU")} change`:w.key==="exact"?"exact amount":w.extra].filter(Boolean).join(" · ");
     const tones=w.parts.map(([d,k])=>{const [,c1,c2]=noteRow(d);return {d,k,s:tone(c1,c2)}});
     const mini=on?"":`<span class="mini" aria-hidden="true">${tones.map(t=>`<i class="tone" style="${t.s}"></i>`).join("")}</span>`;
     // the bar shows each note's share of the amount
