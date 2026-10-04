@@ -31,7 +31,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 .wrap{max-width:440px;margin:0 auto;padding-inline:16px;padding-block:16px 32px;display:flex;flex-direction:column;gap:14px}
 header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:4px}
 h1{font-size:1.1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:0}
-header span{font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* Two views, switched in the header: the calculator, and Notes (notes, note card and exchange rate) */
+.views{display:flex;gap:2px;background:var(--key-op);border-radius:999px;padding:3px}
+.views button{border:0;background:none;color:var(--ink);font:700 .85rem var(--body);border-radius:999px;padding:0 14px;min-height:38px;cursor:pointer;touch-action:manipulation}
+.views button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.view{display:flex;flex-direction:column;gap:14px}
+.rate-sum{align-self:stretch;display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;background:none;border:0;padding:6px 2px;min-height:44px;font:inherit;font-size:.85rem;color:var(--muted);text-align:left;cursor:pointer}
+.rate-sum b{color:var(--accent)}
+.rate-panel{display:flex;flex-direction:column;gap:8px;scroll-margin-top:12px}
 h2{font-size:1rem;font-weight:700;margin:0}
 .panel{background:var(--panel);border-radius:18px;padding:14px;box-shadow:var(--card-shadow)}
 
@@ -64,7 +71,8 @@ select{flex:none;font:600 .9rem var(--body);color:var(--ink);background:var(--ke
 .pay-body{display:flex;flex-direction:column;gap:10px;padding-top:12px;container-type:inline-size}
 /* two rows of two-column tiles; more kinds of note get more columns, never more rows */
 .note-grid{display:grid;gap:8px;height:calc((100cqw - 8px)/2.1 + 8px);align-content:center}
-.tile{position:relative;min-width:0}
+.tile{position:relative;min-width:0;display:block;width:100%;border:0;padding:0;background:none;font:inherit;color:inherit}
+button.tile{cursor:pointer;touch-action:manipulation}
 .tile img,.tile .no-photo{display:block;width:100%;aspect-ratio:2.1/1;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
 .no-photo{display:flex!important;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;color:var(--ink);background:var(--key-op)}
 .badge{position:absolute;right:5px;top:5px;background:rgba(0,0,0,.75);color:#fff;border-radius:999px;padding:1px 8px;font-size:.88rem;font-weight:800}
@@ -132,8 +140,14 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 </style>
 
 <div class="wrap">
-  <header><h1>RightNote</h1><span id="asof">Rate as of 3 Oct 2026</span></header>
+  <header><h1>RightNote</h1>
+    <nav class="views" aria-label="Views">
+      <button type="button" id="toCalc" aria-current="page">Calculator</button>
+      <button type="button" id="toNotes" aria-current="false">Notes</button>
+    </nav>
+  </header>
 
+<div class="view" id="calcView">
   <section class="price" id="panel" aria-label="Conversion">
     <div class="label-row"><span class="label" id="second">They ask, in đồng</span><span class="expr" id="expr"></span></div>
     <div class="amt" id="secondAmt">0</div>
@@ -164,13 +178,10 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
     <div id="payList"></div>
   </section>
 
-  <div class="rate">
-    <span id="rateLabel">1 AUD =</span>
-    <input id="rate" inputmode="decimal" aria-label="Exchange rate">
-    <span id="rateUnit">VND</span>
-    <button class="linkbtn" id="resetRate" type="button">Reset rate</button>
-    <button class="linkbtn" id="refreshRate" type="button">Refresh rate</button>
-  </div>
+  <button type="button" class="rate-sum" id="rateSum"></button>
+</div>
+
+<div class="view" id="notesView" hidden>
 
 <section class="panel note-card" id="noteDlg" aria-labelledby="dlgTitle" hidden>
   <div class="dlg">
@@ -195,8 +206,22 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
   <section class="wallet">
     <h2 id="refTitle">Your đồng</h2>
     <div class="ref" id="ref"></div>
-    <p class="note">Tap a note for its details, or an amount to load it. Rates are mid-market; cash and card rates in Vietnam typically sit 1–2% either side. Edit the rate above to match your bank or money changer.</p>
+    <p class="note">Tap a note for its details, or an amount to load it.</p>
   </section>
+
+  <section class="panel rate-panel" id="ratePanel" aria-labelledby="rateTitle">
+    <h2 id="rateTitle">Exchange rate</h2>
+    <span class="note" id="asof">Rate as of 3 Oct 2026</span>
+    <div class="rate">
+      <span id="rateLabel">1 AUD =</span>
+      <input id="rate" inputmode="decimal" aria-label="Exchange rate">
+      <span id="rateUnit">VND</span>
+      <button class="linkbtn" id="resetRate" type="button">Reset rate</button>
+      <button class="linkbtn" id="refreshRate" type="button">Refresh rate</button>
+    </div>
+    <p class="note">Rates are mid-market; cash and card rates in Vietnam typically sit 1–2% either side. Edit the rate to match your bank or money changer.</p>
+  </section>
+</div>
 </div>
 
 
@@ -284,7 +309,9 @@ function render(){
   $("rateLabel").textContent=`1 ${base} =`; $("rateUnit").textContent=second;
   if(document.activeElement!==$("rate")){const r=rate();$("rate").value=r>=100?r.toLocaleString("en-AU",{maximumFractionDigits:2}):r.toPrecision(6)}
   $("resetRate").hidden=!(custom&&custom.pair===base+second);
-  $("asof").textContent=(custom&&custom.pair===base+second)?"Custom rate":"Rate as of "+asOf;
+  const status=(custom&&custom.pair===base+second)?"Custom rate":"Rate as of "+asOf;
+  $("asof").textContent=status;
+  $("rateSum").innerHTML=`<span>1 ${base} = ${fmt(rate(),"VND")} ${second} · ${status}</span><b>Change ›</b>`;
   renderRef();
   if(typeof renderPay==="function")renderPay();
 }
@@ -339,8 +366,8 @@ $("rate").addEventListener("blur",render);
 $("resetRate").addEventListener("click",()=>{custom=null;save();render()});
 $("ref").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b)return;
-  if(b.dataset.note){openNote(+b.dataset.note);return}
-  loadAmount(+b.dataset.v);
+  if(b.dataset.note){goNotes(`#n${b.dataset.note/1000}k`);return}
+  goCalc(); loadAmount(+b.dataset.v);
 });
 function loadAmount(v){
   expr=trimNum(v,second); render();
@@ -370,12 +397,35 @@ function showPhoto(){
   $("photoBtn").hidden=!(assetsApi&&dbApi);
   $("photoBtnText").textContent=id?"Replace photo":"Add your photo";
 }
-// A link per note: add #n2k … #n500k to the page link
-function openFromHash(){
-  const m=/^#n(\d+)k$/.exec(location.hash||""); if(!m)return;
-  const d=+m[1]*1000; if(NOTE_INFO[d]){openNote(d)}
+// ---- Views: the URL hash picks the view, so the phone's back button returns to the calculator ----
+// #notes and #rate open Notes; #n2k … #n500k open Notes with that note's card
+let fromCalc=false; // Notes was opened from the calculator, so going back returns there
+function showView(v){
+  $("calcView").hidden=v!=="calc"; $("notesView").hidden=v==="calc";
+  $("toCalc").setAttribute("aria-current",v==="calc"?"page":"false");
+  $("toNotes").setAttribute("aria-current",v==="calc"?"false":"page");
 }
-window.addEventListener("hashchange",openFromHash);
+function route(){
+  const h=location.hash, m=/^#n(\d+)k$/.exec(h);
+  if(m&&NOTE_INFO[+m[1]*1000]){showView("notes");openNote(+m[1]*1000);return}
+  closeNote();
+  if(h==="#notes"||h==="#rate"){showView("notes");if(h==="#rate")$("ratePanel").scrollIntoView({block:"start"});else window.scrollTo(0,0);return}
+  showView("calc");
+}
+function goNotes(hash){
+  // one history entry per visit to Notes; moving around inside Notes replaces it
+  if($("notesView").hidden){fromCalc=true;location.hash=hash}
+  else{history.replaceState(null,"",hash);route()}
+}
+function goCalc(){
+  if(!$("notesView").hidden){closeNote();showView("calc");window.scrollTo(0,0)}
+  if(fromCalc){fromCalc=false;history.back()}
+  else if(location.hash)history.replaceState(null,"",location.pathname+location.search);
+}
+window.addEventListener("hashchange",route);
+$("toNotes").addEventListener("click",()=>goNotes("#notes"));
+$("toCalc").addEventListener("click",goCalc);
+$("rateSum").addEventListener("click",()=>goNotes("#rate"));
 // ---- How to pay: up to three ways to hand over the đồng amount, shown as tabs ----
 const PAY_NOTES=[500000,200000,100000,50000,20000,10000,5000,2000,1000]; // 1k–5k are the small paper notes; 1k has no card or photo
 let payOpen; // the tab the user picked; the first option when unset or no longer offered
@@ -403,7 +453,9 @@ function tile(n,k){
   const label=k>1?`${k} × ${n/1000}k notes`:`${n/1000}k note`, [,c1,c2]=noteRow(n);
   const art=photos[n]?`<img src="${photoSrc(photos[n])}" alt="${label}">`
     :`<span class="no-photo${c1?" tone":""}" style="${tone(c1,c2)}${c1?";color:#fff":""}" role="img" aria-label="${label}">${n/1000}k</span>`;
-  return `<div class="tile">${art}${k>1?`<span class="badge" aria-hidden="true">×${k}</span>`:""}</div>`;
+  const badge=k>1?`<span class="badge" aria-hidden="true">×${k}</span>`:"";
+  // notes with a card open it when tapped
+  return NOTE_INFO[n]?`<button type="button" class="tile" data-note="${n}" aria-label="${label}, see details">${art.replace(/ alt="[^"]*"/,' alt=""')}${badge}</button>`:`<div class="tile">${art}${badge}</div>`;
 }
 function renderPay(){
   const A=payAmount();
@@ -423,14 +475,15 @@ function renderPay(){
     </div>`;
 }
 $("payList").addEventListener("click",e=>{
+  const n=e.target.closest("[data-note]"); if(n){goNotes(`#n${n.dataset.note/1000}k`);return}
   const b=e.target.closest("[data-way]"); if(!b)return;
   payOpen=b.dataset.way; renderPay();
 });
 
 function closeNote(){$("noteDlg").hidden=true;openDenom=null}
-$("dlgClose").addEventListener("click",closeNote);
+$("dlgClose").addEventListener("click",()=>{closeNote();history.replaceState(null,"","#notes")});
 $("photoIn").addEventListener("click",()=>{$("dlgMsg").textContent="Opening your photos…"});
-$("dlgUse").addEventListener("click",()=>{const d=openDenom;closeNote();loadAmount(d)});
+$("dlgUse").addEventListener("click",()=>{const d=openDenom;goCalc();loadAmount(d)});
 
 // Shrink a phone photo to a JPEG under ~1600px before storing it
 function shrink(file){return new Promise((res,rej)=>{
@@ -462,7 +515,7 @@ $("photoIn").addEventListener("change",async e=>{
   }
 });
 render();
-openFromHash();
+route();
 
 
 // Offline copy: fetch today's rate when there's a connection, and keep it on this phone

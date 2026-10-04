@@ -45,9 +45,10 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - "Refresh rate" tries `open.er-api.com/v6/latest/AUD`, then the jsDelivr `@fawazahmed0/currency-api` as a fallback.
   - Results are sanity-checked against plausible VND ranges and cached in `localStorage["rates"]`.
   - The app refreshes automatically once a day when online, unless a custom rate is active.
-- **Deep links:** `#n2k` … `#n500k` open that note's card.
+- **Views:** a Calculator | Notes switch in the header. The calculator has the price, keypad, payment tabs and a one-line rate summary. Notes has the note grid (with 1M/2M/5M amounts to load), the note card and the exchange rate controls. `route()` picks the view from the URL hash, so the phone's back button returns to the calculator; each visit to Notes adds one history entry, and moving around inside Notes replaces it.
+- **Deep links:** `#notes` and `#rate` open Notes; `#n2k` … `#n500k` open Notes with that note's card. Tapping a note photo in the payment tabs does the same.
 - **Theme:** colours are CSS variables on `:root` and follow the phone's light or dark setting. Note colours are passed as `--c1` (brighter, used in dark mode) and `--c2` (darker, light mode) and applied by the `.tone` class.
-- **UI:** the note card is an in-page panel (`#noteDlg`), not a modal. Floating popups opened off-screen or didn't work inside app viewers on the owner's phone. Keep interactions inline.
+- **UI:** views and the note card are in-page panels (`#notesView`, `#noteDlg`), not modals. Floating popups opened off-screen or didn't work inside app viewers on the owner's phone. Keep interactions inline.
 
 ## Constraints
 
