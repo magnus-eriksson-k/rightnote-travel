@@ -48,6 +48,10 @@ h1{font-size:.95rem;font-weight:800;letter-spacing:.03em;text-transform:uppercas
 .seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--key-op);border-radius:12px;padding:4px}
 .seg button{min-height:44px;border:0;border-radius:9px;background:none;color:var(--ink);font:600 .88rem var(--body);cursor:pointer;touch-action:manipulation}
 .seg button[aria-checked="true"]{background:var(--accent);color:var(--accent-ink)}
+.steps{display:flex;flex-direction:column;gap:4px}
+.steps h3{font-size:.95rem;margin:4px 0 0}
+.steps ol{margin:0;padding-left:1.3em;font-size:.9rem;line-height:1.5}
+.steps li::marker{color:var(--muted)}
 h2{font-size:1rem;font-weight:700;margin:0}
 .panel{background:var(--panel);border-radius:18px;padding:14px;box-shadow:var(--card-shadow)}
 
@@ -245,6 +249,32 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
       <button type="button" role="radio" data-theme-opt="auto">Auto</button>
       <button type="button" role="radio" data-theme-opt="light">Light</button>
       <button type="button" role="radio" data-theme-opt="dark">Dark</button>
+    </div>
+  </section>
+
+  <section class="panel rate-panel" id="installPanel" aria-labelledby="installTitle">
+    <h2 id="installTitle">Install on your phone</h2>
+    <p class="note">Add RightNote to your home screen to open it like an app. After the first open it works without a connection.</p>
+    <button type="button" class="btn primary" id="installBtn" hidden>Install RightNote</button>
+    <div id="installSteps">
+      <div class="steps" id="stepsIos">
+        <h3>iPhone</h3>
+        <ol>
+          <li>Open this page in Safari.</li>
+          <li>Tap the Share button (the square with an arrow pointing up).</li>
+          <li>Scroll down and tap <b>Add to Home Screen</b>.</li>
+          <li>Tap <b>Add</b>.</li>
+        </ol>
+      </div>
+      <div class="steps" id="stepsAndroid">
+        <h3>Android</h3>
+        <ol>
+          <li>Open this page in Chrome.</li>
+          <li>Tap the menu (⋮) at the top right.</li>
+          <li>Tap <b>Install app</b> or <b>Add to Home screen</b>.</li>
+          <li>Tap <b>Install</b> to confirm.</li>
+        </ol>
+      </div>
     </div>
   </section>
 </div>
@@ -563,6 +593,23 @@ $("themeSeg").addEventListener("click",e=>{
   store.set("theme",b.dataset.themeOpt); applyTheme(b.dataset.themeOpt);
 });
 applyTheme(store.get("theme"));
+
+// ---- Install: steps for adding the app to the home screen, hidden once it's installed ----
+(function(){
+  const installed=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  if(installed){$("installPanel").hidden=true;return}
+  // show this phone's steps first
+  if(/android/i.test(navigator.userAgent))$("installSteps").prepend($("stepsAndroid"));
+  // Chrome on Android can install in one tap when it offers to
+  let offer=null;
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();offer=e;$("installBtn").hidden=false});
+  $("installBtn").addEventListener("click",async()=>{
+    if(!offer)return; offer.prompt();
+    try{await offer.userChoice}catch(_){}
+    offer=null; $("installBtn").hidden=true;
+  });
+  window.addEventListener("appinstalled",()=>{$("installPanel").hidden=true});
+})();
 render();
 route();
 
