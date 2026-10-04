@@ -1,5 +1,5 @@
 // Keeps the app working offline. Bump VERSION whenever you upload a changed file.
-const VERSION = "rightnote-v3";
+const VERSION = "rightnote-v4";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
