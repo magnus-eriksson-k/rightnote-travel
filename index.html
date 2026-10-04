@@ -56,8 +56,8 @@ select{flex:none;font:600 .9rem var(--body);color:var(--ink);background:var(--ke
 /* How to pay: the options are tabs; the area below keeps the same height whichever is picked */
 .pay-top{font-size:.85rem;color:var(--muted);padding-bottom:8px}
 .tabs{display:grid;gap:4px;background:var(--key-op);border-radius:12px;padding:4px}
-.tab{min-width:0;min-height:52px;border:0;border-radius:9px;background:transparent;color:var(--ink);font:inherit;line-height:1.25;padding:4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation}
-.tab b{font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tab{min-width:0;min-height:62px;border:0;border-radius:9px;background:transparent;color:var(--ink);font:inherit;line-height:1.25;padding:4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation}
+.tab b{font-size:.86rem;text-align:center;max-width:100%}
 .tab span{font-size:.75rem;color:var(--muted)}
 .tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
 .tab[aria-selected="true"] span{color:inherit;opacity:.85}
@@ -415,7 +415,7 @@ function renderPay(){
   // the bar shows each note's share of the amount
   const bar=w.parts.map(([d,k])=>{const [,c1,c2]=noteRow(d);return `<span class="tone" style="flex:${d*k};${tone(c1,c2)}"></span>`}).join("");
   const right=w.change?`<b class="back">₫${w.change.toLocaleString("en-AU")} back</b>`:`<span>${w.extra||"exact amount"}</span>`;
-  $("payList").innerHTML=`<div class="tabs" role="tablist" aria-label="Ways to pay" style="grid-template-columns:${ws.some(x=>x.key==="keep")?ws.map(x=>x.key==="keep"?"minmax(0,1fr)":"auto").join(" "):`repeat(${ws.length},minmax(0,1fr))`}">${tabs}</div>
+  $("payList").innerHTML=`<div class="tabs" role="tablist" aria-label="Ways to pay" style="grid-template-columns:repeat(${ws.length},minmax(0,1fr))">${tabs}</div>
     <div class="pay-body" id="payPanel" role="tabpanel">
       <div class="note-grid${cols>2?" small":""}" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${w.parts.map(([d,k])=>tile(d,k)).join("")}</div>
       <div class="bar" aria-hidden="true">${bar}</div>
