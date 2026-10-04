@@ -236,7 +236,7 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 // You always type in đồng for now (note photos exist only for đồng); the other side is selectable
 const second="VND"; let base=store.get("base");
 if(!CUR[base]||base==="VND")base="AUD";
-let expr=second==="VND"?"200000":"100", custom=null; // custom rate overrides default for current pair
+let expr="", custom=null; // custom rate overrides default for current pair
 try{custom=JSON.parse(store.get("custom")||"null")}catch(e){}
 
 $("base").innerHTML=Object.keys(CUR).filter(c=>c!=="VND").map(c=>`<option value="${c}">${c}</option>`).join("");
