@@ -35,16 +35,18 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - `NOTE_INFO` holds the back image and colour description for each note.
   - `PAY_NOTES` is every denomination used for payment, including the paper 1k/2k/5k notes.
 - **Photos:** `photos` maps each denomination to a `data:` URI; `photoSrc()` also accepts asset ids. The photo-upload UI is still in the file but stays hidden, because it needs Claude-artifact storage that Pages doesn't have. To change photos, re-embed them in `photos`.
-- **How to pay:** `ways(A)` returns up to three options:
-  - Greedy fewest notes for the exact amount (greedy is optimal for these denominations).
-  - The same without the largest note used.
-  - Rounding up to whichever total within +100k needs the fewest notes, shown only if it beats the exact option.
+- **How to pay:** `ways(A)` returns up to three options, in this order. The card shows them as fold-out headers, with one open at a time (the first by default):
+  - **Quickest:** round up to whichever total within +100k needs the fewest notes, shown only if it beats the exact option.
+  - **Exact:** greedy fewest notes for the exact amount (greedy is optimal for these denominations).
+  - **Keep your Nk:** the exact amount without the largest note used.
+  - An open option shows full note photos in a 2-column grid (repeats as one photo with a ×N badge), plus a colour bar of each note's share when it uses more than one kind of note.
 - **Rates:**
   - The default is a hard-coded snapshot from 3 Oct 2026.
   - "Refresh rate" tries `open.er-api.com/v6/latest/AUD`, then the jsDelivr `@fawazahmed0/currency-api` as a fallback.
   - Results are sanity-checked against plausible VND ranges and cached in `localStorage["rates"]`.
   - The app refreshes automatically once a day when online, unless a custom rate is active.
-- **Deep links:** `#n10k` … `#n500k` open that note's card.
+- **Deep links:** `#n2k` … `#n500k` open that note's card.
+- **Theme:** colours are CSS variables on `:root` and follow the phone's light or dark setting. Note colours are passed as `--c1` (brighter, used in dark mode) and `--c2` (darker, light mode) and applied by the `.tone` class.
 - **UI:** the note card is an in-page panel (`#noteDlg`), not a modal. Floating popups opened off-screen or didn't work inside app viewers on the owner's phone. Keep interactions inline.
 
 ## Constraints
