@@ -745,14 +745,19 @@
             {
               "t": "Sơn Trà Peninsula and Lady Buddha",
               "d": "Jungle-covered headland north of the beaches, with the 67 m white Lady Buddha at Linh Ứng Pagoda and rare red-shanked douc monkeys. Free.",
-              "wiki": "Sơn Trà Peninsula",
+              "img": "Son-Tra-Peninsula Da-Nang Vietnam Linh-Ung-Pagoda-01.jpg",
               "lat": 16.1002,
               "lon": 108.2779
             },
             {
               "t": "Mỹ Khê Beach",
               "d": "Long, clean city beach lined with seafood restaurants. Swim between the flags, and go early or late to avoid the midday sun.",
-              "wiki": "Mỹ Khê Beach",
+              "find": [
+                "my khe",
+                "china beach",
+                "beach"
+              ],
+              "r": 1500,
               "lat": 16.061,
               "lon": 108.247
             },
@@ -773,7 +778,12 @@
             {
               "t": "Đà Nẵng Cathedral",
               "d": "The pink \"rooster church\" from the 1920s, named for the weathervane on its spire. Visit outside mass times.",
-              "wiki": "Da Nang Cathedral",
+              "find": [
+                "con ga",
+                "cathedral",
+                "nha tho"
+              ],
+              "r": 300,
               "lat": 16.0668,
               "lon": 108.2232
             },
@@ -788,6 +798,10 @@
               "t": "Hải Vân Pass",
               "d": "The famous coast road over the mountains towards Huế, with sweeping sea views. Best by motorbike or car on the way to Huế.",
               "wiki": "Hải Vân Pass",
+              "find": [
+                "hai van"
+              ],
+              "r": 3000,
               "lat": 16.192,
               "lon": 108.13
             }
@@ -811,7 +825,9 @@
             {
               "t": "Bún chả cá",
               "d": "Fish cake noodle soup with pumpkin and pineapple.",
-              "wiki": "Bún chả cá",
+              "find": [
+                "bun cha ca"
+              ],
               "p": 40000
             },
             {
@@ -937,7 +953,7 @@
             {
               "t": "Fujian Assembly Hall",
               "d": "Phúc Kiến: the grandest of the Chinese assembly halls, with dragon fountains and a temple to the sea goddess. On the old town ticket.",
-              "near": [
+              "find": [
                 "phuc kien",
                 "fujian"
               ],
@@ -947,7 +963,7 @@
             {
               "t": "Tân Ký old house",
               "d": "A merchant's house kept by the same family for seven generations, with Chinese and Japanese woodwork. On the old town ticket.",
-              "near": [
+              "find": [
                 "tan ky"
               ],
               "lat": 15.8768,
@@ -956,7 +972,7 @@
             {
               "t": "Central market",
               "d": "Riverside market for produce, fabric and a busy food hall with Hội An specialities. Free.",
-              "near": [
+              "find": [
                 "hoi an market",
                 "central market",
                 "cho hoi an"
@@ -967,7 +983,7 @@
             {
               "t": "An Bàng Beach",
               "d": "Relaxed beach 4 km from town by bicycle, with sun loungers that are free if you eat or drink there.",
-              "near": [
+              "find": [
                 "an bang"
               ],
               "r": 1500,
@@ -985,7 +1001,7 @@
             {
               "t": "Cẩm Thanh coconut forest",
               "d": "Spin round in a round bamboo basket boat through the water-coconut palms, a short ride from town. Agree the price for the boat first.",
-              "near": [
+              "find": [
                 "cam thanh",
                 "basket boat",
                 "coconut"
