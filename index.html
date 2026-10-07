@@ -179,7 +179,8 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .city-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .city-title{display:flex;flex-direction:column;gap:2px;min-width:0}
 .city-title h2{font-size:1.3rem;line-height:1.2}
-#locBtn{flex:none;gap:6px;padding:0 14px}
+.city-acts{display:flex;flex-direction:column;gap:6px;flex:none}
+#locBtn,#mapBtn{gap:6px;padding:0 14px;justify-content:center}
 .city-search{display:flex;gap:8px}
 .city-search input{flex:1;min-width:0;font:16px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 12px;min-height:44px}
 .results{display:flex;flex-direction:column;gap:4px}
@@ -330,7 +331,10 @@ button.item:active{background:var(--accent-soft)}
   <section class="panel city-top" aria-labelledby="cityName">
     <div class="city-head">
       <div class="city-title"><h2 id="cityName">Where are you?</h2><span class="note" id="cityMeta"></span></div>
+      <div class="city-acts">
       <button type="button" class="btn primary" id="locBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Locate me</button>
+      <a class="btn" id="mapBtn" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg>Map</a>
+      </div>
     </div>
     <form class="city-search" id="cityForm" role="search">
       <input type="search" id="cityQ" placeholder="Search for a city" aria-label="Search for a city" enterkeyhint="search" autocomplete="off">
@@ -1061,8 +1065,22 @@ function renderChips(){
   const g=(guide?guide.cities:[]).map(c=>chip(c.id,c.name)).join(""), r=recents().map(x=>chip(x.id,x.name)).join("");
   $("cityChips").innerHTML=(g?`<div class="chip-row"><span class="lbl">Guides</span>${g}</div>`:"")+(r?`<div class="chip-row"><span class="lbl">Recent</span>${r}</div>`:"");
 }
+// Opens the phone's own map app: Apple Maps on iPhone/iPad, the default map app (or a chooser) on Android, OpenStreetMap elsewhere
+function mapURL(p){
+  const ll=`${(+p.lat).toFixed(5)},${(+p.lon).toFixed(5)}`, ua=navigator.userAgent;
+  if(/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1))
+    return "maps://?"+new URLSearchParams({q:p.name,ll});
+  if(/android/i.test(ua))return `geo:${ll}?q=${ll}(${encodeURIComponent(p.name)})`;
+  return `https://www.openstreetmap.org/?mlat=${(+p.lat).toFixed(5)}&mlon=${(+p.lon).toFixed(5)}#map=12/${(+p.lat).toFixed(5)}/${(+p.lon).toFixed(5)}`;
+}
+function renderMapBtn(){
+  const b=$("mapBtn"), ok=place&&isFinite(place.lat)&&isFinite(place.lon);
+  b.hidden=!ok; if(!ok)return;
+  b.href=mapURL(place); b.setAttribute("aria-label",`Show ${place.name} on a map`);
+  if(b.href.startsWith("https:")){b.target="_blank";b.rel="noopener"}else{b.removeAttribute("target");b.removeAttribute("rel")}
+}
 function renderCity(){
-  renderChips();
+  renderChips(); renderMapBtn();
   if(!place){
     $("cityName").textContent="Where are you?"; $("cityMeta").textContent="Tap Locate me, search, or pick a guide below.";
     $("wxCard").hidden=true; $("cityPhoto").hidden=true; $("cityBody").innerHTML=""; $("cityCredit").textContent=""; return;
