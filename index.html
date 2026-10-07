@@ -1421,7 +1421,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v45", opened=Date.now();
+const APP_VERSION="rightnote-v46", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");

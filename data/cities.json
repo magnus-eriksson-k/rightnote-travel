@@ -1187,7 +1187,10 @@
             {
               "t": "Tomb of Minh Mạng",
               "d": "Symmetrical and serene, with lotus lakes and a long processional way. Furthest out, so go by car or boat.",
-              "wiki": "Tomb of Minh Mạng",
+              "find": [
+                "minh mang"
+              ],
+              "r": 1000,
               "lat": 16.388,
               "lon": 107.57,
               "p": 150000
@@ -1202,14 +1205,22 @@
             {
               "t": "Trường Tiền Bridge",
               "d": "The 1890s steel bridge over the Perfume River, lit in changing colours at night. Free.",
-              "wiki": "Trường Tiền Bridge",
+              "wiki": "Truong Tien Bridge",
+              "find": [
+                "truong tien"
+              ],
+              "r": 600,
               "lat": 16.4683,
               "lon": 107.5872
             },
             {
               "t": "Thanh Toàn tile-roofed bridge",
               "d": "An 18th-century wooden bridge in rice fields east of the city, a lovely bicycle ride out. Free.",
-              "wiki": "Thanh Toàn Bridge",
+              "wiki": "Thanh Toàn Tile-roofed Bridge",
+              "find": [
+                "thanh toan"
+              ],
+              "r": 800,
               "lat": 16.495,
               "lon": 107.634
             }
@@ -1256,12 +1267,22 @@
             {
               "t": "Nhã nhạc",
               "d": "Royal court music, Vietnam's first UNESCO intangible heritage. Performed at the Duyệt Thị Đường royal theatre inside the Imperial City.",
-              "wiki": "Nhã nhạc"
+              "wiki": "Nhã nhạc",
+              "find": [
+                "nha nhac",
+                "hue court music",
+                "royal court music"
+              ]
             },
             {
               "t": "Ca Huế on the river",
               "d": "Folk songs sung on a dragon boat on the Perfume River at night, ending with floating candle lanterns.",
-              "wiki": "Ca Huế"
+              "wiki": "Ca Huế",
+              "find": [
+                "ca hue",
+                "dragon boat perfume river",
+                "perfume river dragon boat"
+              ]
             },
             {
               "t": "Royal tombs",
@@ -1270,7 +1291,11 @@
             {
               "t": "Huế Festival",
               "d": "A big arts festival with court music, processions and lantern events. Check dates, as the programme changes each year.",
-              "wiki": "Huế Festival"
+              "wiki": "Festival Huế",
+              "find": [
+                "festival hue",
+                "hue festival"
+              ]
             }
           ]
         },
