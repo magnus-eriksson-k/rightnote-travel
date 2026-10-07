@@ -1052,14 +1052,14 @@ async function renderPhoto(ph){
 // An item names a Commons file (img) or a Wikipedia article (wiki) whose lead image is used. Looked up in two batched calls,
 // credited like the city photo; thumbnails are saved for offline use when the city opens, the large photo once it's been viewed.
 const picKey=it=>it.img?"f:"+it.img:it.wiki?"w:"+it.wiki:null;
-const PIC_W=960, PIC_THUMB=330, PICS_V=2; // bump PICS_V to look up every city's item photos again
+const PIC_W=960, PIC_THUMB=330, PICS_V=3; // bump PICS_V to look up every city's item photos again
 const chunks=(a,n)=>a.length?[a.slice(0,n),...chunks(a.slice(n),n)]:[];
 async function fetchItemPics(items){
   const files={}; // item key -> Commons file name
   items.forEach(it=>{if(it.img)files[picKey(it)]=it.img});
   const arts=[...new Set(items.filter(it=>!it.img&&it.wiki).map(it=>it.wiki))];
   for(const part of chunks(arts,50)){
-    const a=await wp({action:"query",titles:part.join("|"),prop:"pageimages",piprop:"name"}), q=a.query||{};
+    const a=await wp({action:"query",titles:part.join("|"),prop:"pageimages",piprop:"name",pilimit:"max"}), q=a.query||{};
     const to={}; [...(q.normalized||[]),...(q.redirects||[])].forEach(x=>to[x.from]=x.to);
     const img={}; (q.pages||[]).forEach(pg=>{if(pg.pageimage)img[pg.title]=pg.pageimage});
     part.forEach(t=>{let x=t;for(let i=0;i<3&&to[x];i++)x=to[x]; if(img[x])files["w:"+t]=img[x]});
@@ -1089,9 +1089,11 @@ async function fetchItemPics(items){
   const map={};
   for(const it of items){const k=picKey(it); if(k)map[k]=files[k]&&info[files[k]]||null}
   // save the thumbnails now, a few at a time; any that fail are shown from the network and saved later
-  const todo=Object.values(map).filter(Boolean);
-  await Promise.all([0,1,2,3].map(async()=>{for(let ph;(ph=todo.shift());)await keepPhoto(ph.thumb)}));
-  return {at:Date.now(),v:PICS_V,map};
+  const todo=Object.values(map).filter(Boolean), found=todo.length; let saved=0;
+  await Promise.all([0,1,2,3].map(async()=>{for(let ph;(ph=todo.shift());)if(await keepPhoto(ph.thumb))saved++}));
+  // how far each step got, shown under the guide while we check photos work on phones
+  const check=`${Object.keys(map).length} items → ${Object.keys(files).length} images named → ${found} usable → ${saved} saved`;
+  return {at:Date.now(),v:PICS_V,map,check};
 }
 function picsOf(d){return Object.values(d&&d.pics&&d.pics.map||{}).filter(Boolean)}
 function dropPics(old,keep){ // removes saved files no longer used
@@ -1107,8 +1109,13 @@ async function showPic(img){ // the saved copy when there is one, else the netwo
     if(r){url=URL.createObjectURL(await r.blob());picBlobs.push(url)}
   }catch(e){}
   if(img.dataset.pic!==src)return;
-  img.onerror=()=>img.classList.add("broken");
+  img.onerror=()=>{img.classList.add("broken");if(img.classList.contains("thumb"))badThumb()};
   img.src=url;
+}
+function badThumb(){ // counted in the photo check line
+  const c=$("picCheck"); if(!c)return;
+  c.dataset.base=c.dataset.base||c.textContent; c.dataset.bad=(+c.dataset.bad||0)+1;
+  c.textContent=`${c.dataset.base} · ${c.dataset.bad} didn't show`;
 }
 function loadThumbs(){
   picBlobs.forEach(u=>URL.revokeObjectURL(u)); picBlobs=[];
@@ -1209,6 +1216,7 @@ function renderCity(){
   body.innerHTML=sections.map((s,i)=>sectHTML(s,i,curCode,pics)).join(""); body.dataset.id=place.id;
   if(open)body.querySelectorAll("details").forEach(d=>{d.open=open.has(d.dataset.k)});
   loadThumbs(); body.querySelectorAll("details.pic[open]").forEach(bigPic);
+  if(g)credit+=`<br><span id="picCheck">Photo check: ${saved.picsErr?"lookup failed: "+esc(saved.picsErr):saved.pics&&saved.pics.check?esc(saved.pics.check):"not run yet"}</span>`;
   $("cityCredit").innerHTML=credit;
 }
 async function refreshCity(){
@@ -1226,8 +1234,8 @@ async function refreshCity(){
   if(g)jobs.push(photo(g.wiki,g.voy));
   const stalePics=x=>!x||x.v!==PICS_V||Date.now()-x.at>(Object.values(x.map||{}).some(Boolean)?30*24:24)*HOUR; // none found: try again in a day
   if(g&&stalePics(saved.pics))jobs.push(fetchItemPics(g.sections.flatMap(s=>s.items||[])).then(pics=>{
-    const d=cityData(p.id); dropPics(d,{pics}); d.pics=pics; saveCityData(p.id,d);
-  }).catch(()=>{}));
+    const d=cityData(p.id); dropPics(d,{pics}); d.pics=pics; delete d.picsErr; saveCityData(p.id,d);
+  }).catch(e=>{const d=cityData(p.id);d.picsErr=String(e&&e.message||e);saveCityData(p.id,d)}));
   else if(stale(saved.guide))jobs.push(fetchGuide(p).then(v=>{const d=cityData(p.id);d.guide=v;saveCityData(p.id,d);return photo(...titles(v))}).catch(()=>{}));
   else jobs.push(photo(...titles(saved.guide)));
   if(!jobs.some(Boolean))return;
