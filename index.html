@@ -945,17 +945,29 @@ async function wp(params){
   if(!r.ok)throw new Error(r.status); return r.json();
 }
 const htmlText=h=>new DOMParser().parseFromString(h||"","text/html").body.textContent.replace(/\s+/g," ").trim();
-async function fetchPhoto(title){
-  const none={at:Date.now()};
-  const a=await wp({action:"query",titles:title,prop:"pageimages",piprop:"name"}); // free images only, by default
-  const file=a.query&&a.query.pages&&a.query.pages[0]&&a.query.pages[0].pageimage; if(!file)return none;
+const PHOTO_V=2; // bump to re-check every saved photo result
+async function photoInfo(file){ // the file's thumbnail, author and license, or null when it can't be credited
   const b=await wp({action:"query",titles:"File:"+file,prop:"imageinfo",iiprop:"url|extmetadata",iiurlwidth:800,
-    iiextmetadatafilter:"Artist|Credit|LicenseShortName|LicenseUrl|NonFree"});
+    iiextmetadatafilter:"Artist|Credit|LicenseShortName|License|LicenseUrl|NonFree"});
   const ii=b.query&&b.query.pages&&b.query.pages[0]&&b.query.pages[0].imageinfo&&b.query.pages[0].imageinfo[0], m=ii&&ii.extmetadata||{};
-  const v=k=>m[k]&&m[k].value;
-  if(!ii||String(v("NonFree"))==="true"||!v("LicenseShortName"))return none; // no license we can credit, no photo
-  return {at:Date.now(),src:ii.thumburl||ii.url,page:ii.descriptionurl,artist:htmlText(v("Artist"))||htmlText(v("Credit"))||"Unknown author",
-    license:htmlText(v("LicenseShortName")),licenseUrl:v("LicenseUrl")||""};
+  const v=k=>m[k]&&m[k].value, lic=htmlText(v("LicenseShortName"))||htmlText(v("License")).toUpperCase();
+  if(!ii||String(v("NonFree"))==="true"||!lic)return null; // no license we can credit, no photo
+  return {at:Date.now(),v:PHOTO_V,src:ii.thumburl||ii.url,page:ii.descriptionurl,artist:htmlText(v("Artist"))||htmlText(v("Credit"))||"Unknown author",
+    license:lic,licenseUrl:v("LicenseUrl")||""};
+}
+async function fetchPhoto(title){
+  // the article's lead image (free images only, by default), then the place's main image on Wikidata, which is always on Commons
+  const a=await wp({action:"query",titles:title,prop:"pageimages|pageprops",piprop:"name",ppprop:"wikibase_item"});
+  const pg=a.query&&a.query.pages&&a.query.pages[0]||{};
+  if(pg.pageimage){const ph=await photoInfo(pg.pageimage);if(ph)return ph}
+  const q=pg.pageprops&&pg.pageprops.wikibase_item;
+  if(q){
+    const r=await fetch("https://www.wikidata.org/w/api.php?"+new URLSearchParams({action:"wbgetclaims",entity:q,property:"P18",format:"json",origin:"*"}));
+    const c=r.ok&&await r.json(), snak=c&&c.claims&&c.claims.P18&&c.claims.P18[0]&&c.claims.P18[0].mainsnak;
+    const file=snak&&snak.datavalue&&snak.datavalue.value;
+    if(file&&file.replace(/ /g,"_")!==pg.pageimage){const ph=await photoInfo(file);if(ph)return ph}
+  }
+  return {at:Date.now(),v:PHOTO_V};
 }
 async function keepPhoto(src){try{const c=await caches.open(PHOTO_CACHE);if(!await c.match(src)){const r=await fetch(src,{mode:"cors"});if(r.ok)await c.put(src,r)}}catch(e){}}
 function dropPhoto(src){try{caches.open(PHOTO_CACHE).then(c=>c.delete(src)).catch(()=>{})}catch(e){}}
@@ -1038,8 +1050,9 @@ async function refreshCity(){
   const p=place, saved=cityData(p.id), jobs=[];
   if(!saved.wx||Date.now()-saved.wx.at>HOUR)jobs.push(fetchWeather(p).then(data=>{const d=cityData(p.id);d.wx={at:Date.now(),data};saveCityData(p.id,d)}).catch(()=>{}));
   const g=guideCity(p.id), stale=x=>!x||Date.now()-x.at>30*24*HOUR;
+  const stalePhoto=x=>!x||x.v!==PHOTO_V||Date.now()-x.at>(x.src?30*24:24)*HOUR; // "no photo" is re-checked after a day
   // the photo comes from the same Wikipedia article as the overview, so it's of the right place
-  const photo=title=>title&&stale(cityData(p.id).photo)?fetchPhoto(title).then(async ph=>{
+  const photo=title=>title&&stalePhoto(cityData(p.id).photo)?fetchPhoto(title).then(async ph=>{
     if(ph.src)await keepPhoto(ph.src);
     const d=cityData(p.id); if(d.photo&&d.photo.src&&d.photo.src!==ph.src)dropPhoto(d.photo.src); d.photo=ph; saveCityData(p.id,d);
   }).catch(()=>{}):null;
