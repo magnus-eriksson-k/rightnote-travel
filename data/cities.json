@@ -26,6 +26,7 @@
       "lon": 105.8542,
       "tz": "Asia/Ho_Chi_Minh",
       "voy": "Hanoi",
+      "wiki": "Hanoi",
       "sections": [
         {"h": "Overview", "p": [
           "Vietnam's capital for most of the last thousand years, on the Red River in the north. The Old Quarter's narrow streets, each once named for the trade carried on there, wrap around Hoàn Kiếm Lake; French-era boulevards and the Ba Đình political district lie to the west.",
@@ -82,6 +83,7 @@
       "lon": 106.7009,
       "tz": "Asia/Ho_Chi_Minh",
       "voy": "Ho Chi Minh City",
+      "wiki": "Ho Chi Minh City",
       "sections": [
         {"h": "Overview", "p": [
           "Vietnam's biggest city and business capital, still widely called Sài Gòn. The centre has the French-era landmarks: the Opera House, the Central Post Office, Notre-Dame Cathedral and Bến Thành market. Chợ Lớn to the west is the historic Chinese quarter, full of temples and wholesale markets.",
@@ -136,6 +138,7 @@
       "lon": 108.2022,
       "tz": "Asia/Ho_Chi_Minh",
       "voy": "Da Nang",
+      "wiki": "Da Nang",
       "sections": [
         {"h": "Overview", "p": [
           "Central Vietnam's biggest city, on the coast between the Hải Vân Pass and Hội An. It's known for the long sandy beach at Mỹ Khê, the lit-up bridges over the Hàn River, the Sơn Trà peninsula and the Marble Mountains. Modern, clean and relaxed.",
@@ -184,6 +187,7 @@
       "lon": 108.338,
       "tz": "Asia/Ho_Chi_Minh",
       "voy": "Hoi An",
+      "wiki": "Hội An",
       "sections": [
         {"h": "Overview", "p": [
           "A small, beautifully preserved trading port on the Thu Bồn River, about 30 km south of Đà Nẵng. Its old town of ochre shophouses, Chinese assembly halls and the Japanese Covered Bridge (on the ₫20,000 note) is a UNESCO World Heritage Site. Silk lanterns light the streets every evening.",
@@ -235,6 +239,7 @@
       "lon": 107.5909,
       "tz": "Asia/Ho_Chi_Minh",
       "voy": "Hue",
+      "wiki": "Huế",
       "sections": [
         {"h": "Overview", "p": [
           "Vietnam's imperial capital from 1802 to 1945 under the Nguyễn dynasty, on the Perfume River (sông Hương). The walled Citadel and Imperial City, the royal tombs in the hills along the river and Thiên Mụ pagoda are a UNESCO World Heritage Site.",

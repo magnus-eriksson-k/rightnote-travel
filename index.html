@@ -189,6 +189,10 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .chips .lbl{font-size:.78rem;color:var(--muted);margin-right:2px}
 .chips button{border:0;border-radius:999px;background:var(--key-op);color:var(--ink);font:600 .85rem var(--body);padding:0 12px;min-height:36px;cursor:pointer;touch-action:manipulation}
 .chips button[aria-current="true"]{background:var(--accent);color:var(--accent-ink)}
+.city-photo{margin:0;display:flex;flex-direction:column;gap:4px}
+.city-photo img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:18px;background:var(--key-op)}
+.city-photo figcaption{font-size:.72rem;color:var(--muted);padding:0 4px;overflow-wrap:anywhere}
+.city-photo a{color:inherit}
 .wx{display:flex;flex-direction:column;gap:10px}
 .wx-now{display:flex;align-items:center;gap:12px}
 .wx-ico{font-size:2.8rem;line-height:1}
@@ -316,6 +320,7 @@ button.item:active{background:var(--accent-soft)}
     <div class="chips" id="cityChips"></div>
     <p class="note" id="cityMsg" aria-live="polite"></p>
   </section>
+  <figure class="city-photo" id="cityPhoto" hidden><img id="cityImg" alt=""><figcaption id="cityPhotoCredit"></figcaption></figure>
   <section class="panel wx" id="wxCard" aria-label="Weather" hidden></section>
   <div class="city-body" id="cityBody"></div>
   <p class="note" id="cityCredit"></p>
@@ -737,7 +742,7 @@ function setPlace(p){
   place={...p,at:Date.now()}; store.set("place",JSON.stringify(place));
   if(!guideCity(p.id)){ // keep the last 8 other cities, and drop what's saved for older ones
     const r=[place,...recents().filter(x=>x.id!==p.id)];
-    r.slice(8).forEach(x=>{try{localStorage.removeItem("city:"+x.id)}catch(e){}});
+    r.slice(8).forEach(x=>{const d=cityData(x.id);if(d.photo&&d.photo.src)dropPhoto(d.photo.src);try{localStorage.removeItem("city:"+x.id)}catch(e){}});
     store.set("recent",JSON.stringify(r.slice(0,8)));
   }
   $("cityResults").innerHTML=""; renderCity(); refreshCity();
@@ -904,6 +909,43 @@ async function fetchGuide(p){
   return res;
 }
 
+// ---- Photo: the Wikipedia article's lead image, with its author and license from Commons ----
+// The image file is kept in the Cache API so it shows offline too; the service worker leaves this cache alone.
+const PHOTO_CACHE="rightnote-photos";
+async function wp(params){
+  const r=await fetch("https://en.wikipedia.org/w/api.php?"+new URLSearchParams({format:"json",formatversion:2,origin:"*",redirects:1,...params}));
+  if(!r.ok)throw new Error(r.status); return r.json();
+}
+const htmlText=h=>new DOMParser().parseFromString(h||"","text/html").body.textContent.replace(/\s+/g," ").trim();
+async function fetchPhoto(title){
+  const none={at:Date.now()};
+  const a=await wp({action:"query",titles:title,prop:"pageimages",piprop:"name"}); // free images only, by default
+  const file=a.query&&a.query.pages&&a.query.pages[0]&&a.query.pages[0].pageimage; if(!file)return none;
+  const b=await wp({action:"query",titles:"File:"+file,prop:"imageinfo",iiprop:"url|extmetadata",iiurlwidth:800,
+    iiextmetadatafilter:"Artist|Credit|LicenseShortName|LicenseUrl|NonFree"});
+  const ii=b.query&&b.query.pages&&b.query.pages[0]&&b.query.pages[0].imageinfo&&b.query.pages[0].imageinfo[0], m=ii&&ii.extmetadata||{};
+  const v=k=>m[k]&&m[k].value;
+  if(!ii||String(v("NonFree"))==="true"||!v("LicenseShortName"))return none; // no license we can credit, no photo
+  return {at:Date.now(),src:ii.thumburl||ii.url,page:ii.descriptionurl,artist:htmlText(v("Artist"))||htmlText(v("Credit"))||"Unknown author",
+    license:htmlText(v("LicenseShortName")),licenseUrl:v("LicenseUrl")||""};
+}
+async function keepPhoto(src){try{const c=await caches.open(PHOTO_CACHE);if(!await c.match(src)){const r=await fetch(src,{mode:"cors"});if(r.ok)await c.put(src,r)}}catch(e){}}
+function dropPhoto(src){try{caches.open(PHOTO_CACHE).then(c=>c.delete(src)).catch(()=>{})}catch(e){}}
+let photoBlob=null;
+async function renderPhoto(ph){
+  const fig=$("cityPhoto"), img=$("cityImg"), id=place&&place.id;
+  if(!ph||!ph.src){fig.hidden=true;img.removeAttribute("src");return}
+  let url=ph.src;
+  try{const r=await (await caches.open(PHOTO_CACHE)).match(ph.src);if(r)url=URL.createObjectURL(await r.blob())}catch(e){}
+  if(!place||place.id!==id){if(url!==ph.src)URL.revokeObjectURL(url);return} // moved on to another city meanwhile
+  if(photoBlob)URL.revokeObjectURL(photoBlob); photoBlob=url!==ph.src?url:null;
+  img.onerror=()=>{fig.hidden=true}; // offline and not saved yet
+  img.src=url; img.alt=`Photo of ${place.name}`;
+  const lic=ph.licenseUrl?`<a href="${esc(ph.licenseUrl)}" target="_blank" rel="noopener">${esc(ph.license)}</a>`:esc(ph.license);
+  $("cityPhotoCredit").innerHTML=`Photo: <a href="${esc(ph.page)}" target="_blank" rel="noopener">${esc(ph.artist)}</a>, ${lic}, via Wikimedia Commons`;
+  fig.hidden=false;
+}
+
 // ---- Drawing the City view ----
 function priceHTML(v,cur){
   // the local price, and what it is in your currency at the calculator's rate
@@ -936,13 +978,13 @@ function renderCity(){
   renderChips();
   if(!place){
     $("cityName").textContent="Where are you?"; $("cityMeta").textContent="Tap Locate me, search, or pick a guide below.";
-    $("wxCard").hidden=true; $("cityBody").innerHTML=""; $("cityCredit").textContent=""; return;
+    $("wxCard").hidden=true; $("cityPhoto").hidden=true; $("cityBody").innerHTML=""; $("cityCredit").textContent=""; return;
   }
   const saved=cityData(place.id), g=guideCity(place.id);
   $("cityName").textContent=place.name;
   const time=localTime(place,saved.wx&&saved.wx.data);
   $("cityMeta").textContent=[place.country,time&&`${time} local time`,place.gps&&"your location"].filter(Boolean).join(" · ");
-  renderWeather(saved.wx);
+  renderWeather(saved.wx); renderPhoto(saved.photo);
   let sections, credit="";
   if(g){
     const extra=(guide.countries[g.cc]||{}).customs||[];
@@ -967,9 +1009,16 @@ async function refreshCity(){
   if(!place||!navigator.onLine)return;
   const p=place, saved=cityData(p.id), jobs=[];
   if(!saved.wx||Date.now()-saved.wx.at>HOUR)jobs.push(fetchWeather(p).then(data=>{const d=cityData(p.id);d.wx={at:Date.now(),data};saveCityData(p.id,d)}).catch(()=>{}));
-  if(!guideCity(p.id)&&(!saved.guide||Date.now()-saved.guide.at>30*24*HOUR))
-    jobs.push(fetchGuide(p).then(v=>{const d=cityData(p.id);d.guide=v;saveCityData(p.id,d)}).catch(()=>{}));
-  if(!jobs.length)return;
+  const g=guideCity(p.id), stale=x=>!x||Date.now()-x.at>30*24*HOUR;
+  // the photo comes from the same Wikipedia article as the overview, so it's of the right place
+  const photo=title=>title&&stale(cityData(p.id).photo)?fetchPhoto(title).then(async ph=>{
+    if(ph.src)await keepPhoto(ph.src);
+    const d=cityData(p.id); if(d.photo&&d.photo.src&&d.photo.src!==ph.src)dropPhoto(d.photo.src); d.photo=ph; saveCityData(p.id,d);
+  }).catch(()=>{}):null;
+  if(g)jobs.push(photo(g.wiki));
+  else if(stale(saved.guide))jobs.push(fetchGuide(p).then(v=>{const d=cityData(p.id);d.guide=v;saveCityData(p.id,d);return photo(v.wiki&&v.wiki.title)}).catch(()=>{}));
+  else jobs.push(photo(saved.guide.wiki&&saved.guide.wiki.title));
+  if(!jobs.some(Boolean))return;
   await Promise.all(jobs);
   if(place&&place.id===p.id)renderCity();
 }

@@ -60,8 +60,9 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - **Finding the place:** "Locate me" uses `navigator.geolocation`. A built-in guide city within 20 km wins (works offline); otherwise OSM Nominatim `reverse` names the town. Search by name matches built-in guides offline and asks Nominatim `search` online, on submit only (Nominatim's usage policy forbids search-as-you-type). With location already granted, opening City re-locates if the last GPS fix is over an hour old.
   - **Weather:** Open-Meteo (no key): current conditions, 5 days, sunrise/sunset, UV. Refreshed when older than an hour.
   - **Guide:** built-in cities render `data/cities.json` sections (`p` paragraphs, `list` bullets, `items` with optional `p` price in the city's currency). The country's `customs` are appended to each city's Customs. Prices show local and the base currency; when the city's currency is `second` they're buttons that load the amount into the calculator. Other cities use the Wikipedia summary plus the Understand/Eat/Drink/Buy/Respect/Stay safe sections of Wikivoyage (prose only, trimmed), credited as CC BY-SA 4.0.
-  - **Storage:** `localStorage["place"]` is the current place; `["recent"]` the last 8 non-built-in places; `["city:<id>"]` that place's saved weather and online guide (refreshed after 30 days, removed when it drops off Recent).
-  - To add a built-in city, add it to `data/cities.json` (with `lat`/`lon`, `tz` and `voy`, its Wikivoyage title). Bump `VERSION` in `sw.js`.
+  - **Photo:** the lead image of the city's Wikipedia article (`wiki` title for built-in cities, the matched overview article otherwise), via `pageimages` (free images only) and Commons `imageinfo` for author and license, shown with a credit line under it. Images with no license or marked non-free are skipped. The file is stored in the Cache API (`rightnote-photos`, which `sw.js` keeps across versions) so it shows offline, and is removed when its city drops off Recent.
+  - **Storage:** `localStorage["place"]` is the current place; `["recent"]` the last 8 non-built-in places; `["city:<id>"]` that place's saved weather, photo credit and online guide (refreshed after 30 days, removed when it drops off Recent).
+  - To add a built-in city, add it to `data/cities.json` (with `lat`/`lon`, `tz`, `voy` and `wiki`, its Wikivoyage and Wikipedia titles). Bump `VERSION` in `sw.js`.
 - **Theme:** colours are CSS variables on `:root`. By default they follow the phone's light or dark setting; the Appearance section in Options (Auto, Light, Dark) can force light or dark, saved in `localStorage["theme"]` and applied as `data-theme` on `<html>` by a small script in `<head>` before the page draws. The accent comes from the app icon: `--accent` (`#0f7b6c`) fills buttons, and `--accent-text` is the green for text, which in dark mode is the icon's lighter tick green (`#3cc1a9`) so it stays readable. Note colours are passed as `--c1` (brighter, used in dark mode) and `--c2` (darker, light mode) and applied by the `.tone` class.
 - **UI:** views and the note card are in-page panels (`#notesView`, `#noteDlg`), not modals. Floating popups opened off-screen or didn't work inside app viewers on the owner's phone. Keep interactions inline.
 
@@ -69,7 +70,7 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
 
 - Must work fully offline after the first visit, on Android Chrome and iOS Safari. Avoid runtime CDN dependencies; fonts fall back to system fonts. Online-only extras (rates, weather, Nominatim, Wikivoyage) must cache their last result and degrade cleanly.
 - The main user is on a phone. Keep the layout compact and tap targets large, and make payment icons large enough to recognise a note at a glance.
-- The note photos are the owner's own. Don't replace them with images from the web: licensing for banknote images is unclear.
+- The note photos are the owner's own. Don't replace them with images from the web: licensing for banknote images is unclear. City photos are different: they come from Wikimedia Commons at runtime and must always show their author and license.
 
 ## Roadmap: more currencies
 
