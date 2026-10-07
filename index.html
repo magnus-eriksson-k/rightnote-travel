@@ -1054,7 +1054,7 @@ async function renderPhoto(ph){
 // An item names a Commons file (img) or a Wikipedia article (wiki) whose lead image is used. Looked up in two batched calls,
 // credited like the city photo; thumbnails are saved for offline use when the city opens, the large photo once it's been viewed.
 const picKey=it=>it.img?"f:"+it.img:it.wiki?"w:"+it.wiki:null;
-const PIC_W=960, PIC_THUMB=330, PICS_V=4; // bump PICS_V to look up every city's item photos again
+const PIC_W=960, PIC_THUMB=330, PICS_V=5; // bump PICS_V to look up every city's item photos again
 const chunks=(a,n)=>a.length?[a.slice(0,n),...chunks(a.slice(n),n)]:[];
 async function fetchItemPics(items){
   const files={}; // item key -> Commons file name
@@ -1091,7 +1091,9 @@ async function fetchItemPics(items){
   const map={};
   for(const it of items){const k=picKey(it); if(k)map[k]=files[k]&&info[files[k]]||null}
   // how far each step got, shown under the guide while we check photos work on phones; the thumbnails are saved as they're shown
-  const check=`${Object.keys(map).length} items → ${Object.keys(files).length} images named → ${Object.values(map).filter(Boolean).length} usable`;
+  const missing=items.filter(it=>picKey(it)&&!map[picKey(it)]).map(it=>it.t);
+  const check=`${Object.keys(map).length} items → ${Object.keys(files).length} images named → ${Object.values(map).filter(Boolean).length} usable`+
+    (missing.length?`. No photo: ${missing.join(", ")}`:"");
   return {at:Date.now(),v:PICS_V,map,check};
 }
 function picsOf(d){return Object.values(d&&d.pics&&d.pics.map||{}).filter(Boolean)}
@@ -1228,7 +1230,7 @@ function renderCity(){
   if(open)body.querySelectorAll("details").forEach(d=>{d.open=open.has(d.dataset.k)});
   loadThumbs(); body.querySelectorAll("details.pic[open]").forEach(bigPic);
   if(g)credit+=`<br><span id="picCheck">Photo check: ${esc(picsBusy===place.id?"looking up…":picsLast[place.id]||(saved.picsErr?"lookup failed: "+saved.picsErr:
-    saved.pics?(saved.pics.check||`${Object.values(saved.pics.map||{}).filter(Boolean).length} found by an older version`)+`, ${ago(saved.pics.at)}, v${saved.pics.v}`:
+    saved.pics?(saved.pics.check||`${Object.values(saved.pics.map||{}).filter(Boolean).length} found by an older version`)+` · ${ago(saved.pics.at)} · v${saved.pics.v}`:
     navigator.onLine?"not run yet":"offline"))}</span>`;
   $("cityCredit").innerHTML=credit;
 }
@@ -1398,7 +1400,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v41", opened=Date.now();
+const APP_VERSION="rightnote-v42", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
