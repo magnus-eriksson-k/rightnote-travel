@@ -10,8 +10,9 @@ It converts a cash price into the user's home currency and suggests which bankno
 
 | File | Purpose |
 |---|---|
-| `index.html` | The whole app: markup, CSS and JS in one file, with note photos embedded as base64 JPEGs (~650 KB). |
-| `sw.js` | Service worker. Network-first for same-origin files, falls back to cache offline. Rate APIs bypass it. |
+| `index.html` | The whole app: markup, CSS and JS in one file (~50 KB). |
+| `img/vnd/` | Note photos: `<denomination>-back.jpg` and `<denomination>-front.jpg`. |
+| `sw.js` | Service worker. Precaches the app and every note photo (`FILES`); network-first for same-origin files, falls back to cache offline. Rate APIs bypass it. |
 | `manifest.webmanifest` | Install metadata: name "RightNote Travel", short name "RightNote", theme `#0f7b6c`. |
 | `icon-*.png`, `apple-touch-icon.png` | Banknote-with-tick icon. The maskable and Apple versions are padded on a solid background. |
 
@@ -34,7 +35,7 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - `VND_NOTES` lists polymer notes with two gradient colours each. Entries with no colours are plain amounts.
   - `NOTE_INFO` holds the back image and colour description for each note.
   - `PAY_NOTES` is every denomination used for payment, including the paper 1k/2k/5k notes.
-- **Photos:** `backs` holds the back of each note and `photos` the front, each mapping a denomination to a `data:` URI; `photoSrc()` also accepts asset ids. `pic(d)` returns the back, falling back to the front, and every note tile uses it. The note card shows both sides (back first), each with a caption. The photo-upload UI is still in the file but stays hidden, because it needs Claude-artifact storage that Pages doesn't have. To change photos, re-embed them in `photos`.
+- **Photos:** `backs` holds the back of each note and `photos` the front, each mapping a denomination to a file path in `img/vnd/`; `photoSrc()` passes paths and `data:` URIs through and treats anything else as an uploaded asset id. `pic(d)` returns the back, falling back to the front, and every note tile uses it. The note card shows both sides (back first), each with a caption. The photo-upload UI is still in the file but stays hidden, because it needs Claude-artifact storage that Pages doesn't have. To change a photo, replace its file in `img/vnd/`. To add one, add the file, its path in `backs` or `photos`, and the path to `FILES` in `sw.js` so it works offline.
 - **How to pay:** `ways(A)` returns up to three options, in this order, shown as tabs below the keypad (Exact is selected by default, and a picked tab stays picked while it's offered):
   - **Quickest:** round up to whichever total within +100k needs the fewest notes, shown only if it beats the exact option.
   - **Exact:** greedy fewest notes for the exact amount (greedy is optimal for these denominations).
@@ -69,5 +70,5 @@ The code assumes VND in a few places. To generalise:
 1. **Per-currency note data:** replace `VND_NOTES`, `NOTE_INFO`, `PAY_NOTES` and `photos` with a structure keyed by currency code, holding each note's colours, info, photo, the smallest cash unit and the local shorthand (`vnShort` is VND-specific).
 2. **Rates against any pivot:** keep the "value per pivot unit" model, but fetch rates for all supported currencies in one call rather than VND/AUD/USD only. Adjust the sanity ranges per currency.
 3. **Selectable entry currency:** turn `second` back into a selector limited to currencies that have note data. Fixing it to VND was deliberate, because only VND has photos.
-4. **Photos:** consider separate image files cached by the service worker instead of base64 in `index.html`, so the page stays small as currencies are added.
+4. **Photos:** done for VND: photos are files in `img/vnd/`, precached by the service worker. New currencies get their own folder (e.g. `img/thb/`).
 5. **Rounding:** `payAmount()` rounds up to 1,000 for VND. This should use each currency's smallest cash denomination.
