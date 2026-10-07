@@ -3,6 +3,253 @@
   "countries": {
     "VN": {
       "name": "Vietnam",
+      "cur": "VND",
+      "lang": "vi-VN",
+      "langName": "Vietnamese",
+      "phraseNote": "Pronunciation is a rough guide, following the northern accent. Vietnamese has six tones, so tap 🔊 to hear a phrase where your phone has a Vietnamese voice, or tap a phrase to show it large.",
+      "phrases": [
+        {
+          "h": "Basics",
+          "note": "To be polite, add anh (to a man) or chị (to a woman) after a phrase: \"Cảm ơn chị.\"",
+          "items": [
+            {
+              "t": "Xin chào",
+              "say": "sin chow",
+              "en": "Hello"
+            },
+            {
+              "t": "Cảm ơn",
+              "say": "gahm uhn",
+              "en": "Thank you"
+            },
+            {
+              "t": "Không, cảm ơn",
+              "say": "khome, gahm uhn",
+              "en": "No, thank you",
+              "note": "Useful with street sellers and drivers."
+            },
+            {
+              "t": "Xin lỗi",
+              "say": "sin loy",
+              "en": "Sorry / excuse me"
+            },
+            {
+              "t": "Dạ",
+              "say": "zah",
+              "en": "Yes (polite)",
+              "note": "\"Vâng\" (vuhng) is also common in the north."
+            },
+            {
+              "t": "Không",
+              "say": "khome",
+              "en": "No"
+            },
+            {
+              "t": "Tôi không hiểu",
+              "say": "toy khome hyew",
+              "en": "I don't understand"
+            },
+            {
+              "t": "Bạn có nói tiếng Anh không?",
+              "say": "ban gaw noy tyeng ahn khome",
+              "en": "Do you speak English?"
+            },
+            {
+              "t": "Tạm biệt",
+              "say": "tahm byet",
+              "en": "Goodbye"
+            }
+          ]
+        },
+        {
+          "h": "Money and shopping",
+          "items": [
+            {
+              "t": "Bao nhiêu tiền?",
+              "say": "bow nyew tyen",
+              "en": "How much is it?"
+            },
+            {
+              "t": "Đắt quá!",
+              "say": "dat kwah",
+              "en": "Too expensive!"
+            },
+            {
+              "t": "Bớt đi được không?",
+              "say": "buht dee duhk khome",
+              "en": "Can you lower the price?"
+            },
+            {
+              "t": "Tôi lấy cái này",
+              "say": "toy lay kai nay",
+              "en": "I'll take this one"
+            },
+            {
+              "t": "Có tiền lẻ không?",
+              "say": "gaw tyen leh khome",
+              "en": "Do you have change?"
+            },
+            {
+              "t": "Tính tiền",
+              "say": "ting tyen",
+              "en": "The bill, please",
+              "note": "In Hà Nội you'll also hear \"thanh toán\" (tahn twahn)."
+            }
+          ]
+        },
+        {
+          "h": "Numbers and prices",
+          "items": [
+            {
+              "t": "một, hai, ba, bốn, năm",
+              "say": "moht, hai, bah, bone, nahm",
+              "en": "1, 2, 3, 4, 5"
+            },
+            {
+              "t": "sáu, bảy, tám, chín, mười",
+              "say": "sow, bay, tahm, chin, muhy",
+              "en": "6, 7, 8, 9, 10"
+            },
+            {
+              "t": "nghìn",
+              "say": "ngyin",
+              "en": "Thousand",
+              "note": "Written \"k\" on signs. \"Ngàn\" (ngahn) in the south."
+            },
+            {
+              "t": "năm mươi nghìn",
+              "say": "nahm muhy ngyin",
+              "en": "₫50,000",
+              "note": "Sellers often just say \"năm mươi\", meaning 50k."
+            },
+            {
+              "t": "trăm",
+              "say": "chahm",
+              "en": "Hundred: năm trăm nghìn is ₫500,000"
+            },
+            {
+              "t": "triệu",
+              "say": "chyew",
+              "en": "Million: ₫1,000,000"
+            }
+          ]
+        },
+        {
+          "h": "Food and drink",
+          "items": [
+            {
+              "t": "Cho tôi cái này",
+              "say": "chaw toy kai nay",
+              "en": "I'd like this one",
+              "note": "Point at the menu or the dish."
+            },
+            {
+              "t": "Không cay",
+              "say": "khome kai",
+              "en": "Not spicy"
+            },
+            {
+              "t": "Không đá",
+              "say": "khome dah",
+              "en": "No ice"
+            },
+            {
+              "t": "Tôi ăn chay",
+              "say": "toy an chai",
+              "en": "I'm vegetarian"
+            },
+            {
+              "t": "Tôi bị dị ứng đậu phộng",
+              "say": "toy bee zee ung dow fome",
+              "en": "I'm allergic to peanuts",
+              "note": "\"Lạc\" (lahk) is the northern word for peanut."
+            },
+            {
+              "t": "Ngon quá!",
+              "say": "ngon kwah",
+              "en": "Delicious!"
+            },
+            {
+              "t": "Một, hai, ba, dô!",
+              "say": "moht, hai, bah, zo",
+              "en": "Cheers! (one, two, three, drink!)"
+            }
+          ]
+        },
+        {
+          "h": "Getting around",
+          "items": [
+            {
+              "t": "Cho tôi đến địa chỉ này",
+              "say": "chaw toy den dee-uh chee nay",
+              "en": "Take me to this address",
+              "note": "Show the address on your phone."
+            },
+            {
+              "t": "Dừng ở đây",
+              "say": "zung uh day",
+              "en": "Stop here"
+            },
+            {
+              "t": "Rẽ trái",
+              "say": "zeh chai",
+              "en": "Turn left",
+              "note": "\"Quẹo trái\" (kweo chai) in the south."
+            },
+            {
+              "t": "Rẽ phải",
+              "say": "zeh fai",
+              "en": "Turn right"
+            },
+            {
+              "t": "Đi thẳng",
+              "say": "dee tahng",
+              "en": "Straight on"
+            },
+            {
+              "t": "Chậm thôi",
+              "say": "chum toy",
+              "en": "Slow down, please"
+            },
+            {
+              "t": "Nhà vệ sinh ở đâu?",
+              "say": "nya veh sin uh dow",
+              "en": "Where's the toilet?"
+            }
+          ]
+        },
+        {
+          "h": "Help",
+          "note": "Emergency numbers: 113 police, 114 fire, 115 ambulance.",
+          "items": [
+            {
+              "t": "Cứu tôi với!",
+              "say": "kew toy vuhy",
+              "en": "Help me!"
+            },
+            {
+              "t": "Gọi cảnh sát",
+              "say": "goy kahn saht",
+              "en": "Call the police"
+            },
+            {
+              "t": "Bệnh viện",
+              "say": "ben vyen",
+              "en": "Hospital"
+            },
+            {
+              "t": "Nhà thuốc",
+              "say": "nya twohk",
+              "en": "Pharmacy"
+            },
+            {
+              "t": "Tôi bị lạc",
+              "say": "toy bee lahk",
+              "en": "I'm lost"
+            }
+          ]
+        }
+      ],
       "customs": [
         "Tipping isn't expected. Rounding up or leaving small change is appreciated; spa and massage staff often expect ₫50,000–100,000.",
         "Bargain politely at markets and with street sellers, with a smile. Shops and cafés with printed prices are fixed.",
@@ -19,7 +266,9 @@
       "id": "hanoi",
       "name": "Hà Nội",
       "en": "Hanoi",
-      "alt": ["ha noi"],
+      "alt": [
+        "ha noi"
+      ],
       "cc": "VN",
       "cur": "VND",
       "lat": 21.0285,
@@ -28,55 +277,151 @@
       "voy": "Hanoi",
       "wiki": "Hanoi",
       "sections": [
-        {"h": "Overview", "p": [
-          "Vietnam's capital for most of the last thousand years, on the Red River in the north. The Old Quarter's narrow streets, each once named for the trade carried on there, wrap around Hoàn Kiếm Lake; French-era boulevards and the Ba Đình political district lie to the west.",
-          "Hà Nội has real seasons: hot, humid summers with heavy rain, and a cool, grey winter from December to February. October and November are the best months, with dry, warm days and cooler evenings."
-        ]},
-        {"h": "Food to try", "items": [
-          {"t": "Phở bò", "d": "Beef noodle soup, the classic Hà Nội breakfast. The northern style has a clear broth and few herbs.", "p": 50000},
-          {"t": "Bún chả", "d": "Grilled pork patties and belly in a sweet-sour broth, with rice noodles and herbs. A lunchtime dish.", "p": 50000},
-          {"t": "Bánh cuốn", "d": "Silky steamed rice rolls filled with pork and wood-ear mushroom, with fish sauce for dipping.", "p": 40000},
-          {"t": "Chả cá", "d": "Turmeric-marinated fish fried at the table with dill and spring onion. A Hà Nội speciality.", "p": 150000},
-          {"t": "Bún đậu mắm tôm", "d": "Fried tofu, rice noodles and herbs with fermented shrimp paste. Love it or hate it.", "p": 50000},
-          {"t": "Cà phê trứng", "d": "Egg coffee: yolk whipped with condensed milk on strong coffee. Invented in Hà Nội in the 1940s.", "p": 40000},
-          {"t": "Cốm", "d": "Young green sticky rice, wrapped in lotus leaves. An autumn treat, best in September and October.", "p": 30000}
-        ]},
-        {"h": "Music and culture", "items": [
-          {"t": "Water puppetry", "d": "Múa rối nước: wooden puppets perform on a water stage to live chèo folk music. Thăng Long Theatre by Hoàn Kiếm Lake has several shows a day."},
-          {"t": "Ca trù", "d": "Centuries-old chamber singing with a long-necked lute and wooden clappers, on UNESCO's list of heritage in need of protection. Small evening shows run in the Old Quarter."},
-          {"t": "Xẩm", "d": "Street ballads once sung by blind wandering musicians, revived on weekend evenings near Đồng Xuân market."},
-          {"t": "Walking streets", "d": "From Friday to Sunday evening the roads around Hoàn Kiếm Lake close to traffic: buskers, folk games, dancing and families out late."},
-          {"t": "Bia hơi", "d": "Fresh, light draught beer brewed daily, drunk on tiny plastic stools. Tạ Hiện street is the busiest corner."}
-        ]},
-        {"h": "Customs", "list": [
-          "At the Hồ Chí Minh Mausoleum: shoulders and knees covered, no hands in pockets, no talking or photos inside. It opens mornings only and closes on Mondays and Fridays."
-        ]},
-        {"h": "Typical prices", "items": [
-          {"t": "Bottle of water from a shop", "p": 10000},
-          {"t": "Iced coffee at a street stall", "p": 25000},
-          {"t": "Glass of bia hơi", "p": 15000},
-          {"t": "Bánh mì from a stall", "p": 25000},
-          {"t": "Grab motorbike, short ride", "p": 25000},
-          {"t": "Grab car, airport to Old Quarter", "p": 300000},
-          {"t": "Water puppet show ticket", "p": 150000},
-          {"t": "Temple of Literature entry", "p": 70000},
-          {"t": "One-hour foot massage", "p": 250000},
-          {"t": "Tourist SIM with data", "p": 200000}
-        ]},
-        {"h": "Watch out for", "list": [
-          "The ₫20,000 and ₫500,000 notes are both blue polymer. Check before you hand one over, especially at night.",
-          "Unmetered taxis and xích lô (cyclos) that change the price at the end. Agree the total first, or use Grab.",
-          "Fruit sellers who put their shoulder pole on you for a photo, then ask for money. Shoe shiners who start before you agree.",
-          "Phones snatched from passing motorbikes. Hold yours away from the road side.",
-          "The Mausoleum closes for maintenance for about two months most years. Check before you go."
-        ]}
+        {
+          "h": "Overview",
+          "p": [
+            "Vietnam's capital for most of the last thousand years, on the Red River in the north. The Old Quarter's narrow streets, each once named for the trade carried on there, wrap around Hoàn Kiếm Lake; French-era boulevards and the Ba Đình political district lie to the west.",
+            "Hà Nội has real seasons: hot, humid summers with heavy rain, and a cool, grey winter from December to February. October and November are the best months, with dry, warm days and cooler evenings."
+          ]
+        },
+        {
+          "h": "Food to try",
+          "items": [
+            {
+              "t": "Phở bò",
+              "d": "Beef noodle soup, the classic Hà Nội breakfast. The northern style has a clear broth and few herbs.",
+              "p": 50000
+            },
+            {
+              "t": "Bún chả",
+              "d": "Grilled pork patties and belly in a sweet-sour broth, with rice noodles and herbs. A lunchtime dish.",
+              "p": 50000
+            },
+            {
+              "t": "Bánh cuốn",
+              "d": "Silky steamed rice rolls filled with pork and wood-ear mushroom, with fish sauce for dipping.",
+              "p": 40000
+            },
+            {
+              "t": "Chả cá",
+              "d": "Turmeric-marinated fish fried at the table with dill and spring onion. A Hà Nội speciality.",
+              "p": 150000
+            },
+            {
+              "t": "Bún đậu mắm tôm",
+              "d": "Fried tofu, rice noodles and herbs with fermented shrimp paste. Love it or hate it.",
+              "p": 50000
+            },
+            {
+              "t": "Cà phê trứng",
+              "d": "Egg coffee: yolk whipped with condensed milk on strong coffee. Invented in Hà Nội in the 1940s.",
+              "p": 40000
+            },
+            {
+              "t": "Cốm",
+              "d": "Young green sticky rice, wrapped in lotus leaves. An autumn treat, best in September and October.",
+              "p": 30000
+            }
+          ]
+        },
+        {
+          "h": "Music and culture",
+          "items": [
+            {
+              "t": "Water puppetry",
+              "d": "Múa rối nước: wooden puppets perform on a water stage to live chèo folk music. Thăng Long Theatre by Hoàn Kiếm Lake has several shows a day."
+            },
+            {
+              "t": "Ca trù",
+              "d": "Centuries-old chamber singing with a long-necked lute and wooden clappers, on UNESCO's list of heritage in need of protection. Small evening shows run in the Old Quarter."
+            },
+            {
+              "t": "Xẩm",
+              "d": "Street ballads once sung by blind wandering musicians, revived on weekend evenings near Đồng Xuân market."
+            },
+            {
+              "t": "Walking streets",
+              "d": "From Friday to Sunday evening the roads around Hoàn Kiếm Lake close to traffic: buskers, folk games, dancing and families out late."
+            },
+            {
+              "t": "Bia hơi",
+              "d": "Fresh, light draught beer brewed daily, drunk on tiny plastic stools. Tạ Hiện street is the busiest corner."
+            }
+          ]
+        },
+        {
+          "h": "Customs",
+          "list": [
+            "At the Hồ Chí Minh Mausoleum: shoulders and knees covered, no hands in pockets, no talking or photos inside. It opens mornings only and closes on Mondays and Fridays."
+          ]
+        },
+        {
+          "h": "Typical prices",
+          "items": [
+            {
+              "t": "Bottle of water from a shop",
+              "p": 10000
+            },
+            {
+              "t": "Iced coffee at a street stall",
+              "p": 25000
+            },
+            {
+              "t": "Glass of bia hơi",
+              "p": 15000
+            },
+            {
+              "t": "Bánh mì from a stall",
+              "p": 25000
+            },
+            {
+              "t": "Grab motorbike, short ride",
+              "p": 25000
+            },
+            {
+              "t": "Grab car, airport to Old Quarter",
+              "p": 300000
+            },
+            {
+              "t": "Water puppet show ticket",
+              "p": 150000
+            },
+            {
+              "t": "Temple of Literature entry",
+              "p": 70000
+            },
+            {
+              "t": "One-hour foot massage",
+              "p": 250000
+            },
+            {
+              "t": "Tourist SIM with data",
+              "p": 200000
+            }
+          ]
+        },
+        {
+          "h": "Watch out for",
+          "list": [
+            "The ₫20,000 and ₫500,000 notes are both blue polymer. Check before you hand one over, especially at night.",
+            "Unmetered taxis and xích lô (cyclos) that change the price at the end. Agree the total first, or use Grab.",
+            "Fruit sellers who put their shoulder pole on you for a photo, then ask for money. Shoe shiners who start before you agree.",
+            "Phones snatched from passing motorbikes. Hold yours away from the road side.",
+            "The Mausoleum closes for maintenance for about two months most years. Check before you go."
+          ]
+        }
       ]
     },
     {
       "id": "hcmc",
       "name": "Hồ Chí Minh City",
       "en": "Ho Chi Minh City",
-      "alt": ["saigon", "sai gon", "hcmc", "ho chi minh"],
+      "alt": [
+        "saigon",
+        "sai gon",
+        "hcmc",
+        "ho chi minh"
+      ],
       "cc": "VN",
       "cur": "VND",
       "lat": 10.7769,
@@ -85,53 +430,141 @@
       "voy": "Ho Chi Minh City",
       "wiki": "Ho Chi Minh City",
       "sections": [
-        {"h": "Overview", "p": [
-          "Vietnam's biggest city and business capital, still widely called Sài Gòn. The centre has the French-era landmarks: the Opera House, the Central Post Office, Notre-Dame Cathedral and Bến Thành market. Chợ Lớn to the west is the historic Chinese quarter, full of temples and wholesale markets.",
-          "It's hot all year, around 25–34 °C. The rainy season runs from May to November, usually as short, heavy downpours in the afternoon. The food and street life run late into the night."
-        ]},
-        {"h": "Food to try", "items": [
-          {"t": "Cơm tấm", "d": "Broken rice with grilled pork chop, steamed egg meatloaf and sweet fish sauce. The city's breakfast.", "p": 50000},
-          {"t": "Hủ tiếu", "d": "Noodles in a clear pork broth, from the Chinese-Vietnamese community of Chợ Lớn.", "p": 45000},
-          {"t": "Bánh xèo", "d": "A big crispy turmeric pancake with shrimp, pork and bean sprouts, wrapped in lettuce and herbs.", "p": 70000},
-          {"t": "Bánh mì", "d": "Sài Gòn style is generously filled with pâté, cold cuts, pickles and chilli.", "p": 30000},
-          {"t": "Ốc", "d": "Snails and shellfish cooked a dozen ways, an evening food eaten with beer on plastic stools.", "p": 60000},
-          {"t": "Bột chiên", "d": "Fried rice-flour cake with egg and pickled papaya, an afternoon snack.", "p": 35000},
-          {"t": "Cà phê sữa đá", "d": "Strong drip coffee over ice with condensed milk. Coffee culture here is huge, from street stools to rooftop cafés.", "p": 25000}
-        ]},
-        {"h": "Music and culture", "items": [
-          {"t": "Đờn ca tài tử", "d": "Southern chamber music from the Mekong Delta, played on zithers and moon lutes. UNESCO-listed."},
-          {"t": "Cải lương", "d": "Southern 'reformed opera' mixing folk melodies with melodrama. Still performed at a few theatres and hugely popular on TV."},
-          {"t": "Bamboo circus at the Opera House", "d": "Contemporary acrobatic shows about southern life, staged most evenings in the French-era Opera House."},
-          {"t": "Nguyễn Huệ walking street", "d": "A wide pedestrian boulevard leading to the old City Hall, busy with families, buskers and skaters every evening."},
-          {"t": "Bùi Viện", "d": "The backpacker street: loud bars, street food and people-watching until the early hours."}
-        ]},
-        {"h": "Customs", "list": [
-          "Chợ Lớn's temples, such as Thiên Hậu, are active places of worship. Keep your voice down and step over, not on, the raised door thresholds."
-        ]},
-        {"h": "Typical prices", "items": [
-          {"t": "Bottle of water from a shop", "p": 10000},
-          {"t": "Iced coffee at a street stall", "p": 25000},
-          {"t": "Sugarcane juice", "p": 15000},
-          {"t": "Beer at a bar on Bùi Viện", "p": 40000},
-          {"t": "Grab motorbike, short ride", "p": 25000},
-          {"t": "Grab car, airport to District 1", "p": 150000},
-          {"t": "War Remnants Museum entry", "p": 40000},
-          {"t": "One-hour foot massage", "p": 250000}
-        ]},
-        {"h": "Watch out for", "list": [
-          "Bag and phone snatching from motorbikes is the most common crime. Keep your phone away from the kerb and wear bags across your body.",
-          "Taxis with fast meters. Use Grab, Xanh SM, or the big taxi firms Vinasun (white) and Mai Linh (green).",
-          "Overcharging at Bến Thành market. Ask a few stalls and agree the price before buying.",
-          "The ₫20,000 and ₫500,000 notes are both blue polymer. Check before you hand one over.",
-          "Streets can flood quickly in the afternoon storms of the rainy season."
-        ]}
+        {
+          "h": "Overview",
+          "p": [
+            "Vietnam's biggest city and business capital, still widely called Sài Gòn. The centre has the French-era landmarks: the Opera House, the Central Post Office, Notre-Dame Cathedral and Bến Thành market. Chợ Lớn to the west is the historic Chinese quarter, full of temples and wholesale markets.",
+            "It's hot all year, around 25–34 °C. The rainy season runs from May to November, usually as short, heavy downpours in the afternoon. The food and street life run late into the night."
+          ]
+        },
+        {
+          "h": "Food to try",
+          "items": [
+            {
+              "t": "Cơm tấm",
+              "d": "Broken rice with grilled pork chop, steamed egg meatloaf and sweet fish sauce. The city's breakfast.",
+              "p": 50000
+            },
+            {
+              "t": "Hủ tiếu",
+              "d": "Noodles in a clear pork broth, from the Chinese-Vietnamese community of Chợ Lớn.",
+              "p": 45000
+            },
+            {
+              "t": "Bánh xèo",
+              "d": "A big crispy turmeric pancake with shrimp, pork and bean sprouts, wrapped in lettuce and herbs.",
+              "p": 70000
+            },
+            {
+              "t": "Bánh mì",
+              "d": "Sài Gòn style is generously filled with pâté, cold cuts, pickles and chilli.",
+              "p": 30000
+            },
+            {
+              "t": "Ốc",
+              "d": "Snails and shellfish cooked a dozen ways, an evening food eaten with beer on plastic stools.",
+              "p": 60000
+            },
+            {
+              "t": "Bột chiên",
+              "d": "Fried rice-flour cake with egg and pickled papaya, an afternoon snack.",
+              "p": 35000
+            },
+            {
+              "t": "Cà phê sữa đá",
+              "d": "Strong drip coffee over ice with condensed milk. Coffee culture here is huge, from street stools to rooftop cafés.",
+              "p": 25000
+            }
+          ]
+        },
+        {
+          "h": "Music and culture",
+          "items": [
+            {
+              "t": "Đờn ca tài tử",
+              "d": "Southern chamber music from the Mekong Delta, played on zithers and moon lutes. UNESCO-listed."
+            },
+            {
+              "t": "Cải lương",
+              "d": "Southern 'reformed opera' mixing folk melodies with melodrama. Still performed at a few theatres and hugely popular on TV."
+            },
+            {
+              "t": "Bamboo circus at the Opera House",
+              "d": "Contemporary acrobatic shows about southern life, staged most evenings in the French-era Opera House."
+            },
+            {
+              "t": "Nguyễn Huệ walking street",
+              "d": "A wide pedestrian boulevard leading to the old City Hall, busy with families, buskers and skaters every evening."
+            },
+            {
+              "t": "Bùi Viện",
+              "d": "The backpacker street: loud bars, street food and people-watching until the early hours."
+            }
+          ]
+        },
+        {
+          "h": "Customs",
+          "list": [
+            "Chợ Lớn's temples, such as Thiên Hậu, are active places of worship. Keep your voice down and step over, not on, the raised door thresholds."
+          ]
+        },
+        {
+          "h": "Typical prices",
+          "items": [
+            {
+              "t": "Bottle of water from a shop",
+              "p": 10000
+            },
+            {
+              "t": "Iced coffee at a street stall",
+              "p": 25000
+            },
+            {
+              "t": "Sugarcane juice",
+              "p": 15000
+            },
+            {
+              "t": "Beer at a bar on Bùi Viện",
+              "p": 40000
+            },
+            {
+              "t": "Grab motorbike, short ride",
+              "p": 25000
+            },
+            {
+              "t": "Grab car, airport to District 1",
+              "p": 150000
+            },
+            {
+              "t": "War Remnants Museum entry",
+              "p": 40000
+            },
+            {
+              "t": "One-hour foot massage",
+              "p": 250000
+            }
+          ]
+        },
+        {
+          "h": "Watch out for",
+          "list": [
+            "Bag and phone snatching from motorbikes is the most common crime. Keep your phone away from the kerb and wear bags across your body.",
+            "Taxis with fast meters. Use Grab, Xanh SM, or the big taxi firms Vinasun (white) and Mai Linh (green).",
+            "Overcharging at Bến Thành market. Ask a few stalls and agree the price before buying.",
+            "The ₫20,000 and ₫500,000 notes are both blue polymer. Check before you hand one over.",
+            "Streets can flood quickly in the afternoon storms of the rainy season."
+          ]
+        }
       ]
     },
     {
       "id": "danang",
       "name": "Đà Nẵng",
       "en": "Da Nang",
-      "alt": ["danang", "da nang"],
+      "alt": [
+        "danang",
+        "da nang"
+      ],
       "cc": "VN",
       "cur": "VND",
       "lat": 16.0544,
@@ -140,47 +573,123 @@
       "voy": "Da Nang",
       "wiki": "Da Nang",
       "sections": [
-        {"h": "Overview", "p": [
-          "Central Vietnam's biggest city, on the coast between the Hải Vân Pass and Hội An. It's known for the long sandy beach at Mỹ Khê, the lit-up bridges over the Hàn River, the Sơn Trà peninsula and the Marble Mountains. Modern, clean and relaxed.",
-          "The dry season is roughly February to August. From September to December it's the rainy season, with typhoon and flood risk at its highest in October and November."
-        ]},
-        {"h": "Food to try", "items": [
-          {"t": "Mì Quảng", "d": "Wide turmeric rice noodles in a little rich broth, with pork, shrimp, peanuts, herbs and a sesame rice cracker.", "p": 40000},
-          {"t": "Bánh tráng cuốn thịt heo", "d": "Boiled pork rolled in rice paper with herbs and cucumber, dipped in a pungent anchovy sauce.", "p": 80000},
-          {"t": "Bún chả cá", "d": "Fish cake noodle soup with pumpkin and pineapple.", "p": 40000},
-          {"t": "Bánh xèo", "d": "Central-style: small, crispy pancakes dipped in a peanut and pork-liver sauce.", "p": 50000},
-          {"t": "Seafood", "d": "Pick it live at the beach restaurants and pay by weight. Ask the price per kilo before it's cooked."}
-        ]},
-        {"h": "Music and culture", "items": [
-          {"t": "Dragon Bridge", "d": "Cầu Rồng breathes fire, then water, at 9 pm on Saturday and Sunday nights. Watch from the riverbank."},
-          {"t": "Tuồng", "d": "Classical opera with painted faces and stylised battles, staged at the Nguyễn Hiển Dĩnh Theatre."},
-          {"t": "Bài chòi", "d": "A central-coast folk singing game, part bingo, part ballad. UNESCO-listed."},
-          {"t": "Museum of Cham Sculpture", "d": "The world's largest collection of sculpture from the Hindu Cham kingdoms that ruled this coast."},
-          {"t": "Fireworks festival", "d": "International teams compete over the Hàn River on summer weekends, usually June and July."}
-        ]},
-        {"h": "Typical prices", "items": [
-          {"t": "Iced coffee", "p": 25000},
-          {"t": "Beer at a beach bar", "p": 30000},
-          {"t": "Grab motorbike, short ride", "p": 25000},
-          {"t": "Grab car, airport to Mỹ Khê beach", "p": 90000},
-          {"t": "Grab car to Hội An", "p": 350000},
-          {"t": "Marble Mountains entry", "p": 40000},
-          {"t": "Museum of Cham Sculpture entry", "p": 60000},
-          {"t": "Bà Nà Hills cable car ticket", "p": 900000}
-        ]},
-        {"h": "Watch out for", "list": [
-          "October and November bring typhoons and floods. Check the forecast; boat trips, hill trips and flights can be cancelled.",
-          "Strong currents at Mỹ Khê in rough weather. Swim between the lifeguard flags.",
-          "Seafood priced by weight: confirm the price per kilo and see it weighed before it's cooked.",
-          "Bà Nà Hills is high and often foggy and cold. Take a layer."
-        ]}
+        {
+          "h": "Overview",
+          "p": [
+            "Central Vietnam's biggest city, on the coast between the Hải Vân Pass and Hội An. It's known for the long sandy beach at Mỹ Khê, the lit-up bridges over the Hàn River, the Sơn Trà peninsula and the Marble Mountains. Modern, clean and relaxed.",
+            "The dry season is roughly February to August. From September to December it's the rainy season, with typhoon and flood risk at its highest in October and November."
+          ]
+        },
+        {
+          "h": "Food to try",
+          "items": [
+            {
+              "t": "Mì Quảng",
+              "d": "Wide turmeric rice noodles in a little rich broth, with pork, shrimp, peanuts, herbs and a sesame rice cracker.",
+              "p": 40000
+            },
+            {
+              "t": "Bánh tráng cuốn thịt heo",
+              "d": "Boiled pork rolled in rice paper with herbs and cucumber, dipped in a pungent anchovy sauce.",
+              "p": 80000
+            },
+            {
+              "t": "Bún chả cá",
+              "d": "Fish cake noodle soup with pumpkin and pineapple.",
+              "p": 40000
+            },
+            {
+              "t": "Bánh xèo",
+              "d": "Central-style: small, crispy pancakes dipped in a peanut and pork-liver sauce.",
+              "p": 50000
+            },
+            {
+              "t": "Seafood",
+              "d": "Pick it live at the beach restaurants and pay by weight. Ask the price per kilo before it's cooked."
+            }
+          ]
+        },
+        {
+          "h": "Music and culture",
+          "items": [
+            {
+              "t": "Dragon Bridge",
+              "d": "Cầu Rồng breathes fire, then water, at 9 pm on Saturday and Sunday nights. Watch from the riverbank."
+            },
+            {
+              "t": "Tuồng",
+              "d": "Classical opera with painted faces and stylised battles, staged at the Nguyễn Hiển Dĩnh Theatre."
+            },
+            {
+              "t": "Bài chòi",
+              "d": "A central-coast folk singing game, part bingo, part ballad. UNESCO-listed."
+            },
+            {
+              "t": "Museum of Cham Sculpture",
+              "d": "The world's largest collection of sculpture from the Hindu Cham kingdoms that ruled this coast."
+            },
+            {
+              "t": "Fireworks festival",
+              "d": "International teams compete over the Hàn River on summer weekends, usually June and July."
+            }
+          ]
+        },
+        {
+          "h": "Typical prices",
+          "items": [
+            {
+              "t": "Iced coffee",
+              "p": 25000
+            },
+            {
+              "t": "Beer at a beach bar",
+              "p": 30000
+            },
+            {
+              "t": "Grab motorbike, short ride",
+              "p": 25000
+            },
+            {
+              "t": "Grab car, airport to Mỹ Khê beach",
+              "p": 90000
+            },
+            {
+              "t": "Grab car to Hội An",
+              "p": 350000
+            },
+            {
+              "t": "Marble Mountains entry",
+              "p": 40000
+            },
+            {
+              "t": "Museum of Cham Sculpture entry",
+              "p": 60000
+            },
+            {
+              "t": "Bà Nà Hills cable car ticket",
+              "p": 900000
+            }
+          ]
+        },
+        {
+          "h": "Watch out for",
+          "list": [
+            "October and November bring typhoons and floods. Check the forecast; boat trips, hill trips and flights can be cancelled.",
+            "Strong currents at Mỹ Khê in rough weather. Swim between the lifeguard flags.",
+            "Seafood priced by weight: confirm the price per kilo and see it weighed before it's cooked.",
+            "Bà Nà Hills is high and often foggy and cold. Take a layer."
+          ]
+        }
       ]
     },
     {
       "id": "hoian",
       "name": "Hội An",
       "en": "Hoi An",
-      "alt": ["hoian", "hoi an"],
+      "alt": [
+        "hoian",
+        "hoi an"
+      ],
       "cc": "VN",
       "cur": "VND",
       "lat": 15.8801,
@@ -189,50 +698,130 @@
       "voy": "Hoi An",
       "wiki": "Hội An",
       "sections": [
-        {"h": "Overview", "p": [
-          "A small, beautifully preserved trading port on the Thu Bồn River, about 30 km south of Đà Nẵng. Its old town of ochre shophouses, Chinese assembly halls and the Japanese Covered Bridge (on the ₫20,000 note) is a UNESCO World Heritage Site. Silk lanterns light the streets every evening.",
-          "Beaches at An Bàng and Cửa Đại are a short bike ride away. October and November are flood season, when the riverside streets can go under water."
-        ]},
-        {"h": "Food to try", "items": [
-          {"t": "Cao lầu", "d": "Chewy, smoky noodles with pork, greens and crunchy croutons. Traditionally only made in Hội An.", "p": 40000},
-          {"t": "Cơm gà Hội An", "d": "Turmeric chicken rice with shredded chicken, herbs and pickled onion.", "p": 50000},
-          {"t": "Bánh mì", "d": "Hội An's are famous; the best-known stalls have queues all day.", "p": 30000},
-          {"t": "White rose dumplings", "d": "Bánh bao bánh vạc: translucent shrimp dumplings shaped like roses, made by one family for the whole town.", "p": 60000},
-          {"t": "Hoành thánh chiên", "d": "Fried wontons topped with a sweet-sour tomato and shrimp salsa.", "p": 60000},
-          {"t": "Mì Quảng", "d": "The region's turmeric noodles, with a little broth, pork, shrimp and peanuts.", "p": 40000}
-        ]},
-        {"h": "Music and culture", "items": [
-          {"t": "Bài chòi", "d": "A folk singing-and-bingo game, UNESCO-listed, performed by the river in the old town most evenings. Buy a card and join in."},
-          {"t": "Full-moon nights", "d": "On the 14th day of each lunar month the old town turns down its electric lights; lanterns, music and candles float on the river."},
-          {"t": "Folk music and dance shows", "d": "Short traditional shows run several times a day in the old town, included with the old town ticket."},
-          {"t": "Tailors", "d": "Hội An is famous for made-to-measure clothes and shoes, made in a day or two."},
-          {"t": "Lantern boats", "d": "Small boats on the Thu Bồn after dark, where you can float a paper lantern for luck."}
-        ]},
-        {"h": "Customs", "list": [
-          "The old town is a lived-in neighbourhood. Ask before photographing people up close, and keep shoulders covered in the assembly halls."
-        ]},
-        {"h": "Typical prices", "items": [
-          {"t": "Old town ticket (5 sites)", "p": 120000},
-          {"t": "Lantern boat ride, per boat", "p": 150000},
-          {"t": "Floating lantern", "p": 20000},
-          {"t": "Bicycle hire for a day", "p": 30000},
-          {"t": "Iced coffee", "p": 25000},
-          {"t": "Made-to-measure shirt, from about", "p": 400000},
-          {"t": "Grab car to Đà Nẵng airport", "p": 350000}
-        ]},
-        {"h": "Watch out for", "list": [
-          "Floods in October and November: Bạch Đằng and Nguyễn Thái Học streets by the river can flood, and boats replace bikes.",
-          "Tailors: allow two or three days and at least two fittings. Agree the fabric and price in writing.",
-          "Lantern boat touts may quote per person when you assumed per boat, or the reverse. Clarify first.",
-          "Buy the old town ticket at the official booths; it's checked at the entrances."
-        ]}
+        {
+          "h": "Overview",
+          "p": [
+            "A small, beautifully preserved trading port on the Thu Bồn River, about 30 km south of Đà Nẵng. Its old town of ochre shophouses, Chinese assembly halls and the Japanese Covered Bridge (on the ₫20,000 note) is a UNESCO World Heritage Site. Silk lanterns light the streets every evening.",
+            "Beaches at An Bàng and Cửa Đại are a short bike ride away. October and November are flood season, when the riverside streets can go under water."
+          ]
+        },
+        {
+          "h": "Food to try",
+          "items": [
+            {
+              "t": "Cao lầu",
+              "d": "Chewy, smoky noodles with pork, greens and crunchy croutons. Traditionally only made in Hội An.",
+              "p": 40000
+            },
+            {
+              "t": "Cơm gà Hội An",
+              "d": "Turmeric chicken rice with shredded chicken, herbs and pickled onion.",
+              "p": 50000
+            },
+            {
+              "t": "Bánh mì",
+              "d": "Hội An's are famous; the best-known stalls have queues all day.",
+              "p": 30000
+            },
+            {
+              "t": "White rose dumplings",
+              "d": "Bánh bao bánh vạc: translucent shrimp dumplings shaped like roses, made by one family for the whole town.",
+              "p": 60000
+            },
+            {
+              "t": "Hoành thánh chiên",
+              "d": "Fried wontons topped with a sweet-sour tomato and shrimp salsa.",
+              "p": 60000
+            },
+            {
+              "t": "Mì Quảng",
+              "d": "The region's turmeric noodles, with a little broth, pork, shrimp and peanuts.",
+              "p": 40000
+            }
+          ]
+        },
+        {
+          "h": "Music and culture",
+          "items": [
+            {
+              "t": "Bài chòi",
+              "d": "A folk singing-and-bingo game, UNESCO-listed, performed by the river in the old town most evenings. Buy a card and join in."
+            },
+            {
+              "t": "Full-moon nights",
+              "d": "On the 14th day of each lunar month the old town turns down its electric lights; lanterns, music and candles float on the river."
+            },
+            {
+              "t": "Folk music and dance shows",
+              "d": "Short traditional shows run several times a day in the old town, included with the old town ticket."
+            },
+            {
+              "t": "Tailors",
+              "d": "Hội An is famous for made-to-measure clothes and shoes, made in a day or two."
+            },
+            {
+              "t": "Lantern boats",
+              "d": "Small boats on the Thu Bồn after dark, where you can float a paper lantern for luck."
+            }
+          ]
+        },
+        {
+          "h": "Customs",
+          "list": [
+            "The old town is a lived-in neighbourhood. Ask before photographing people up close, and keep shoulders covered in the assembly halls."
+          ]
+        },
+        {
+          "h": "Typical prices",
+          "items": [
+            {
+              "t": "Old town ticket (5 sites)",
+              "p": 120000
+            },
+            {
+              "t": "Lantern boat ride, per boat",
+              "p": 150000
+            },
+            {
+              "t": "Floating lantern",
+              "p": 20000
+            },
+            {
+              "t": "Bicycle hire for a day",
+              "p": 30000
+            },
+            {
+              "t": "Iced coffee",
+              "p": 25000
+            },
+            {
+              "t": "Made-to-measure shirt, from about",
+              "p": 400000
+            },
+            {
+              "t": "Grab car to Đà Nẵng airport",
+              "p": 350000
+            }
+          ]
+        },
+        {
+          "h": "Watch out for",
+          "list": [
+            "Floods in October and November: Bạch Đằng and Nguyễn Thái Học streets by the river can flood, and boats replace bikes.",
+            "Tailors: allow two or three days and at least two fittings. Agree the fabric and price in writing.",
+            "Lantern boat touts may quote per person when you assumed per boat, or the reverse. Clarify first.",
+            "Buy the old town ticket at the official booths; it's checked at the entrances."
+          ]
+        }
       ]
     },
     {
       "id": "hue",
       "name": "Huế",
       "en": "Hue",
-      "alt": ["hue"],
+      "alt": [
+        "hue"
+      ],
       "cc": "VN",
       "cur": "VND",
       "lat": 16.4637,
@@ -241,37 +830,105 @@
       "voy": "Hue",
       "wiki": "Huế",
       "sections": [
-        {"h": "Overview", "p": [
-          "Vietnam's imperial capital from 1802 to 1945 under the Nguyễn dynasty, on the Perfume River (sông Hương). The walled Citadel and Imperial City, the royal tombs in the hills along the river and Thiên Mụ pagoda are a UNESCO World Heritage Site.",
-          "Huế is quieter and more traditional than the big cities, and its cooking, once made for the royal court, is the spiciest in Vietnam. It's also the wettest city in the country: October and November bring heavy rain and frequent floods."
-        ]},
-        {"h": "Food to try", "items": [
-          {"t": "Bún bò Huế", "d": "Spicy lemongrass beef noodle soup with pork knuckle and congealed blood. Huế's signature dish.", "p": 45000},
-          {"t": "Cơm hến", "d": "Rice with tiny river clams, peanuts, pork crackling, herbs and chilli.", "p": 25000},
-          {"t": "Bánh bèo, nậm, lọc", "d": "Steamed rice cakes: bèo are little saucers with shrimp, nậm are flat parcels in banana leaf, lọc are chewy tapioca with shrimp and pork.", "p": 50000},
-          {"t": "Bánh khoái", "d": "Huế's crispy pancake, served with a thick peanut and pork-liver sauce.", "p": 40000},
-          {"t": "Chè", "d": "Sweet soups and puddings; Huế has dozens of kinds, from lotus seed to taro.", "p": 20000}
-        ]},
-        {"h": "Music and culture", "items": [
-          {"t": "Nhã nhạc", "d": "Royal court music, Vietnam's first UNESCO intangible heritage. Performed at the Duyệt Thị Đường royal theatre inside the Imperial City."},
-          {"t": "Ca Huế on the river", "d": "Folk songs sung on a dragon boat on the Perfume River at night, ending with floating candle lanterns."},
-          {"t": "Royal tombs", "d": "Each emperor designed his own tomb as a garden retreat; Tự Đức's, Minh Mạng's and Khải Định's are the best known."},
-          {"t": "Huế Festival", "d": "A big arts festival with court music, processions and lantern events. Check dates, as the programme changes each year."}
-        ]},
-        {"h": "Typical prices", "items": [
-          {"t": "Imperial City entry", "p": 200000},
-          {"t": "Entry to a royal tomb", "p": 150000},
-          {"t": "Ca Huế boat show", "p": 150000},
-          {"t": "Bún bò Huế", "p": 45000},
-          {"t": "Iced coffee", "p": 20000},
-          {"t": "Grab motorbike, short ride", "p": 20000},
-          {"t": "Bicycle hire for a day", "p": 40000}
-        ]},
-        {"h": "Watch out for", "list": [
-          "Floods in October and November can close roads to the tombs. Check before setting out.",
-          "Dragon boats to Thiên Mụ pagoda may add stops at shops. Agree the route and price first.",
-          "Food is spicy here. Say \"không cay\" (khom kai) for not spicy."
-        ]}
+        {
+          "h": "Overview",
+          "p": [
+            "Vietnam's imperial capital from 1802 to 1945 under the Nguyễn dynasty, on the Perfume River (sông Hương). The walled Citadel and Imperial City, the royal tombs in the hills along the river and Thiên Mụ pagoda are a UNESCO World Heritage Site.",
+            "Huế is quieter and more traditional than the big cities, and its cooking, once made for the royal court, is the spiciest in Vietnam. It's also the wettest city in the country: October and November bring heavy rain and frequent floods."
+          ]
+        },
+        {
+          "h": "Food to try",
+          "items": [
+            {
+              "t": "Bún bò Huế",
+              "d": "Spicy lemongrass beef noodle soup with pork knuckle and congealed blood. Huế's signature dish.",
+              "p": 45000
+            },
+            {
+              "t": "Cơm hến",
+              "d": "Rice with tiny river clams, peanuts, pork crackling, herbs and chilli.",
+              "p": 25000
+            },
+            {
+              "t": "Bánh bèo, nậm, lọc",
+              "d": "Steamed rice cakes: bèo are little saucers with shrimp, nậm are flat parcels in banana leaf, lọc are chewy tapioca with shrimp and pork.",
+              "p": 50000
+            },
+            {
+              "t": "Bánh khoái",
+              "d": "Huế's crispy pancake, served with a thick peanut and pork-liver sauce.",
+              "p": 40000
+            },
+            {
+              "t": "Chè",
+              "d": "Sweet soups and puddings; Huế has dozens of kinds, from lotus seed to taro.",
+              "p": 20000
+            }
+          ]
+        },
+        {
+          "h": "Music and culture",
+          "items": [
+            {
+              "t": "Nhã nhạc",
+              "d": "Royal court music, Vietnam's first UNESCO intangible heritage. Performed at the Duyệt Thị Đường royal theatre inside the Imperial City."
+            },
+            {
+              "t": "Ca Huế on the river",
+              "d": "Folk songs sung on a dragon boat on the Perfume River at night, ending with floating candle lanterns."
+            },
+            {
+              "t": "Royal tombs",
+              "d": "Each emperor designed his own tomb as a garden retreat; Tự Đức's, Minh Mạng's and Khải Định's are the best known."
+            },
+            {
+              "t": "Huế Festival",
+              "d": "A big arts festival with court music, processions and lantern events. Check dates, as the programme changes each year."
+            }
+          ]
+        },
+        {
+          "h": "Typical prices",
+          "items": [
+            {
+              "t": "Imperial City entry",
+              "p": 200000
+            },
+            {
+              "t": "Entry to a royal tomb",
+              "p": 150000
+            },
+            {
+              "t": "Ca Huế boat show",
+              "p": 150000
+            },
+            {
+              "t": "Bún bò Huế",
+              "p": 45000
+            },
+            {
+              "t": "Iced coffee",
+              "p": 20000
+            },
+            {
+              "t": "Grab motorbike, short ride",
+              "p": 20000
+            },
+            {
+              "t": "Bicycle hire for a day",
+              "p": 40000
+            }
+          ]
+        },
+        {
+          "h": "Watch out for",
+          "list": [
+            "Floods in October and November can close roads to the tombs. Check before setting out.",
+            "Dragon boats to Thiên Mụ pagoda may add stops at shops. Agree the route and price first.",
+            "Food is spicy here. Say \"không cay\" (khom kai) for not spicy."
+          ]
+        }
       ]
     }
   ]

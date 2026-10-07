@@ -75,7 +75,9 @@ select{flex:none;font:600 .9rem var(--body);color:var(--ink);background:var(--ke
 @keyframes flash{from{background:var(--accent-soft)}to{background:transparent}}
 
 /* How to pay: the options are tabs; the area below keeps the same height whichever is picked */
-.pay-top{font-size:.85rem;color:var(--muted);padding-bottom:8px}
+.pay-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);padding-bottom:8px;min-height:2.6rem}
+.pay-top .linkbtn{padding:8px 0 8px 8px;margin:-8px 0;white-space:nowrap}
+.back-link{align-self:flex-start;font-size:.95rem;padding:8px 2px;margin:-8px 0 -6px}
 .pay-top,#payList{transition:opacity .2s}
 #payCard.pending .pay-top,#payCard.pending #payList{opacity:.4}
 .tabs{display:grid;gap:4px;background:var(--key-op);border-radius:12px;padding:4px}
@@ -224,6 +226,22 @@ button.item:active{background:var(--accent-soft)}
 .item .pr b{color:var(--accent-text)}
 .item .pr span{font-size:.8rem;color:var(--muted)}
 #cityCredit a{color:var(--accent-text)}
+
+/* Phrases: tap one to show it large (to hold up to a driver or vendor), 🔊 to hear it */
+.phr-head{display:flex;flex-direction:column;gap:4px;padding:0 2px}
+.phr-head h2{font-size:1.3rem}
+.phr{display:flex;flex-direction:column;gap:1px;width:100%;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;text-align:left;padding:9px 0;cursor:pointer;touch-action:manipulation}
+.items .phr:first-child{border-top:0;padding-top:2px}
+.phr b{font-size:1.05rem}
+.phr .say{font-size:.85rem;color:var(--accent-text);font-style:italic}
+.phr .en{font-size:.88rem;color:var(--muted)}
+.phr-big{display:flex;flex-direction:column;gap:8px;border-radius:14px;background:var(--accent-soft);padding:16px 14px;margin:4px 0}
+.phr-big .t{font-size:2rem;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+.phr-big .say{font-size:1.05rem;color:var(--accent-text);font-style:italic}
+.phr-big .en{font-size:1rem}
+.phr-big .hint2{font-size:.82rem;color:var(--muted)}
+.phr-big .dlg-actions{margin-top:4px}
+.grp-note{font-size:.84rem;color:var(--muted);margin:0}
 @media (prefers-reduced-motion: reduce){.keys button:active{transform:none}.chev{transition:none}}
 </style>
 
@@ -231,8 +249,8 @@ button.item:active{background:var(--accent-soft)}
   <header><h1>RightNote</h1>
     <div class="hdr-r">
       <nav class="views" aria-label="Views">
-        <button type="button" id="toCalc" aria-current="page">Calculator</button>
-        <button type="button" id="toNotes" aria-current="false">Notes</button>
+        <button type="button" id="toCalc" aria-current="page">Pay</button>
+        <button type="button" id="toPhrases" aria-current="false">Phrases</button>
         <button type="button" id="toCity" aria-current="false">City</button>
       </nav>
       <button type="button" class="gear" id="toOptions" aria-label="Options" aria-current="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -266,7 +284,7 @@ button.item:active{background:var(--accent-soft)}
   </div>
 
   <section class="panel" id="payCard" aria-label="How to pay">
-    <div class="pay-top"><span id="payTitle">How to pay</span></div>
+    <div class="pay-top"><span id="payTitle">How to pay</span><button type="button" class="linkbtn" id="toNotes">See all notes ›</button></div>
     <div id="payList"></div>
   </section>
 
@@ -274,6 +292,7 @@ button.item:active{background:var(--accent-soft)}
 </div>
 
 <div class="view" id="notesView" hidden>
+<button type="button" class="linkbtn back-link" id="notesBack">‹ Pay</button>
 
 <section class="panel note-card" id="noteDlg" aria-labelledby="dlgTitle" hidden>
   <div class="dlg">
@@ -324,6 +343,11 @@ button.item:active{background:var(--accent-soft)}
   <section class="panel wx" id="wxCard" aria-label="Weather" hidden></section>
   <div class="city-body" id="cityBody"></div>
   <p class="note" id="cityCredit"></p>
+</div>
+
+<div class="view" id="phrasesView" hidden>
+  <div class="phr-head"><h2 id="phrTitle">Phrases</h2><p class="note" id="phrNote"></p></div>
+  <div class="city-body" id="phrList"></div>
 </div>
 
 <div class="view" id="optionsView" hidden>
@@ -563,26 +587,28 @@ function showPhoto(){
   $("photoBtnText").textContent=id?"Replace photo":"Add your photo";
 }
 // ---- Views: the URL hash picks the view, so the phone's back button returns to the calculator ----
-// #notes opens Notes and #n1k … #n500k a note's card there; #city opens City; #options (or the older #rate) opens Options
+// #notes opens Notes (reached from Pay) and #n1k … #n500k a note's card there; #phrases opens Phrases; #city opens City;
+// #options (or the older #rate) opens Options
 let fromCalc=false; // we left the calculator in this visit, so going back returns there
 function showView(v){
-  const was=$("cityView").hidden;
-  $("calcView").hidden=v!=="calc"; $("notesView").hidden=v!=="notes"; $("cityView").hidden=v!=="city"; $("optionsView").hidden=v!=="options";
-  $("toCalc").setAttribute("aria-current",v==="calc"?"page":"false");
-  $("toNotes").setAttribute("aria-current",v==="notes"?"page":"false");
+  const was=$("cityView").hidden, wasPhr=$("phrasesView").hidden;
+  for(const k of ["calc","notes","phrases","city","options"])$(k+"View").hidden=v!==k;
+  $("toCalc").setAttribute("aria-current",v==="calc"||v==="notes"?"page":"false"); // Notes is part of Pay
+  $("toPhrases").setAttribute("aria-current",v==="phrases"?"page":"false");
   $("toCity").setAttribute("aria-current",v==="city"?"page":"false");
   if(v==="city"&&was)openCity();
+  if(v==="phrases"&&wasPhr)openPhrases();
   $("toOptions").setAttribute("aria-current",v==="options"?"page":"false");
 }
 function route(){
   const h=location.hash, m=/^#n(\d+)k$/.exec(h);
   if(m&&NOTE_INFO[+m[1]*1000]){showView("notes");openNote(+m[1]*1000);return}
   closeNote();
-  const v=h==="#notes"?"notes":h==="#city"?"city":h==="#options"||h==="#rate"?"options":"calc";
+  const v=h==="#notes"?"notes":h==="#phrases"?"phrases":h==="#city"?"city":h==="#options"||h==="#rate"?"options":"calc";
   showView(v); if(v!=="calc")window.scrollTo(0,0);
 }
 function goTo(hash){
-  // one history entry per trip away from the calculator; moving between Notes, City and Options replaces it
+  // one history entry per trip away from Pay; moving between Notes, Phrases, City and Options replaces it
   if(!$("calcView").hidden){fromCalc=true;location.hash=hash}
   else{history.replaceState(null,"",hash);route()}
 }
@@ -595,6 +621,8 @@ window.addEventListener("hashchange",route);
 $("toNotes").addEventListener("click",()=>goTo("#notes"));
 $("toCalc").addEventListener("click",goCalc);
 $("toCity").addEventListener("click",()=>goTo("#city"));
+$("toPhrases").addEventListener("click",()=>goTo("#phrases"));
+$("notesBack").addEventListener("click",goCalc);
 // the gear opens Options, and closes it again when it's already open
 $("toOptions").addEventListener("click",()=>$("optionsView").hidden?goTo("#options"):goCalc());
 $("rateSum").addEventListener("click",()=>goTo("#options"));
@@ -1032,6 +1060,52 @@ async function openCity(){
 $("cityBody").addEventListener("click",e=>{
   const b=e.target.closest("[data-price]"); if(!b)return;
   goCalc(); loadAmount(+b.dataset.price);
+});
+// ---- Phrases: for the country you're in (from City), else the country of the currency you pay in ----
+let phrOpen=null; // "group-item" of the phrase shown large
+function phraseCountry(){
+  const cs=guide.countries, cc=place&&cs[place.cc]&&cs[place.cc].phrases?place.cc:Object.keys(cs).find(k=>cs[k].cur===second&&cs[k].phrases);
+  return cc&&cs[cc];
+}
+const canSpeak="speechSynthesis" in window;
+function voiceFor(lang){
+  if(!canSpeak)return null;
+  const l=lang.slice(0,2).toLowerCase();
+  return speechSynthesis.getVoices().find(v=>v.lang.replace("_","-").toLowerCase().startsWith(l))||null;
+}
+function speak(text,lang){
+  const u=new SpeechSynthesisUtterance(text), v=voiceFor(lang);
+  u.lang=lang; if(v)u.voice=v; u.rate=.8;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+if(canSpeak)speechSynthesis.addEventListener("voiceschanged",()=>{if(!$("phrasesView").hidden)renderPhrases()}); // voices load late
+function renderPhrases(){
+  const c=phraseCountry();
+  if(!c){$("phrTitle").textContent="Phrases";$("phrNote").textContent="No phrases for this country yet.";$("phrList").innerHTML="";return}
+  $("phrTitle").textContent=`${c.langName} phrases`;
+  $("phrNote").textContent=c.phraseNote||"";
+  const hear=!!voiceFor(c.lang);
+  $("phrList").innerHTML=c.phrases.map((g,gi)=>{
+    const open=phrOpen&&phrOpen.startsWith(gi+"-");
+    const items=g.items.map((it,ii)=>{
+      const k=`${gi}-${ii}`;
+      if(k===phrOpen)return `<div class="phr-big" id="phrBig" lang="${esc(c.lang)}">
+          <span class="t">${esc(it.t)}</span><span class="say" lang="en">${esc(it.say)}</span><span class="en" lang="en">${esc(it.en)}</span>
+          ${it.note?`<span class="hint2" lang="en">${esc(it.note)}</span>`:""}
+          <div class="dlg-actions" lang="en">${hear?`<button type="button" class="btn primary" data-speak="${k}">🔊 Hear it</button>`:""}<button type="button" class="btn" data-phr="">Smaller</button></div>
+        </div>`;
+      return `<button type="button" class="phr" data-phr="${k}" aria-label="${esc(it.en)}: ${esc(it.t)}. Show large"><b lang="${esc(c.lang)}">${esc(it.t)}</b><span class="say">${esc(it.say)}</span><span class="en">${esc(it.en)}</span></button>`;
+    }).join("");
+    return `<details class="panel sect"${gi===0||open?" open":""}><summary>${esc(g.h)}</summary><div class="sect-body">${g.note?`<p class="grp-note">${esc(g.note)}</p>`:""}<div class="items">${items}</div></div></details>`;
+  }).join("");
+}
+async function openPhrases(){await loadGuide();renderPhrases()}
+$("phrList").addEventListener("click",e=>{
+  const s=e.target.closest("[data-speak]");
+  if(s){const c=phraseCountry(),[gi,ii]=s.dataset.speak.split("-");speak(c.phrases[gi].items[ii].t,c.lang);return}
+  const b=e.target.closest("[data-phr]"); if(!b)return;
+  phrOpen=b.dataset.phr||null; renderPhrases();
+  if(phrOpen)$("phrBig").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"nearest"});
 });
 // ---- Appearance: match the phone, or always light or dark ----
 const THEME_BG={light:"#f1f2f3",dark:"#121314"};

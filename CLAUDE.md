@@ -12,7 +12,7 @@ It converts a cash price into the user's home currency and suggests which bankno
 |---|---|
 | `index.html` | The whole app: markup, CSS and JS in one file (~50 KB). |
 | `img/vnd/` | Note photos: `<denomination>-back.jpg` and `<denomination>-front.jpg`. |
-| `data/cities.json` | Built-in city guides (Hà Nội, Hồ Chí Minh City, Đà Nẵng, Hội An, Huế) plus per-country customs. Precached, so they work offline. |
+| `data/cities.json` | Built-in city guides (Hà Nội, Hồ Chí Minh City, Đà Nẵng, Hội An, Huế) plus per-country customs and phrases. Precached, so they work offline. |
 | `sw.js` | Service worker. Precaches the app and every note photo (`FILES`); network-first for same-origin files, falls back to cache offline. Rate APIs bypass it. |
 | `manifest.webmanifest` | Install metadata: name "RightNote Travel", short name "RightNote", theme `#0f7b6c`. |
 | `icon-*.png`, `apple-touch-icon.png` | Banknote-with-tick icon. The maskable and Apple versions are padded on a solid background. |
@@ -49,13 +49,14 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - "Refresh rate" tries `open.er-api.com/v6/latest/AUD`, then the jsDelivr `@fawazahmed0/currency-api` as a fallback.
   - Results are sanity-checked against plausible VND ranges and cached in `localStorage["rates"]`.
   - The app refreshes automatically once a day when online, unless a custom rate is active.
-- **Views:** four in-page views. Calculator, Notes and City are switched in the header; Options opens from the gear icon at the right of the header (tapping it again closes it).
-  - Calculator: the price, keypad, payment tabs and a one-line rate summary that opens Options.
-  - Notes: the note grid (with 1M/2M/5M amounts to load) and the note card.
+- **Views:** five in-page views. Pay, Phrases and City are switched in the header; Options opens from the gear icon at the right of the header (tapping it again closes it).
+  - Pay (`#calcView`, the calculator): the price, keypad, payment tabs and a one-line rate summary that opens Options. "See all notes ›" on the How to pay card opens Notes.
+  - Notes: a sub-page of Pay (the Pay tab stays highlighted, "‹ Pay" goes back): the note grid (with 1M/2M/5M amounts to load) and the note card.
+  - Phrases: phrases for the current City's country, else the country whose `cur` is the currency you pay in. Groups come from `countries.<CC>.phrases` in `data/cities.json` (`t` local text, `say` rough pronunciation, `en`, optional `note`; groups may have a `note`). Tapping a phrase shows it large inline, to hold up to someone; "🔊 Hear it" uses `speechSynthesis` with a voice matching the country's `lang`, and is hidden when the phone has none.
   - City: weather and a travel guide for where you are (see **City** below).
   - Options: the exchange rate controls, Appearance, and "Install on your phone" (iPhone and Android steps, this phone's first; a one-tap Install button when Chrome offers `beforeinstallprompt`). The install section hides when the app runs from the home screen.
   - `route()` picks the view from the URL hash, so the phone's back button returns to the calculator. Each trip away from the calculator adds one history entry; moving between Notes and Options replaces it.
-- **Deep links:** `#notes` opens Notes; `#city` opens City; `#n1k` … `#n500k` open Notes with that note's card (tapping a note photo in the payment tabs does the same). `#options` (or the older `#rate`) opens Options.
+- **Deep links:** `#notes` opens Notes; `#phrases` opens Phrases; `#city` opens City; `#n1k` … `#n500k` open Notes with that note's card (tapping a note photo in the payment tabs does the same). `#options` (or the older `#rate`) opens Options.
 - **City:**
   - **Finding the place:** "Locate me" uses `navigator.geolocation`. A built-in guide city within 20 km wins (works offline); otherwise OSM Nominatim `reverse` names the town. Search by name matches built-in guides offline and asks Nominatim `search` online, on submit only (Nominatim's usage policy forbids search-as-you-type). With location already granted, opening City re-locates if the last GPS fix is over an hour old.
   - **Weather:** Open-Meteo (no key): current conditions, 5 days, sunrise/sunset, UV. Refreshed when older than an hour.
