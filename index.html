@@ -53,6 +53,7 @@ h1{font-size:.95rem;font-weight:800;letter-spacing:.03em;text-transform:uppercas
 .steps h3{font-size:.95rem;margin:4px 0 0}
 .steps ol{margin:0;padding-left:1.3em;font-size:.9rem;line-height:1.5}
 .steps li::marker{color:var(--muted)}
+.sources{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px;line-height:1.45}
 h2{font-size:1rem;font-weight:700;margin:0}
 .panel{background:var(--panel);border-radius:18px;padding:14px;box-shadow:var(--card-shadow)}
 
@@ -420,6 +421,16 @@ button.item:active{background:var(--accent-soft)}
         </ol>
       </div>
     </div>
+  </section>
+
+  <section class="panel rate-panel" aria-labelledby="sourcesTitle">
+    <h2 id="sourcesTitle">Data sources</h2>
+    <ul class="sources note">
+      <li>Exchange rates: <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener">Rates By Exchange Rate API</a>, with <a href="https://github.com/fawazahmed0/exchange-api" target="_blank" rel="noopener">fawazahmed0/exchange-api</a> as a fallback.</li>
+      <li>Weather: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Weather data by Open-Meteo.com</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>).</li>
+      <li>Place names: <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">Nominatim</a>, map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> (ODbL).</li>
+      <li>City guides and photos: Wikivoyage, Wikipedia, Wikidata and Wikimedia Commons. Text is <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>; each photo shows its own author and license.</li>
+    </ul>
   </section>
   <p class="note" id="appVer" style="text-align:center"></p>
 </div>
@@ -1429,7 +1440,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v47", opened=Date.now();
+const APP_VERSION="rightnote-v48", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
