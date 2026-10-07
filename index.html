@@ -990,15 +990,27 @@ const PHOTO_SOURCES=[
     return best&&photoInfo(best.f.title.replace(/^File:/,""));
   }
 ];
-async function fetchPhoto(p,wiki,voy){
+async function fetchPhoto(p,wiki,voy,bad=[]){
   const ctx={...p}; let failed=false;
   for(const src of PHOTO_SOURCES){
-    try{const ph=await src(ctx,wiki,voy);if(ph)return ph}catch(e){failed=true}
+    try{
+      const ph=await src(ctx,wiki,voy); if(!ph||bad.includes(ph.src))continue;
+      if(await keepPhoto(ph.src)===false){bad.push(ph.src);continue} // the image itself won't load: try the next source
+      return ph;
+    }catch(e){failed=true}
   }
   if(failed)throw new Error("offline"); // don't save "no photo" when a source couldn't be reached
   return {at:Date.now(),v:PHOTO_V};
 }
-async function keepPhoto(src){try{const c=await caches.open(PHOTO_CACHE);if(!await c.match(src)){const r=await fetch(src,{mode:"cors"});if(r.ok)await c.put(src,r)}}catch(e){}}
+// Saves the image for offline use: true when saved, false when the server refused it, null when we couldn't tell
+async function keepPhoto(src){
+  try{
+    const c=await caches.open(PHOTO_CACHE); if(await c.match(src))return true;
+    const r=await fetch(src,{mode:"cors"}); if(!r.ok)return false;
+    if(!/^image\//.test(r.headers.get("content-type")||"image/"))return false;
+    await c.put(src,r); return true;
+  }catch(e){return null}
+}
 function dropPhoto(src){try{caches.open(PHOTO_CACHE).then(c=>c.delete(src)).catch(()=>{})}catch(e){}}
 let photoBlob=null;
 async function renderPhoto(ph){
@@ -1008,7 +1020,13 @@ async function renderPhoto(ph){
   try{const r=await (await caches.open(PHOTO_CACHE)).match(ph.src);if(r)url=URL.createObjectURL(await r.blob())}catch(e){}
   if(!place||place.id!==id){if(url!==ph.src)URL.revokeObjectURL(url);return} // moved on to another city meanwhile
   if(photoBlob)URL.revokeObjectURL(photoBlob); photoBlob=url!==ph.src?url:null;
-  img.onerror=()=>{fig.hidden=true}; // offline and not saved yet
+  img.onerror=()=>{
+    fig.hidden=true; if(!navigator.onLine||!place||place.id!==id)return; // offline and not saved yet
+    // online and it still won't load: never use this file again for this city, and look for another photo
+    const d=cityData(id); if((d.badPhotos||[]).includes(ph.src))return; // already handled
+    d.badPhotos=[...(d.badPhotos||[]),ph.src].slice(-8); delete d.photo; saveCityData(id,d);
+    dropPhoto(ph.src); refreshCity();
+  };
   img.src=url; img.alt=`Photo of ${place.name}`; img.classList.toggle("wide",!!ph.wide);
   const lic=ph.licenseUrl?`<a href="${esc(ph.licenseUrl)}" target="_blank" rel="noopener">${esc(ph.license)}</a>`:esc(ph.license);
   $("cityPhotoCredit").innerHTML=`Photo: <a href="${esc(ph.page)}" target="_blank" rel="noopener">${esc(ph.artist)}</a>, ${lic}, via Wikimedia Commons`;
@@ -1081,9 +1099,9 @@ async function refreshCity(){
   const g=guideCity(p.id), stale=x=>!x||Date.now()-x.at>30*24*HOUR;
   const stalePhoto=x=>!x||x.v!==PHOTO_V||Date.now()-x.at>(x.src?30*24:24)*HOUR; // "no photo" is re-checked after a day
   // the photo comes from the same Wikipedia and Wikivoyage articles as the guide, so it's of the right place
-  const photo=(wiki,voy)=>stalePhoto(cityData(p.id).photo)?fetchPhoto(p,wiki,voy).then(async ph=>{
-    if(ph.src)await keepPhoto(ph.src);
-    const d=cityData(p.id); if(d.photo&&d.photo.src&&d.photo.src!==ph.src)dropPhoto(d.photo.src); d.photo=ph; saveCityData(p.id,d);
+  const bad=cityData(p.id).badPhotos||[]; // files that wouldn't load before; fetchPhoto adds any new ones
+  const photo=(wiki,voy)=>stalePhoto(cityData(p.id).photo)?fetchPhoto(p,wiki,voy,bad).then(ph=>{
+    const d=cityData(p.id); if(d.photo&&d.photo.src&&d.photo.src!==ph.src)dropPhoto(d.photo.src); d.photo=ph; d.badPhotos=bad.slice(-8); saveCityData(p.id,d);
   }).catch(()=>{}):null;
   const titles=v=>[v.wiki&&v.wiki.title,v.voy];
   if(g)jobs.push(photo(g.wiki,g.voy));
