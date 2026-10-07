@@ -12,6 +12,7 @@ It converts a cash price into the user's home currency and suggests which bankno
 |---|---|
 | `index.html` | The whole app: markup, CSS and JS in one file (~50 KB). |
 | `img/vnd/` | Note photos: `<denomination>-back.jpg` and `<denomination>-front.jpg`. |
+| `data/cities.json` | Built-in city guides (Hà Nội, Hồ Chí Minh City, Đà Nẵng, Hội An, Huế) plus per-country customs. Precached, so they work offline. |
 | `sw.js` | Service worker. Precaches the app and every note photo (`FILES`); network-first for same-origin files, falls back to cache offline. Rate APIs bypass it. |
 | `manifest.webmanifest` | Install metadata: name "RightNote Travel", short name "RightNote", theme `#0f7b6c`. |
 | `icon-*.png`, `apple-touch-icon.png` | Banknote-with-tick icon. The maskable and Apple versions are padded on a solid background. |
@@ -48,18 +49,25 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - "Refresh rate" tries `open.er-api.com/v6/latest/AUD`, then the jsDelivr `@fawazahmed0/currency-api` as a fallback.
   - Results are sanity-checked against plausible VND ranges and cached in `localStorage["rates"]`.
   - The app refreshes automatically once a day when online, unless a custom rate is active.
-- **Views:** three in-page views. Calculator and Notes are switched in the header; Options opens from the gear icon at the right of the header (tapping it again closes it).
+- **Views:** four in-page views. Calculator, Notes and City are switched in the header; Options opens from the gear icon at the right of the header (tapping it again closes it).
   - Calculator: the price, keypad, payment tabs and a one-line rate summary that opens Options.
   - Notes: the note grid (with 1M/2M/5M amounts to load) and the note card.
+  - City: weather and a travel guide for where you are (see **City** below).
   - Options: the exchange rate controls, Appearance, and "Install on your phone" (iPhone and Android steps, this phone's first; a one-tap Install button when Chrome offers `beforeinstallprompt`). The install section hides when the app runs from the home screen.
   - `route()` picks the view from the URL hash, so the phone's back button returns to the calculator. Each trip away from the calculator adds one history entry; moving between Notes and Options replaces it.
-- **Deep links:** `#notes` opens Notes; `#n1k` … `#n500k` open Notes with that note's card (tapping a note photo in the payment tabs does the same). `#options` (or the older `#rate`) opens Options.
+- **Deep links:** `#notes` opens Notes; `#city` opens City; `#n1k` … `#n500k` open Notes with that note's card (tapping a note photo in the payment tabs does the same). `#options` (or the older `#rate`) opens Options.
+- **City:**
+  - **Finding the place:** "Locate me" uses `navigator.geolocation`. A built-in guide city within 20 km wins (works offline); otherwise OSM Nominatim `reverse` names the town. Search by name matches built-in guides offline and asks Nominatim `search` online, on submit only (Nominatim's usage policy forbids search-as-you-type). With location already granted, opening City re-locates if the last GPS fix is over an hour old.
+  - **Weather:** Open-Meteo (no key): current conditions, 5 days, sunrise/sunset, UV. Refreshed when older than an hour.
+  - **Guide:** built-in cities render `data/cities.json` sections (`p` paragraphs, `list` bullets, `items` with optional `p` price in the city's currency). The country's `customs` are appended to each city's Customs. Prices show local and the base currency; when the city's currency is `second` they're buttons that load the amount into the calculator. Other cities use the Wikipedia summary plus the Understand/Eat/Drink/Buy/Respect/Stay safe sections of Wikivoyage (prose only, trimmed), credited as CC BY-SA 4.0.
+  - **Storage:** `localStorage["place"]` is the current place; `["recent"]` the last 8 non-built-in places; `["city:<id>"]` that place's saved weather and online guide (refreshed after 30 days, removed when it drops off Recent).
+  - To add a built-in city, add it to `data/cities.json` (with `lat`/`lon`, `tz` and `voy`, its Wikivoyage title). Bump `VERSION` in `sw.js`.
 - **Theme:** colours are CSS variables on `:root`. By default they follow the phone's light or dark setting; the Appearance section in Options (Auto, Light, Dark) can force light or dark, saved in `localStorage["theme"]` and applied as `data-theme` on `<html>` by a small script in `<head>` before the page draws. The accent comes from the app icon: `--accent` (`#0f7b6c`) fills buttons, and `--accent-text` is the green for text, which in dark mode is the icon's lighter tick green (`#3cc1a9`) so it stays readable. Note colours are passed as `--c1` (brighter, used in dark mode) and `--c2` (darker, light mode) and applied by the `.tone` class.
 - **UI:** views and the note card are in-page panels (`#notesView`, `#noteDlg`), not modals. Floating popups opened off-screen or didn't work inside app viewers on the owner's phone. Keep interactions inline.
 
 ## Constraints
 
-- Must work fully offline after the first visit, on Android Chrome and iOS Safari. Avoid runtime CDN dependencies; fonts fall back to system fonts.
+- Must work fully offline after the first visit, on Android Chrome and iOS Safari. Avoid runtime CDN dependencies; fonts fall back to system fonts. Online-only extras (rates, weather, Nominatim, Wikivoyage) must cache their last result and degrade cleanly.
 - The main user is on a phone. Keep the layout compact and tap targets large, and make payment icons large enough to recognise a note at a glance.
 - The note photos are the owner's own. Don't replace them with images from the web: licensing for banknote images is unclear.
 

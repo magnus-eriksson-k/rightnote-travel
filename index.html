@@ -40,7 +40,8 @@ h1{font-size:.95rem;font-weight:800;letter-spacing:.03em;text-transform:uppercas
 .gear[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
 .views button{border:0;background:none;color:var(--ink);font:700 .85rem var(--body);border-radius:999px;padding:0 10px;min-height:38px;cursor:pointer;touch-action:manipulation}
 .views button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
-@media (max-width:350px){h1{font-size:.82rem;letter-spacing:0}.views button{padding:0 8px;font-size:.8rem}.gear{width:38px}}
+@media (max-width:400px){h1{font-size:.82rem;letter-spacing:0}.views button{padding:0 8px;font-size:.8rem}.gear{width:38px}}
+@media (max-width:350px){.wrap{padding-inline:12px}h1{font-size:.75rem}.views button{padding:0 6px;font-size:.76rem}.gear{width:34px}}
 .view{display:flex;flex-direction:column;gap:14px}
 .rate-sum{align-self:stretch;display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;background:none;border:0;padding:6px 2px;min-height:44px;font:inherit;font-size:.85rem;color:var(--muted);text-align:left;cursor:pointer}
 .rate-sum b{color:var(--accent-text)}
@@ -170,6 +171,55 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .file-btn{position:relative;overflow:hidden}
 .file-btn input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:100px}
 .file-btn:focus-within{outline:2px solid var(--accent-text);outline-offset:2px}
+
+/* City: weather and a guide to where you are */
+.city-top{display:flex;flex-direction:column;gap:10px}
+.city-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.city-title{display:flex;flex-direction:column;gap:2px;min-width:0}
+.city-title h2{font-size:1.3rem;line-height:1.2}
+#locBtn{flex:none;gap:6px;padding:0 14px}
+.city-search{display:flex;gap:8px}
+.city-search input{flex:1;min-width:0;font:16px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 12px;min-height:44px}
+.results{display:flex;flex-direction:column;gap:4px}
+.results:empty,.chips:empty,.city-top .note:empty{display:none}
+.results button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:0;border-radius:10px;background:var(--key-op);color:var(--ink);font:inherit;padding:8px 12px;min-height:48px;cursor:pointer;touch-action:manipulation}
+.results button span{font-size:.8rem;color:var(--muted)}
+.chips{display:flex;flex-direction:column;gap:6px}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips .lbl{font-size:.78rem;color:var(--muted);margin-right:2px}
+.chips button{border:0;border-radius:999px;background:var(--key-op);color:var(--ink);font:600 .85rem var(--body);padding:0 12px;min-height:36px;cursor:pointer;touch-action:manipulation}
+.chips button[aria-current="true"]{background:var(--accent);color:var(--accent-ink)}
+.wx{display:flex;flex-direction:column;gap:10px}
+.wx-now{display:flex;align-items:center;gap:12px}
+.wx-ico{font-size:2.8rem;line-height:1}
+.wx-t{font-size:2.4rem;font-weight:300;line-height:1}
+.wx-d{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);min-width:0}
+.wx-d b{color:var(--ink);font-size:.95rem}
+.wx-days{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;text-align:center;font-size:.8rem}
+.wx-days div{display:flex;flex-direction:column;gap:1px;background:var(--key-op);border-radius:10px;padding:6px 2px}
+.wx-days .i{font-size:1.3rem;line-height:1.3}
+.wx-days .r{color:var(--muted);font-size:.72rem}
+.wx-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;font-size:.78rem;color:var(--muted)}
+.city-body{display:flex;flex-direction:column;gap:10px}
+.sect{padding:0}
+.sect summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:0 14px;min-height:52px;font-weight:700;cursor:pointer;touch-action:manipulation}
+.sect summary::-webkit-details-marker{display:none}
+.sect summary::after{content:"▾";color:var(--muted);transition:transform .2s}
+.sect[open] summary::after{transform:rotate(180deg)}
+.sect-body{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px;font-size:.92rem}
+.sect-body p{margin:0}
+.sect-body ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.items{display:flex;flex-direction:column}
+.item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;width:100%;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;text-align:left;padding:9px 0}
+.items .item:first-child{border-top:0;padding-top:2px}
+button.item{cursor:pointer;touch-action:manipulation}
+button.item:active{background:var(--accent-soft)}
+.item .txt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.item .txt span{font-size:.84rem;color:var(--muted)}
+.item .pr{flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap}
+.item .pr b{color:var(--accent-text)}
+.item .pr span{font-size:.8rem;color:var(--muted)}
+#cityCredit a{color:var(--accent-text)}
 @media (prefers-reduced-motion: reduce){.keys button:active{transform:none}.chev{transition:none}}
 </style>
 
@@ -179,6 +229,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
       <nav class="views" aria-label="Views">
         <button type="button" id="toCalc" aria-current="page">Calculator</button>
         <button type="button" id="toNotes" aria-current="false">Notes</button>
+        <button type="button" id="toCity" aria-current="false">City</button>
       </nav>
       <button type="button" class="gear" id="toOptions" aria-label="Options" aria-current="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </div>
@@ -249,6 +300,25 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
     <p class="note">Tap a note for its details, or an amount to load it.</p>
   </section>
 
+</div>
+
+<div class="view" id="cityView" hidden>
+  <section class="panel city-top" aria-labelledby="cityName">
+    <div class="city-head">
+      <div class="city-title"><h2 id="cityName">Where are you?</h2><span class="note" id="cityMeta"></span></div>
+      <button type="button" class="btn primary" id="locBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Locate me</button>
+    </div>
+    <form class="city-search" id="cityForm" role="search">
+      <input type="search" id="cityQ" placeholder="Search for a city" aria-label="Search for a city" enterkeyhint="search" autocomplete="off">
+      <button type="submit" class="btn">Search</button>
+    </form>
+    <div class="results" id="cityResults"></div>
+    <div class="chips" id="cityChips"></div>
+    <p class="note" id="cityMsg" aria-live="polite"></p>
+  </section>
+  <section class="panel wx" id="wxCard" aria-label="Weather" hidden></section>
+  <div class="city-body" id="cityBody"></div>
+  <p class="note" id="cityCredit"></p>
 </div>
 
 <div class="view" id="optionsView" hidden>
@@ -488,23 +558,26 @@ function showPhoto(){
   $("photoBtnText").textContent=id?"Replace photo":"Add your photo";
 }
 // ---- Views: the URL hash picks the view, so the phone's back button returns to the calculator ----
-// #notes opens Notes and #n1k … #n500k a note's card there; #options (or the older #rate) opens Options
+// #notes opens Notes and #n1k … #n500k a note's card there; #city opens City; #options (or the older #rate) opens Options
 let fromCalc=false; // we left the calculator in this visit, so going back returns there
 function showView(v){
-  $("calcView").hidden=v!=="calc"; $("notesView").hidden=v!=="notes"; $("optionsView").hidden=v!=="options";
+  const was=$("cityView").hidden;
+  $("calcView").hidden=v!=="calc"; $("notesView").hidden=v!=="notes"; $("cityView").hidden=v!=="city"; $("optionsView").hidden=v!=="options";
   $("toCalc").setAttribute("aria-current",v==="calc"?"page":"false");
   $("toNotes").setAttribute("aria-current",v==="notes"?"page":"false");
+  $("toCity").setAttribute("aria-current",v==="city"?"page":"false");
+  if(v==="city"&&was)openCity();
   $("toOptions").setAttribute("aria-current",v==="options"?"page":"false");
 }
 function route(){
   const h=location.hash, m=/^#n(\d+)k$/.exec(h);
   if(m&&NOTE_INFO[+m[1]*1000]){showView("notes");openNote(+m[1]*1000);return}
   closeNote();
-  const v=h==="#notes"?"notes":h==="#options"||h==="#rate"?"options":"calc";
+  const v=h==="#notes"?"notes":h==="#city"?"city":h==="#options"||h==="#rate"?"options":"calc";
   showView(v); if(v!=="calc")window.scrollTo(0,0);
 }
 function goTo(hash){
-  // one history entry per trip away from the calculator; moving between Notes and Options replaces it
+  // one history entry per trip away from the calculator; moving between Notes, City and Options replaces it
   if(!$("calcView").hidden){fromCalc=true;location.hash=hash}
   else{history.replaceState(null,"",hash);route()}
 }
@@ -516,6 +589,7 @@ function goCalc(){
 window.addEventListener("hashchange",route);
 $("toNotes").addEventListener("click",()=>goTo("#notes"));
 $("toCalc").addEventListener("click",goCalc);
+$("toCity").addEventListener("click",()=>goTo("#city"));
 // the gear opens Options, and closes it again when it's already open
 $("toOptions").addEventListener("click",()=>$("optionsView").hidden?goTo("#options"):goCalc());
 $("rateSum").addEventListener("click",()=>goTo("#options"));
@@ -636,6 +710,279 @@ $("photoIn").addEventListener("change",async e=>{
       store_unavailable:"Storage is busy. Try again in a moment."}[code]||"Couldn't save the photo.";
     $("dlgMsg").textContent=`${why} (${code})`;
   }
+});
+// ---- City: weather and a guide to where you are, from GPS or a search ----
+// Curated guides (data/cities.json) work offline; other cities use Wikivoyage and Wikipedia, saved on this phone after the first look.
+let guide=null, place=null; // place: {id,name,country,cc,lat,lon,tz,gps,at}
+try{place=JSON.parse(store.get("place")||"null")}catch(e){}
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const norm=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[đĐ]/g,"d").toLowerCase().trim();
+const HOUR=36e5;
+function km(a,b,c,d){const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742*Math.asin(Math.sqrt(x))}
+async function loadGuide(){
+  if(!guide){try{guide=await (await fetch("data/cities.json")).json()}catch(e){guide={cities:[],countries:{}}}}
+  return guide;
+}
+const guideCity=id=>guide&&guide.cities.find(c=>c.id===id);
+function asPlace(c){return {id:c.id,name:c.name,country:(guide.countries[c.cc]||{}).name||"",cc:c.cc,lat:c.lat,lon:c.lon,tz:c.tz}}
+function nearGuide(lat,lon){ // a curated city within 20 km
+  let best=null;for(const c of guide.cities){const d=km(lat,lon,c.lat,c.lon);if(d<20&&(!best||d<best.d))best={c,d}}
+  return best&&best.c;
+}
+// What's saved for each city: weather, and the online guide for cities without a curated one
+const cityData=id=>{try{return JSON.parse(store.get("city:"+id)||"null")||{}}catch(e){return {}}};
+const saveCityData=(id,d)=>store.set("city:"+id,JSON.stringify(d));
+function recents(){try{return JSON.parse(store.get("recent")||"[]")}catch(e){return []}}
+function setPlace(p){
+  place={...p,at:Date.now()}; store.set("place",JSON.stringify(place));
+  if(!guideCity(p.id)){ // keep the last 8 other cities, and drop what's saved for older ones
+    const r=[place,...recents().filter(x=>x.id!==p.id)];
+    r.slice(8).forEach(x=>{try{localStorage.removeItem("city:"+x.id)}catch(e){}});
+    store.set("recent",JSON.stringify(r.slice(0,8)));
+  }
+  $("cityResults").innerHTML=""; renderCity(); refreshCity();
+  window.scrollTo(0,0);
+}
+const msg=t=>{$("cityMsg").textContent=t||""};
+
+// ---- Finding the city: GPS, then a curated city nearby or the town name from OpenStreetMap ----
+async function nominatim(path,params){
+  const u=`https://nominatim.openstreetmap.org/${path}?`+new URLSearchParams({format:"jsonv2",addressdetails:1,"accept-language":"en",...params});
+  const r=await fetch(u); if(!r.ok)throw new Error(r.status); return r.json();
+}
+function fromOsm(o,lat,lon){
+  const a=o.address||{}, name=a.city||a.town||a.village||a.municipality||o.name||a.county||a.state;
+  if(!name)return null;
+  const cc=(a.country_code||"").toUpperCase();
+  return {id:norm(name+"-"+cc).replace(/[^a-z0-9]+/g,"-"),name,country:a.country||"",cc,lat:+(lat??o.lat),lon:+(lon??o.lon)};
+}
+function locate(quiet){
+  if(!navigator.geolocation){if(!quiet)msg("This browser can't share your location. Search for a city instead.");return}
+  if(!quiet)msg("Finding where you are…");
+  $("locBtn").disabled=true;
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const {latitude:lat,longitude:lon}=pos.coords;
+    await loadGuide();
+    const g=nearGuide(lat,lon);
+    if(g){$("locBtn").disabled=false;msg("");setPlace({...asPlace(g),gps:true});return}
+    try{
+      const p=fromOsm(await nominatim("reverse",{lat,lon,zoom:10}),lat,lon);
+      if(!p)throw new Error("no place");
+      msg(""); setPlace({...p,gps:true});
+    }catch(e){
+      msg(navigator.onLine?"Couldn't name this place. Try searching for it.":"You're offline. Without a connection the app can only recognise the cities with a built-in guide.");
+    }
+    $("locBtn").disabled=false;
+  },err=>{
+    $("locBtn").disabled=false;
+    if(!quiet)msg(err.code===1?"Location is blocked for this app. Allow it in your browser's site settings, or search for a city."
+      :"Couldn't get a location fix. Try again outdoors, or search for a city.");
+  },{enableHighAccuracy:false,timeout:20000,maximumAge:10*60*1000});
+}
+$("locBtn").addEventListener("click",()=>locate(false));
+
+let cityResults=[];
+// Search: built-in guides match offline; other places come from OpenStreetMap when online (on submit only, as its rules ask)
+$("cityForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const q=$("cityQ").value.trim(); if(!q)return;
+  $("cityQ").blur(); await loadGuide();
+  const nq=norm(q), local=guide.cities.filter(c=>[c.name,c.en,...(c.alt||[])].some(n=>norm(n).startsWith(nq)||nq.startsWith(norm(n))));
+  let found=local.map(c=>({...asPlace(c),sub:`${(guide.countries[c.cc]||{}).name} · built-in guide`}));
+  msg(navigator.onLine?"Searching…":"");
+  if(navigator.onLine){
+    try{
+      const rs=await nominatim("search",{q,limit:6,featureType:"settlement"});
+      for(const o of rs){
+        const p=fromOsm(o); if(!p)continue;
+        const g=nearGuide(p.lat,p.lon);
+        if(g){if(!found.some(f=>f.id===g.id))found.push({...asPlace(g),sub:`${(guide.countries[g.cc]||{}).name} · built-in guide`});continue}
+        if(!found.some(f=>f.id===p.id))found.push({...p,sub:o.display_name.split(", ").slice(1).join(", ")});
+      }
+    }catch(err){}
+  }
+  msg(found.length?"":navigator.onLine?`No town or city called "${q}" found.`:"You're offline. Only the cities with a built-in guide can be found.");
+  cityResults=found;
+  $("cityResults").innerHTML=found.map((f,i)=>`<button type="button" data-i="${i}"><b>${esc(f.name)}</b><span>${esc(f.sub||f.country)}</span></button>`).join("");
+});
+$("cityResults").addEventListener("click",e=>{
+  const b=e.target.closest("[data-i]"); if(!b)return;
+  const {sub,...p}=cityResults[+b.dataset.i]; $("cityQ").value=""; setPlace(p);
+});
+$("cityChips").addEventListener("click",e=>{
+  const b=e.target.closest("[data-id]"); if(!b)return;
+  const g=guideCity(b.dataset.id); setPlace(g?asPlace(g):recents().find(x=>x.id===b.dataset.id));
+});
+
+// ---- Weather from Open-Meteo (no key); the last forecast is kept for offline ----
+function wx(code,day){
+  const c=+code;
+  if(c<=1&&day===0)return ["🌙",c?"Mostly clear":"Clear"];
+  if(c===0)return ["☀️","Clear"]; if(c===1)return ["🌤️","Mostly clear"]; if(c===2)return ["⛅","Partly cloudy"]; if(c===3)return ["☁️","Cloudy"];
+  if(c<=48)return ["🌫️","Fog"]; if(c<=57)return ["🌦️","Drizzle"]; if(c===61)return ["🌦️","Light rain"]; if(c<=67)return ["🌧️",c>=65?"Heavy rain":"Rain"];
+  if(c<=77||c===85||c===86)return ["❄️","Snow"]; if(c===80)return ["🌦️","Showers"]; if(c<=82)return ["🌧️","Heavy showers"];
+  return ["⛈️","Thunderstorm"];
+}
+async function fetchWeather(p){
+  const u="https://api.open-meteo.com/v1/forecast?"+new URLSearchParams({latitude:p.lat,longitude:p.lon,timezone:"auto",forecast_days:5,
+    current:"temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day",
+    daily:"weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset"});
+  const r=await fetch(u); if(!r.ok)throw new Error(r.status); return r.json();
+}
+const ago=t=>{const m=Math.round((Date.now()-t)/6e4);return m<2?"just now":m<60?`${m} min ago`:m<48*60?`${Math.round(m/60)} h ago`:`${Math.round(m/1440)} days ago`};
+function localTime(p,w){ // the city's clock, from its time zone, or the forecast's UTC offset
+  const opt={hour:"numeric",minute:"2-digit"};
+  try{if(p.tz||w&&w.timezone)return new Date().toLocaleTimeString("en-AU",{...opt,timeZone:p.tz||w.timezone})}catch(e){}
+  if(w&&"utc_offset_seconds" in w)return new Date(Date.now()+w.utc_offset_seconds*1000).toLocaleTimeString("en-AU",{...opt,timeZone:"UTC"});
+  return "";
+}
+function renderWeather(saved){
+  const w=saved&&saved.data, card=$("wxCard");
+  if(!w||!w.current){card.hidden=true;return}
+  const c=w.current, d=w.daily, [ico,txt]=wx(c.weather_code,c.is_day), t=n=>Math.round(n)+"°";
+  const hm=s=>s?s.slice(11,16):"";
+  const days=d.time.slice(0,5).map((day,i)=>{
+    const name=i?new Date(day+"T12:00:00Z").toLocaleDateString("en-AU",{weekday:"short",timeZone:"UTC"}):"Today", [di,dt]=wx(d.weather_code[i],1);
+    const rain=d.precipitation_probability_max&&d.precipitation_probability_max[i];
+    return `<div aria-label="${name}: ${dt}, ${t(d.temperature_2m_max[i])} to ${t(d.temperature_2m_min[i])}"><span>${name}</span><span class="i" aria-hidden="true">${di}</span><b>${t(d.temperature_2m_max[i])}</b><span class="r">${t(d.temperature_2m_min[i])}${rain!=null?` · ${rain}%`:""}</span></div>`;
+  }).join("");
+  const uv=d.uv_index_max&&d.uv_index_max[0];
+  card.innerHTML=`<div class="wx-now"><span class="wx-ico" aria-hidden="true">${ico}</span><span class="wx-t">${t(c.temperature_2m)}</span>
+      <span class="wx-d"><b>${txt}</b><span>Feels like ${t(c.apparent_temperature)} · humidity ${c.relative_humidity_2m}%</span><span>Wind ${Math.round(c.wind_speed_10m)} km/h${uv!=null?` · UV ${Math.round(uv)}`:""}</span></span></div>
+    <div class="wx-days">${days}</div>
+    <div class="wx-foot"><span>Sunrise ${hm(d.sunrise[0])} · sunset ${hm(d.sunset[0])}</span><span>Updated ${ago(saved.at)}</span></div>`;
+  card.hidden=false;
+}
+
+// ---- Online guide for other cities: Wikipedia's summary and the useful Wikivoyage sections ----
+const VOY_SECTIONS=[["Understand","About the city"],["Eat","Food"],["Drink","Drink and nightlife"],["Buy","Shopping and money"],["Respect","Customs"],["Stay safe","Watch out for"]];
+async function wv(params){
+  const r=await fetch("https://en.wikivoyage.org/w/api.php?"+new URLSearchParams({format:"json",formatversion:2,origin:"*",...params}));
+  if(!r.ok)throw new Error(r.status); return r.json();
+}
+async function voyTitle(p){ // the Wikivoyage article for this place: a nearby article with the same name, else the name itself
+  const g=await wv({action:"query",list:"geosearch",gscoord:`${p.lat}|${p.lon}`,gsradius:10000,gslimit:30});
+  const hits=(g.query&&g.query.geosearch||[]).filter(h=>!h.title.includes("/"));
+  const n=norm(p.name), same=hits.find(h=>norm(h.title.replace(/ \(.*\)$/,""))===n);
+  if(same)return same.title;
+  const q=await wv({action:"query",titles:p.name,redirects:1,prop:"coordinates|pageprops"});
+  const pg=q.query&&q.query.pages&&q.query.pages[0];
+  if(pg&&!pg.missing&&!(pg.pageprops&&"disambiguation" in pg.pageprops)){
+    const co=pg.coordinates&&pg.coordinates[0];
+    if(!co||km(p.lat,p.lon,co.lat,co.lon)<60)return pg.title;
+  }
+  return null;
+}
+function voySections(html){
+  const doc=new DOMParser().parseFromString(html,"text/html"), out=[];
+  const isH2=n=>n.matches("h2,.mw-heading2")||!!n.querySelector("h2");
+  for(const [name,label] of VOY_SECTIONS){
+    const h=[...doc.querySelectorAll("h2")].find(x=>x.textContent.trim()===name); if(!h)continue;
+    const start=h.parentElement.matches(".mw-heading")?h.parentElement:h, ps=[]; let len=0;
+    for(let n=start.nextElementSibling;n&&!isH2(n)&&ps.length<6&&len<1800;n=n.nextElementSibling){
+      for(const p of n.matches("p")?[n]:n.querySelectorAll("p")){
+        const t=p.textContent.replace(/\[\d+\]/g,"").replace(/\s+/g," ").trim();
+        if(t.length>40&&ps.length<6&&len<1800){ps.push(t);len+=t.length}
+      }
+    }
+    if(ps.length)out.push({h:label,p:ps});
+  }
+  return out;
+}
+async function fetchGuide(p){
+  const title=await voyTitle(p), res={at:Date.now(),voy:null,wiki:null,sections:[]};
+  if(title){
+    const j=await wv({action:"parse",page:title,prop:"text",redirects:1,disableeditsection:1,disabletoc:1});
+    if(j.parse){res.voy=j.parse.title;res.sections=voySections(j.parse.text)}
+  }
+  try{ // Wikipedia's short summary, if it's about the same place
+    const r=await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title||p.name)+"?redirect=true");
+    const s=r.ok&&await r.json();
+    if(s&&s.type==="standard"&&s.extract&&s.coordinates&&km(p.lat,p.lon,s.coordinates.lat,s.coordinates.lon)<60)
+      res.wiki={title:s.title,extract:s.extract,url:s.content_urls&&s.content_urls.mobile&&s.content_urls.mobile.page};
+  }catch(e){}
+  return res;
+}
+
+// ---- Drawing the City view ----
+function priceHTML(v,cur){
+  // the local price, and what it is in your currency at the calculator's rate
+  const loc=CUR[cur]?CUR[cur].sym+fmt(v,cur):`${v.toLocaleString("en-AU")} ${cur}`;
+  const r=cur===second?v/rate():CUR[cur]?v*CUR[cur].vnd/CUR[base].vnd:NaN;
+  return `<span class="pr"><b>${loc}</b>${isFinite(r)&&cur!==base?`<span>${CUR[base].sym}${fmt(r,base)}</span>`:""}</span>`;
+}
+function sectHTML(s,i,cur){
+  let body="";
+  if(s.p)body+=s.p.map(t=>`<p>${esc(t)}</p>`).join("");
+  if(s.list)body+=`<ul>${s.list.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`;
+  if(s.items){
+    body+=`<div class="items">${s.items.map(it=>{
+      const txt=`<span class="txt"><b>${esc(it.t)}</b>${it.d?`<span>${esc(it.d)}</span>`:""}</span>`;
+      if(it.p==null)return `<div class="item">${txt}</div>`;
+      // prices in the currency you type in open in the calculator
+      return cur===second?`<button type="button" class="item" data-price="${it.p}" aria-label="${esc(it.t)}, ${it.p.toLocaleString("en-AU")} ${cur}, open in calculator">${txt}${priceHTML(it.p,cur)}</button>`
+        :`<div class="item">${txt}${priceHTML(it.p,cur)}</div>`;
+    }).join("")}</div>`;
+    if(cur===second&&s.items.some(it=>it.p!=null))body+=`<p class="note">Rough guide prices (${esc(guide.checked)}). Tap one to open it in the calculator.</p>`;
+  }
+  return `<details class="panel sect"${i===0?" open":""}><summary>${esc(s.h)}</summary><div class="sect-body">${body}</div></details>`;
+}
+function renderChips(){
+  const cur=place&&place.id, chip=(id,n)=>`<button type="button" data-id="${esc(id)}" aria-current="${id===cur}">${esc(n)}</button>`;
+  const g=(guide?guide.cities:[]).map(c=>chip(c.id,c.name)).join(""), r=recents().map(x=>chip(x.id,x.name)).join("");
+  $("cityChips").innerHTML=(g?`<div class="chip-row"><span class="lbl">Guides</span>${g}</div>`:"")+(r?`<div class="chip-row"><span class="lbl">Recent</span>${r}</div>`:"");
+}
+function renderCity(){
+  renderChips();
+  if(!place){
+    $("cityName").textContent="Where are you?"; $("cityMeta").textContent="Tap Locate me, search, or pick a guide below.";
+    $("wxCard").hidden=true; $("cityBody").innerHTML=""; $("cityCredit").textContent=""; return;
+  }
+  const saved=cityData(place.id), g=guideCity(place.id);
+  $("cityName").textContent=place.name;
+  const time=localTime(place,saved.wx&&saved.wx.data);
+  $("cityMeta").textContent=[place.country,time&&`${time} local time`,place.gps&&"your location"].filter(Boolean).join(" · ");
+  renderWeather(saved.wx);
+  let sections, credit="";
+  if(g){
+    const extra=(guide.countries[g.cc]||{}).customs||[];
+    sections=g.sections.map(s=>s.h==="Customs"?{...s,list:[...s.list,...extra]}:s);
+    if(!sections.some(s=>s.h==="Customs")&&extra.length)sections.splice(sections.findIndex(s=>s.h==="Typical prices"),0,{h:"Customs",list:extra});
+    credit=`Built-in guide, checked ${esc(guide.checked)}. More on <a href="https://en.wikivoyage.org/wiki/${encodeURIComponent(g.voy)}" target="_blank" rel="noopener">Wikivoyage</a>.`;
+  }else{
+    const v=saved.guide;
+    sections=v?[...(v.wiki?[{h:"Overview",p:[v.wiki.extract]}]:[]),...v.sections]:[];
+    if(v&&(v.wiki||v.voy)){
+      const links=[v.wiki&&`<a href="${esc(v.wiki.url||"https://en.wikipedia.org/wiki/"+encodeURIComponent(v.wiki.title))}" target="_blank" rel="noopener">Wikipedia</a>`,
+        v.voy&&`<a href="https://en.wikivoyage.org/wiki/${encodeURIComponent(v.voy)}" target="_blank" rel="noopener">Wikivoyage</a>`].filter(Boolean).join(" and ");
+      credit=`Text from ${links}, shared under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Saved ${ago(v.at)} for offline use.`;
+    }else if(v)credit="No travel guide found for this place.";
+    else credit=navigator.onLine?"Loading the guide…":"Connect to the internet to load this city's guide. It's saved for offline use after that.";
+  }
+  const curCode=g?g.cur:null;
+  $("cityBody").innerHTML=sections.map((s,i)=>sectHTML(s,i,curCode)).join("");
+  $("cityCredit").innerHTML=credit;
+}
+async function refreshCity(){
+  if(!place||!navigator.onLine)return;
+  const p=place, saved=cityData(p.id), jobs=[];
+  if(!saved.wx||Date.now()-saved.wx.at>HOUR)jobs.push(fetchWeather(p).then(data=>{const d=cityData(p.id);d.wx={at:Date.now(),data};saveCityData(p.id,d)}).catch(()=>{}));
+  if(!guideCity(p.id)&&(!saved.guide||Date.now()-saved.guide.at>30*24*HOUR))
+    jobs.push(fetchGuide(p).then(v=>{const d=cityData(p.id);d.guide=v;saveCityData(p.id,d)}).catch(()=>{}));
+  if(!jobs.length)return;
+  await Promise.all(jobs);
+  if(place&&place.id===p.id)renderCity();
+}
+async function openCity(){
+  await loadGuide(); renderCity(); refreshCity();
+  // with location already allowed, follow the phone when the last fix is over an hour old
+  if((!place||place.gps&&Date.now()-place.at>HOUR)&&navigator.permissions){
+    try{const s=await navigator.permissions.query({name:"geolocation"});if(s.state==="granted")locate(true)}catch(e){}
+  }
+}
+$("cityBody").addEventListener("click",e=>{
+  const b=e.target.closest("[data-price]"); if(!b)return;
+  goCalc(); loadAmount(+b.dataset.price);
 });
 // ---- Appearance: match the phone, or always light or dark ----
 const THEME_BG={light:"#f1f2f3",dark:"#121314"};
