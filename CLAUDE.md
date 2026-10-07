@@ -22,9 +22,9 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
 ## Releasing a change
 
 1. Edit the files.
-2. **Bump `VERSION` in `sw.js`** (e.g. `rightnote-v3` → `rightnote-v4`). Without this, installed copies keep serving the old cache.
+2. **Bump `VERSION` in `sw.js`** (e.g. `rightnote-v3` → `rightnote-v4`) **and `APP_VERSION` in `index.html` to match**. Without this, installed copies keep serving the old cache. The version shows at the bottom of Options, with a note when a newer one is downloaded but not running yet. The app checks for an update whenever it comes back to the foreground and switches to it at once if it was opened under 10 s ago, otherwise the next time you leave the app.
 3. Run a syntax check on the inline script: extract the `<script>` body and run `node --check`.
-4. Commit and push to `main`. Pages redeploys in about a minute.
+4. Commit and push to `main`, **on its own**: a push that updates several branches at once didn't trigger a Pages build. Pages redeploys in about a minute; check the "pages build and deployment" run if in doubt.
 
 ## How index.html works
 

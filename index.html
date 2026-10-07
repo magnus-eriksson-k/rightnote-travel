@@ -415,6 +415,7 @@ button.item:active{background:var(--accent-soft)}
       </div>
     </div>
   </section>
+  <p class="note" id="appVer" style="text-align:center"></p>
 </div>
 </div>
 
@@ -1373,7 +1374,28 @@ route();
 })();
 
 // Installed app: work offline, and refresh the rate automatically once a day when online
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+// ---- Updates ----
+// Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
+// version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
+const APP_VERSION="rightnote-v38", opened=Date.now();
+async function showVersion(){
+  let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
+  const n=v=>v.replace("rightnote-v","");
+  $("appVer").textContent=`Version ${n(APP_VERSION)}`+(saved&&saved!==APP_VERSION?` · version ${n(saved)} downloaded, reopen the app to use it`:"");
+}
+showVersion();
+if("serviceWorker" in navigator){
+  const hadWorker=!!navigator.serviceWorker.controller; let reloadWhenHidden=false, checked=0;
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    if(!hadWorker)return; // first install: this page is already current
+    if(Date.now()-opened<10000)location.reload(); else{reloadWhenHidden=true;showVersion()}
+  });
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden){if(reloadWhenHidden)location.reload();return}
+    if(Date.now()-checked>10*60000){checked=Date.now();navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{})}
+  });
+}
 (function(){
   let last=null; try{last=JSON.parse(localStorage.getItem("rates")||"null")}catch(e){}
   const today=new Date().toISOString().slice(0,10);
