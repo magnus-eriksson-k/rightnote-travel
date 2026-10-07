@@ -1054,7 +1054,7 @@ async function renderPhoto(ph){
 // An item names a Commons file (img) or a Wikipedia article (wiki) whose lead image is used. Looked up in two batched calls,
 // credited like the city photo; thumbnails are saved for offline use when the city opens, the large photo once it's been viewed.
 const picKey=it=>it.img?"f:"+it.img:it.wiki?"w:"+it.wiki:null;
-const PIC_W=960, PIC_THUMB=330, PICS_V=3; // bump PICS_V to look up every city's item photos again
+const PIC_W=960, PIC_THUMB=330, PICS_V=4; // bump PICS_V to look up every city's item photos again
 const chunks=(a,n)=>a.length?[a.slice(0,n),...chunks(a.slice(n),n)]:[];
 async function fetchItemPics(items){
   const files={}; // item key -> Commons file name
@@ -1099,7 +1099,7 @@ function dropPics(old,keep){ // removes saved files no longer used
   const used=new Set(picsOf(keep).flatMap(p=>[p.thumb,p.src]));
   picsOf(old).forEach(p=>[p.thumb,p.src].forEach(s=>{if(!used.has(s))dropPhoto(s)}));
 }
-let picBlobs=[], picsBusy=null;
+let picBlobs=[], picsBusy=null, picsLast={}; // picsLast: this session's lookup result per city, in case it couldn't be saved
 const saveQueue=[]; let saving=0;
 function queueSave(src){ // downloads for offline use, four at a time
   return new Promise(done=>{
@@ -1227,7 +1227,9 @@ function renderCity(){
   body.innerHTML=sections.map((s,i)=>sectHTML(s,i,curCode,pics)).join(""); body.dataset.id=place.id;
   if(open)body.querySelectorAll("details").forEach(d=>{d.open=open.has(d.dataset.k)});
   loadThumbs(); body.querySelectorAll("details.pic[open]").forEach(bigPic);
-  if(g)credit+=`<br><span id="picCheck">Photo check: ${picsBusy===place.id?"looking up…":saved.picsErr?"lookup failed: "+esc(saved.picsErr):saved.pics&&saved.pics.check?esc(saved.pics.check):navigator.onLine?"not run yet":"offline"}</span>`;
+  if(g)credit+=`<br><span id="picCheck">Photo check: ${esc(picsBusy===place.id?"looking up…":picsLast[place.id]||(saved.picsErr?"lookup failed: "+saved.picsErr:
+    saved.pics?(saved.pics.check||`${Object.values(saved.pics.map||{}).filter(Boolean).length} found by an older version`)+`, ${ago(saved.pics.at)}, v${saved.pics.v}`:
+    navigator.onLine?"not run yet":"offline"))}</span>`;
   $("cityCredit").innerHTML=credit;
 }
 async function refreshCity(){
@@ -1248,7 +1250,11 @@ async function refreshCity(){
     picsBusy=p.id; if(place&&place.id===p.id)renderCity();
     fetchItemPics(g.sections.flatMap(s=>s.items||[])).then(pics=>{
       const d=cityData(p.id); dropPics(d,{pics}); d.pics=pics; delete d.picsErr; saveCityData(p.id,d);
-    }).catch(e=>{const d=cityData(p.id);d.picsErr=String(e&&e.name==="TimeoutError"?"timed out":e&&e.message||e);saveCityData(p.id,d)})
+      picsLast[p.id]=pics.check+((cityData(p.id).pics||{}).at===pics.at?"":" · couldn't save (storage full?)");
+    }).catch(e=>{
+      const d=cityData(p.id); d.picsErr=String(e&&e.name==="TimeoutError"?"timed out":e&&e.message||e); saveCityData(p.id,d);
+      picsLast[p.id]="lookup failed: "+d.picsErr;
+    })
       .finally(()=>{picsBusy=null;if(place&&place.id===p.id)renderCity()});
   }
   if(g)jobs.push(photo(g.wiki,g.voy));
@@ -1392,7 +1398,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v39", opened=Date.now();
+const APP_VERSION="rightnote-v40", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
