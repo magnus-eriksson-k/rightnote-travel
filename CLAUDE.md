@@ -34,7 +34,7 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - `VND_NOTES` lists polymer notes with two gradient colours each. Entries with no colours are plain amounts.
   - `NOTE_INFO` holds the back image and colour description for each note.
   - `PAY_NOTES` is every denomination used for payment, including the paper 1k/2k/5k notes.
-- **Photos:** `photos` maps each denomination to a `data:` URI; `photoSrc()` also accepts asset ids. The photo-upload UI is still in the file but stays hidden, because it needs Claude-artifact storage that Pages doesn't have. To change photos, re-embed them in `photos`.
+- **Photos:** `backs` holds the back of each note and `photos` the front, each mapping a denomination to a `data:` URI; `photoSrc()` also accepts asset ids. `pic(d)` returns the back, falling back to the front, and every note tile uses it. The note card shows both sides (back first), each with a caption. The photo-upload UI is still in the file but stays hidden, because it needs Claude-artifact storage that Pages doesn't have. To change photos, re-embed them in `photos`.
 - **How to pay:** `ways(A)` returns up to three options, in this order, shown as tabs below the keypad (Exact is selected by default, and a picked tab stays picked while it's offered):
   - **Quickest:** round up to whichever total within +100k needs the fewest notes, shown only if it beats the exact option.
   - **Exact:** greedy fewest notes for the exact amount (greedy is optimal for these denominations).
