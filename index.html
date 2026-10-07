@@ -958,8 +958,9 @@ async function fetchGuide(p){
 // ---- Photo: the Wikipedia article's lead image, with its author and license from Commons ----
 // The image file is kept in the Cache API so it shows offline too; the service worker leaves this cache alone.
 const PHOTO_CACHE="rightnote-photos";
+const within=ms=>{try{return AbortSignal.timeout(ms)}catch(e){}}; // so a stuck request on a phone gives up instead of holding everything up
 async function wp(params){
-  const r=await fetch("https://en.wikipedia.org/w/api.php?"+new URLSearchParams({format:"json",formatversion:2,origin:"*",redirects:1,...params}));
+  const r=await fetch("https://en.wikipedia.org/w/api.php?"+new URLSearchParams({format:"json",formatversion:2,origin:"*",redirects:1,...params}),{signal:within(20000)});
   if(!r.ok)throw new Error(r.status); return r.json();
 }
 const htmlText=h=>new DOMParser().parseFromString(h||"","text/html").body.textContent.replace(/\s+/g," ").trim();
@@ -1023,7 +1024,7 @@ async function fetchPhoto(p,wiki,voy,bad=[]){
 async function keepPhoto(src){
   try{
     const c=await caches.open(PHOTO_CACHE); if(await c.match(src))return true;
-    const r=await fetch(src,{mode:"cors"}); if(!r.ok)return false;
+    const r=await fetch(src,{mode:"cors",signal:within(20000)}); if(!r.ok)return false;
     if(!/^image\//.test(r.headers.get("content-type")||"image/"))return false;
     await c.put(src,r); return true;
   }catch(e){return null}
@@ -1089,11 +1090,8 @@ async function fetchItemPics(items){
   }
   const map={};
   for(const it of items){const k=picKey(it); if(k)map[k]=files[k]&&info[files[k]]||null}
-  // save the thumbnails now, a few at a time; any that fail are shown from the network and saved later
-  const todo=Object.values(map).filter(Boolean), found=todo.length; let saved=0;
-  await Promise.all([0,1,2,3].map(async()=>{for(let ph;(ph=todo.shift());)if(await keepPhoto(ph.thumb))saved++}));
-  // how far each step got, shown under the guide while we check photos work on phones
-  const check=`${Object.keys(map).length} items → ${Object.keys(files).length} images named → ${found} usable → ${saved} saved`;
+  // how far each step got, shown under the guide while we check photos work on phones; the thumbnails are saved as they're shown
+  const check=`${Object.keys(map).length} items → ${Object.keys(files).length} images named → ${Object.values(map).filter(Boolean).length} usable`;
   return {at:Date.now(),v:PICS_V,map,check};
 }
 function picsOf(d){return Object.values(d&&d.pics&&d.pics.map||{}).filter(Boolean)}
@@ -1101,12 +1099,24 @@ function dropPics(old,keep){ // removes saved files no longer used
   const used=new Set(picsOf(keep).flatMap(p=>[p.thumb,p.src]));
   picsOf(old).forEach(p=>[p.thumb,p.src].forEach(s=>{if(!used.has(s))dropPhoto(s)}));
 }
-let picBlobs=[];
+let picBlobs=[], picsBusy=null;
+const saveQueue=[]; let saving=0;
+function queueSave(src){ // downloads for offline use, four at a time
+  return new Promise(done=>{
+    saveQueue.push([src,done]); pump();
+    function pump(){
+      while(saving<4&&saveQueue.length){
+        const [s,d]=saveQueue.shift(); saving++;
+        keepPhoto(s).then(d,()=>d(null)).finally(()=>{saving--;pump()});
+      }
+    }
+  });
+}
 async function showPic(img){ // the saved copy when there is one, else the network (and save it for next time)
   const src=img.dataset.pic; let url=src;
   try{
     const c=await caches.open(PHOTO_CACHE); let r=await c.match(src);
-    if(!r&&navigator.onLine&&await keepPhoto(src))r=await c.match(src);
+    if(!r&&navigator.onLine&&await queueSave(src))r=await c.match(src);
     if(r){url=URL.createObjectURL(await r.blob());picBlobs.push(url)}
   }catch(e){}
   if(img.dataset.pic!==src)return;
@@ -1217,7 +1227,7 @@ function renderCity(){
   body.innerHTML=sections.map((s,i)=>sectHTML(s,i,curCode,pics)).join(""); body.dataset.id=place.id;
   if(open)body.querySelectorAll("details").forEach(d=>{d.open=open.has(d.dataset.k)});
   loadThumbs(); body.querySelectorAll("details.pic[open]").forEach(bigPic);
-  if(g)credit+=`<br><span id="picCheck">Photo check: ${saved.picsErr?"lookup failed: "+esc(saved.picsErr):saved.pics&&saved.pics.check?esc(saved.pics.check):"not run yet"}</span>`;
+  if(g)credit+=`<br><span id="picCheck">Photo check: ${picsBusy===place.id?"looking up…":saved.picsErr?"lookup failed: "+esc(saved.picsErr):saved.pics&&saved.pics.check?esc(saved.pics.check):navigator.onLine?"not run yet":"offline"}</span>`;
   $("cityCredit").innerHTML=credit;
 }
 async function refreshCity(){
@@ -1232,11 +1242,16 @@ async function refreshCity(){
     const d=cityData(p.id); if(d.photo&&d.photo.src&&d.photo.src!==ph.src)dropPhoto(d.photo.src); d.photo=ph; d.badPhotos=bad.slice(-8); saveCityData(p.id,d);
   }).catch(()=>{}):null;
   const titles=v=>[v.wiki&&v.wiki.title,v.voy];
-  if(g)jobs.push(photo(g.wiki,g.voy));
   const stalePics=x=>!x||x.v!==PICS_V||Date.now()-x.at>(Object.values(x.map||{}).some(Boolean)?30*24:24)*HOUR; // none found: try again in a day
-  if(g&&stalePics(saved.pics))jobs.push(fetchItemPics(g.sections.flatMap(s=>s.items||[])).then(pics=>{
-    const d=cityData(p.id); dropPics(d,{pics}); d.pics=pics; delete d.picsErr; saveCityData(p.id,d);
-  }).catch(e=>{const d=cityData(p.id);d.picsErr=String(e&&e.message||e);saveCityData(p.id,d)}));
+  if(g&&stalePics(saved.pics)&&picsBusy!==p.id){
+    // drawn as soon as it's known, without waiting for the weather or the city photo
+    picsBusy=p.id; if(place&&place.id===p.id)renderCity();
+    fetchItemPics(g.sections.flatMap(s=>s.items||[])).then(pics=>{
+      const d=cityData(p.id); dropPics(d,{pics}); d.pics=pics; delete d.picsErr; saveCityData(p.id,d);
+    }).catch(e=>{const d=cityData(p.id);d.picsErr=String(e&&e.name==="TimeoutError"?"timed out":e&&e.message||e);saveCityData(p.id,d)})
+      .finally(()=>{picsBusy=null;if(place&&place.id===p.id)renderCity()});
+  }
+  if(g)jobs.push(photo(g.wiki,g.voy));
   else if(stale(saved.guide))jobs.push(fetchGuide(p).then(v=>{const d=cityData(p.id);d.guide=v;saveCityData(p.id,d);return photo(...titles(v))}).catch(()=>{}));
   else jobs.push(photo(...titles(saved.guide)));
   if(!jobs.some(Boolean))return;
@@ -1377,7 +1392,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v38", opened=Date.now();
+const APP_VERSION="rightnote-v39", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
