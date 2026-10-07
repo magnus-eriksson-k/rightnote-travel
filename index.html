@@ -237,7 +237,13 @@ button.item:active{background:var(--accent-soft)}
 .item.pic .txt{flex:1}
 .item .thumb{flex:none;width:64px;height:64px;border-radius:10px;object-fit:cover;background:var(--key-op)}
 .item.pic .more{display:flex;flex-direction:column;gap:10px;padding:0 0 12px}
-.item.pic .city-photo img{aspect-ratio:4/3;border-radius:14px}
+.ph-box{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:var(--key-op)}
+.item.pic .ph-box img{width:100%;height:100%;aspect-ratio:auto;border-radius:0;opacity:0;transition:opacity .25s}
+.item.pic .ph-box.loaded img{opacity:1}
+.ph-box.loading::after{content:"";position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;
+  border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
+.ph-box.failed::after{content:"Photo couldn't load";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.84rem;color:var(--muted)}
+@keyframes spin{to{transform:rotate(360deg)}}
 .city-body img.broken{display:none}
 #cityCredit a{color:var(--accent-text)}
 
@@ -256,7 +262,7 @@ button.item:active{background:var(--accent-soft)}
 .phr-big .hint2{font-size:.82rem;color:var(--muted)}
 .phr-big .dlg-actions{margin-top:4px}
 .grp-note{font-size:.84rem;color:var(--muted);margin:0}
-@media (prefers-reduced-motion: reduce){.keys button:active{transform:none}.chev{transition:none}}
+@media (prefers-reduced-motion: reduce){.keys button:active{transform:none}.chev{transition:none}.ph-box.loading::after{animation-duration:2.4s}}
 </style>
 
 <div class="wrap">
@@ -1141,7 +1147,9 @@ async function showPic(img){ // the saved copy when there is one, else the netwo
     if(r){url=URL.createObjectURL(await r.blob());picBlobs.push(url)}
   }catch(e){}
   if(img.dataset.pic!==src)return;
-  img.onerror=()=>{img.classList.add("broken");if(img.classList.contains("thumb"))badThumb()};
+  const box=img.closest(".ph-box"); // the large photo's frame: a spinner until it loads
+  img.onload=()=>{if(box)box.className="ph-box loaded"};
+  img.onerror=()=>{img.classList.add("broken");if(box)box.className="ph-box failed";if(img.classList.contains("thumb"))badThumb()};
   img.src=url;
 }
 function badThumb(){ // counted in the photo check line
@@ -1174,7 +1182,7 @@ function itemHTML(it,cur,pics,k){
     const map=mu?`<a class="btn" href="${esc(mu)}"${mu.startsWith("https:")?' target="_blank" rel="noopener"':""}>Map</a>`:"";
     const use=calc?`<button type="button" class="btn primary" data-price="${it.p}">${esc(CUR[cur].sym+fmt(it.p,cur))} in calculator</button>`:"";
     return `<details class="item pic" data-k="${esc(k)}"><summary>${thumb}${txt}${pr}</summary><div class="more">
-      ${ph?`<figure class="city-photo"><img data-big="${esc(ph.src)}" alt="Photo of ${esc(it.t)}"><figcaption>${creditHTML(ph)}</figcaption></figure>`:""}
+      ${ph?`<figure class="city-photo"><div class="ph-box loading"><img data-big="${esc(ph.src)}" alt="Photo of ${esc(it.t)}"></div><figcaption>${creditHTML(ph)}</figcaption></figure>`:""}
       ${map||use?`<div class="dlg-actions">${use}${map}</div>`:""}</div></details>`;
   }
   if(it.p==null)return `<div class="item">${txt}</div>`;
@@ -1421,7 +1429,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v46", opened=Date.now();
+const APP_VERSION="rightnote-v47", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
