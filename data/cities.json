@@ -515,41 +515,111 @@
           ]
         },
         {
+          "h": "Sights",
+          "items": [
+            {
+              "t": "War Remnants Museum",
+              "d": "The war seen from the Vietnamese side, with tanks and aircraft outside and hard-hitting photography within. Give it two hours.",
+              "wiki": "War Remnants Museum",
+              "lat": 10.7794,
+              "lon": 106.692,
+              "p": 40000
+            },
+            {
+              "t": "Independence Palace",
+              "d": "Also called Reunification Palace: the 1960s presidential palace where a tank broke through the gates on 30 April 1975. Retro state rooms and command bunkers. Entry roughly ₫40,000–65,000.",
+              "wiki": "Independence Palace",
+              "lat": 10.777,
+              "lon": 106.6953
+            },
+            {
+              "t": "Notre-Dame Cathedral",
+              "d": "Red-brick French cathedral from the 1880s, built with bricks shipped from Marseille. It's been under long restoration, so you may only see it from outside.",
+              "wiki": "Notre-Dame Cathedral Basilica of Saigon",
+              "lat": 10.7798,
+              "lon": 106.699
+            },
+            {
+              "t": "Central Post Office",
+              "d": "Next to the cathedral: a grand vaulted hall from the 1890s with old maps on the walls, still a working post office. Free.",
+              "wiki": "Saigon Central Post Office",
+              "lat": 10.7799,
+              "lon": 106.6999
+            },
+            {
+              "t": "Bến Thành Market",
+              "d": "The city's best-known market, under its clock tower. Fun to walk through and good for food stalls, but prices for visitors are high: bargain hard.",
+              "wiki": "Bến Thành Market",
+              "lat": 10.7725,
+              "lon": 106.698
+            },
+            {
+              "t": "Jade Emperor Pagoda",
+              "d": "Ngọc Hoàng: a smoky Taoist temple full of carved wooden deities, one of the most atmospheric in the city. Free.",
+              "wiki": "Jade Emperor Pagoda",
+              "lat": 10.792,
+              "lon": 106.6981
+            },
+            {
+              "t": "Chợ Lớn and Thiên Hậu Temple",
+              "d": "The old Chinese district, with busy markets and the 18th-century temple to the sea goddess, hung with giant incense coils. Free.",
+              "wiki": "Chợ Lớn",
+              "lat": 10.7534,
+              "lon": 106.6613
+            },
+            {
+              "t": "Củ Chi tunnels",
+              "d": "The wartime tunnel network, a half-day trip north-west of the city. Bến Đình is the usual site; Bến Dược is quieter. Fee shown is for Bến Đình.",
+              "wiki": "Củ Chi tunnels",
+              "lat": 11.1427,
+              "lon": 106.4636,
+              "p": 110000
+            }
+          ]
+        },
+        {
           "h": "Food to try",
           "items": [
             {
               "t": "Cơm tấm",
               "d": "Broken rice with grilled pork chop, steamed egg meatloaf and sweet fish sauce. The city's breakfast.",
+              "wiki": "Cơm tấm",
               "p": 50000
             },
             {
               "t": "Hủ tiếu",
               "d": "Noodles in a clear pork broth, from the Chinese-Vietnamese community of Chợ Lớn.",
+              "wiki": "Hủ tiếu",
               "p": 45000
             },
             {
               "t": "Bánh xèo",
               "d": "A big crispy turmeric pancake with shrimp, pork and bean sprouts, wrapped in lettuce and herbs.",
+              "wiki": "Bánh xèo",
               "p": 70000
             },
             {
               "t": "Bánh mì",
               "d": "Sài Gòn style is generously filled with pâté, cold cuts, pickles and chilli.",
+              "wiki": "Bánh mì",
               "p": 30000
             },
             {
               "t": "Ốc",
               "d": "Snails and shellfish cooked a dozen ways, an evening food eaten with beer on plastic stools.",
+              "wiki": "Snails as food",
               "p": 60000
             },
             {
               "t": "Bột chiên",
               "d": "Fried rice-flour cake with egg and pickled papaya, an afternoon snack.",
+              "wiki": "Bột chiên",
               "p": 35000
             },
             {
               "t": "Cà phê sữa đá",
               "d": "Strong drip coffee over ice with condensed milk. Coffee culture here is huge, from street stools to rooftop cafés.",
+              "wiki": "Vietnamese iced coffee",
               "p": 25000
             }
           ]
@@ -559,19 +629,23 @@
           "items": [
             {
               "t": "Đờn ca tài tử",
-              "d": "Southern chamber music from the Mekong Delta, played on zithers and moon lutes. UNESCO-listed."
+              "d": "Southern chamber music from the Mekong Delta, played on zithers and moon lutes. UNESCO-listed.",
+              "wiki": "Đờn ca tài tử"
             },
             {
               "t": "Cải lương",
-              "d": "Southern 'reformed opera' mixing folk melodies with melodrama. Still performed at a few theatres and hugely popular on TV."
+              "d": "Southern 'reformed opera' mixing folk melodies with melodrama. Still performed at a few theatres and hugely popular on TV.",
+              "wiki": "Cải lương"
             },
             {
               "t": "Bamboo circus at the Opera House",
-              "d": "Contemporary acrobatic shows about southern life, staged most evenings in the French-era Opera House."
+              "d": "Contemporary acrobatic shows about southern life, staged most evenings in the French-era Opera House.",
+              "wiki": "Saigon Opera House"
             },
             {
               "t": "Nguyễn Huệ walking street",
-              "d": "A wide pedestrian boulevard leading to the old City Hall, busy with families, buskers and skaters every evening."
+              "d": "A wide pedestrian boulevard leading to the old City Hall, busy with families, buskers and skaters every evening.",
+              "wiki": "Nguyễn Huệ Boulevard"
             },
             {
               "t": "Bùi Viện",
@@ -658,26 +732,92 @@
           ]
         },
         {
+          "h": "Sights",
+          "items": [
+            {
+              "t": "Marble Mountains",
+              "d": "Five limestone hills with caves, shrines and pagodas, and views over the coast from the top. Wear grippy shoes; a lift saves the first climb.",
+              "wiki": "Marble Mountains (Vietnam)",
+              "lat": 16.0036,
+              "lon": 108.2638,
+              "p": 40000
+            },
+            {
+              "t": "Sơn Trà Peninsula and Lady Buddha",
+              "d": "Jungle-covered headland north of the beaches, with the 67 m white Lady Buddha at Linh Ứng Pagoda and rare red-shanked douc monkeys. Free.",
+              "wiki": "Sơn Trà Peninsula",
+              "lat": 16.1002,
+              "lon": 108.2779
+            },
+            {
+              "t": "Mỹ Khê Beach",
+              "d": "Long, clean city beach lined with seafood restaurants. Swim between the flags, and go early or late to avoid the midday sun.",
+              "wiki": "Mỹ Khê Beach",
+              "lat": 16.061,
+              "lon": 108.247
+            },
+            {
+              "t": "Dragon Bridge",
+              "d": "Cầu Rồng across the Hàn River, lit up every night; it breathes fire and water at 9 pm on Saturdays and Sundays. Free.",
+              "wiki": "Dragon Bridge (Da Nang)",
+              "lat": 16.0612,
+              "lon": 108.2272
+            },
+            {
+              "t": "Museum of Cham Sculpture",
+              "d": "The world's largest collection of sculpture from the Hindu Cham kingdoms that ruled this coast.",
+              "wiki": "Museum of Cham Sculpture",
+              "lat": 16.0606,
+              "lon": 108.2236
+            },
+            {
+              "t": "Đà Nẵng Cathedral",
+              "d": "The pink \"rooster church\" from the 1920s, named for the weathervane on its spire. Visit outside mass times.",
+              "wiki": "Da Nang Cathedral",
+              "lat": 16.0668,
+              "lon": 108.2232
+            },
+            {
+              "t": "Bà Nà Hills and Golden Bridge",
+              "d": "Hilltop theme park reached by a record-breaking cable car, with the Golden Bridge held up by two giant stone hands. Expensive (roughly ₫900,000 with the cable car) and busy; go early.",
+              "wiki": "Golden Bridge (Vietnam)",
+              "lat": 15.995,
+              "lon": 107.996
+            },
+            {
+              "t": "Hải Vân Pass",
+              "d": "The famous coast road over the mountains towards Huế, with sweeping sea views. Best by motorbike or car on the way to Huế.",
+              "wiki": "Hải Vân Pass",
+              "lat": 16.192,
+              "lon": 108.13
+            }
+          ]
+        },
+        {
           "h": "Food to try",
           "items": [
             {
               "t": "Mì Quảng",
               "d": "Wide turmeric rice noodles in a little rich broth, with pork, shrimp, peanuts, herbs and a sesame rice cracker.",
+              "wiki": "Mì Quảng",
               "p": 40000
             },
             {
               "t": "Bánh tráng cuốn thịt heo",
               "d": "Boiled pork rolled in rice paper with herbs and cucumber, dipped in a pungent anchovy sauce.",
+              "wiki": "Bánh tráng",
               "p": 80000
             },
             {
               "t": "Bún chả cá",
               "d": "Fish cake noodle soup with pumpkin and pineapple.",
+              "wiki": "Bún chả cá",
               "p": 40000
             },
             {
               "t": "Bánh xèo",
               "d": "Central-style: small, crispy pancakes dipped in a peanut and pork-liver sauce.",
+              "wiki": "Bánh xèo",
               "p": 50000
             },
             {
@@ -690,20 +830,14 @@
           "h": "Music and culture",
           "items": [
             {
-              "t": "Dragon Bridge",
-              "d": "Cầu Rồng breathes fire, then water, at 9 pm on Saturday and Sunday nights. Watch from the riverbank."
-            },
-            {
               "t": "Tuồng",
-              "d": "Classical opera with painted faces and stylised battles, staged at the Nguyễn Hiển Dĩnh Theatre."
+              "d": "Classical opera with painted faces and stylised battles, staged at the Nguyễn Hiển Dĩnh Theatre.",
+              "wiki": "Tuồng"
             },
             {
               "t": "Bài chòi",
-              "d": "A central-coast folk singing game, part bingo, part ballad. UNESCO-listed."
-            },
-            {
-              "t": "Museum of Cham Sculpture",
-              "d": "The world's largest collection of sculpture from the Hindu Cham kingdoms that ruled this coast."
+              "d": "A central-coast folk singing game, part bingo, part ballad. UNESCO-listed.",
+              "wiki": "Bài chòi"
             },
             {
               "t": "Fireworks festival",
@@ -783,11 +917,72 @@
           ]
         },
         {
+          "h": "Sights",
+          "items": [
+            {
+              "t": "Old town ticket",
+              "d": "Entry to the UNESCO-listed old town for visitors: it covers five of the old houses, assembly halls and museums. Keep it with you; it's checked at the gates.",
+              "wiki": "Hội An Ancient Town",
+              "lat": 15.877,
+              "lon": 108.328,
+              "p": 120000
+            },
+            {
+              "t": "Japanese Covered Bridge",
+              "d": "The town's symbol, built by the Japanese community in the 1590s, with a small temple inside. Recently restored.",
+              "wiki": "Japanese Covered Bridge",
+              "lat": 15.8772,
+              "lon": 108.326
+            },
+            {
+              "t": "Fujian Assembly Hall",
+              "d": "Phúc Kiến: the grandest of the Chinese assembly halls, with dragon fountains and a temple to the sea goddess. On the old town ticket.",
+              "wiki": "Fujian Assembly Hall",
+              "lat": 15.877,
+              "lon": 108.3305
+            },
+            {
+              "t": "Tân Ký old house",
+              "d": "A merchant's house kept by the same family for seven generations, with Chinese and Japanese woodwork. On the old town ticket.",
+              "lat": 15.8768,
+              "lon": 108.3277
+            },
+            {
+              "t": "Central market",
+              "d": "Riverside market for produce, fabric and a busy food hall with Hội An specialities. Free.",
+              "lat": 15.8768,
+              "lon": 108.3313
+            },
+            {
+              "t": "An Bàng Beach",
+              "d": "Relaxed beach 4 km from town by bicycle, with sun loungers that are free if you eat or drink there.",
+              "wiki": "An Bàng Beach",
+              "lat": 15.9137,
+              "lon": 108.341
+            },
+            {
+              "t": "Mỹ Sơn",
+              "d": "Ruined Hindu temples of the Cham kingdom in a jungle valley, a UNESCO site an hour inland. Go at opening time, before the heat and tour buses.",
+              "wiki": "Mỹ Sơn",
+              "lat": 15.764,
+              "lon": 108.124,
+              "p": 150000
+            },
+            {
+              "t": "Cẩm Thanh coconut forest",
+              "d": "Spin round in a round bamboo basket boat through the water-coconut palms, a short ride from town. Agree the price for the boat first.",
+              "lat": 15.878,
+              "lon": 108.372
+            }
+          ]
+        },
+        {
           "h": "Food to try",
           "items": [
             {
               "t": "Cao lầu",
               "d": "Chewy, smoky noodles with pork, greens and crunchy croutons. Traditionally only made in Hội An.",
+              "wiki": "Cao lầu",
               "p": 40000
             },
             {
@@ -798,21 +993,25 @@
             {
               "t": "Bánh mì",
               "d": "Hội An's are famous; the best-known stalls have queues all day.",
+              "wiki": "Bánh mì",
               "p": 30000
             },
             {
               "t": "White rose dumplings",
               "d": "Bánh bao bánh vạc: translucent shrimp dumplings shaped like roses, made by one family for the whole town.",
+              "wiki": "White rose dumpling",
               "p": 60000
             },
             {
               "t": "Hoành thánh chiên",
               "d": "Fried wontons topped with a sweet-sour tomato and shrimp salsa.",
+              "wiki": "Wonton",
               "p": 60000
             },
             {
               "t": "Mì Quảng",
               "d": "The region's turmeric noodles, with a little broth, pork, shrimp and peanuts.",
+              "wiki": "Mì Quảng",
               "p": 40000
             }
           ]
@@ -822,7 +1021,8 @@
           "items": [
             {
               "t": "Bài chòi",
-              "d": "A folk singing-and-bingo game, UNESCO-listed, performed by the river in the old town most evenings. Buy a card and join in."
+              "d": "A folk singing-and-bingo game, UNESCO-listed, performed by the river in the old town most evenings. Buy a card and join in.",
+              "wiki": "Bài chòi"
             },
             {
               "t": "Full-moon nights",
@@ -915,31 +1115,101 @@
           ]
         },
         {
+          "h": "Sights",
+          "items": [
+            {
+              "t": "Imperial City",
+              "d": "Đại Nội: the walled palace of the Nguyễn emperors, damaged in 1968 and steadily being rebuilt. The Forbidden Purple City is inside. Allow half a day.",
+              "wiki": "Imperial City of Huế",
+              "lat": 16.4698,
+              "lon": 107.5786,
+              "p": 200000
+            },
+            {
+              "t": "Thiên Mụ Pagoda",
+              "d": "Seven-storey pagoda on a bluff above the Perfume River, Huế's emblem. The car of the monk Thích Quảng Đức is kept here. Free.",
+              "wiki": "Thiên Mụ Pagoda",
+              "lat": 16.4537,
+              "lon": 107.5446
+            },
+            {
+              "t": "Tomb of Tự Đức",
+              "d": "A poetic garden of lakes and pavilions where the emperor wrote and fished; most graceful of the tombs.",
+              "wiki": "Tomb of Tự Đức",
+              "lat": 16.433,
+              "lon": 107.566,
+              "p": 150000
+            },
+            {
+              "t": "Tomb of Khải Định",
+              "d": "Ornate concrete tomb with an interior covered in glass-and-porcelain mosaics. Many steps.",
+              "wiki": "Tomb of Khải Định",
+              "lat": 16.399,
+              "lon": 107.59,
+              "p": 150000
+            },
+            {
+              "t": "Tomb of Minh Mạng",
+              "d": "Symmetrical and serene, with lotus lakes and a long processional way. Furthest out, so go by car or boat.",
+              "wiki": "Tomb of Minh Mạng",
+              "lat": 16.388,
+              "lon": 107.57,
+              "p": 150000
+            },
+            {
+              "t": "Đông Ba Market",
+              "d": "Huế's main market by the river: snacks, conical hats and dried goods. Free.",
+              "wiki": "Đông Ba Market",
+              "lat": 16.4738,
+              "lon": 107.589
+            },
+            {
+              "t": "Trường Tiền Bridge",
+              "d": "The 1890s steel bridge over the Perfume River, lit in changing colours at night. Free.",
+              "wiki": "Trường Tiền Bridge",
+              "lat": 16.4683,
+              "lon": 107.5872
+            },
+            {
+              "t": "Thanh Toàn tile-roofed bridge",
+              "d": "An 18th-century wooden bridge in rice fields east of the city, a lovely bicycle ride out. Free.",
+              "wiki": "Thanh Toàn Bridge",
+              "lat": 16.495,
+              "lon": 107.634
+            }
+          ]
+        },
+        {
           "h": "Food to try",
           "items": [
             {
               "t": "Bún bò Huế",
               "d": "Spicy lemongrass beef noodle soup with pork knuckle and congealed blood. Huế's signature dish.",
+              "wiki": "Bún bò Huế",
               "p": 45000
             },
             {
               "t": "Cơm hến",
               "d": "Rice with tiny river clams, peanuts, pork crackling, herbs and chilli.",
+              "wiki": "Cơm hến",
               "p": 25000
             },
             {
               "t": "Bánh bèo, nậm, lọc",
               "d": "Steamed rice cakes: bèo are little saucers with shrimp, nậm are flat parcels in banana leaf, lọc are chewy tapioca with shrimp and pork.",
+              "wiki": "Bánh bèo",
               "p": 50000
             },
             {
               "t": "Bánh khoái",
               "d": "Huế's crispy pancake, served with a thick peanut and pork-liver sauce.",
+              "wiki": "Bánh khoái",
               "p": 40000
             },
             {
               "t": "Chè",
               "d": "Sweet soups and puddings; Huế has dozens of kinds, from lotus seed to taro.",
+              "wiki": "Chè",
               "p": 20000
             }
           ]
@@ -949,11 +1219,13 @@
           "items": [
             {
               "t": "Nhã nhạc",
-              "d": "Royal court music, Vietnam's first UNESCO intangible heritage. Performed at the Duyệt Thị Đường royal theatre inside the Imperial City."
+              "d": "Royal court music, Vietnam's first UNESCO intangible heritage. Performed at the Duyệt Thị Đường royal theatre inside the Imperial City.",
+              "wiki": "Nhã nhạc"
             },
             {
               "t": "Ca Huế on the river",
-              "d": "Folk songs sung on a dragon boat on the Perfume River at night, ending with floating candle lanterns."
+              "d": "Folk songs sung on a dragon boat on the Perfume River at night, ending with floating candle lanterns.",
+              "wiki": "Ca Huế"
             },
             {
               "t": "Royal tombs",
@@ -961,7 +1233,8 @@
             },
             {
               "t": "Huế Festival",
-              "d": "A big arts festival with court music, processions and lantern events. Check dates, as the programme changes each year."
+              "d": "A big arts festival with court music, processions and lantern events. Check dates, as the programme changes each year.",
+              "wiki": "Huế Festival"
             }
           ]
         },
