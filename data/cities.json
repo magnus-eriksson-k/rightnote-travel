@@ -937,26 +937,40 @@
             {
               "t": "Fujian Assembly Hall",
               "d": "Phúc Kiến: the grandest of the Chinese assembly halls, with dragon fountains and a temple to the sea goddess. On the old town ticket.",
-              "wiki": "Fujian Assembly Hall",
+              "near": [
+                "phuc kien",
+                "fujian"
+              ],
               "lat": 15.877,
               "lon": 108.3305
             },
             {
               "t": "Tân Ký old house",
               "d": "A merchant's house kept by the same family for seven generations, with Chinese and Japanese woodwork. On the old town ticket.",
+              "near": [
+                "tan ky"
+              ],
               "lat": 15.8768,
               "lon": 108.3277
             },
             {
               "t": "Central market",
               "d": "Riverside market for produce, fabric and a busy food hall with Hội An specialities. Free.",
+              "near": [
+                "hoi an market",
+                "central market",
+                "cho hoi an"
+              ],
               "lat": 15.8768,
               "lon": 108.3313
             },
             {
               "t": "An Bàng Beach",
               "d": "Relaxed beach 4 km from town by bicycle, with sun loungers that are free if you eat or drink there.",
-              "wiki": "An Bàng Beach",
+              "near": [
+                "an bang"
+              ],
+              "r": 1500,
               "lat": 15.9137,
               "lon": 108.341
             },
@@ -971,6 +985,12 @@
             {
               "t": "Cẩm Thanh coconut forest",
               "d": "Spin round in a round bamboo basket boat through the water-coconut palms, a short ride from town. Agree the price for the boat first.",
+              "near": [
+                "cam thanh",
+                "basket boat",
+                "coconut"
+              ],
+              "r": 2000,
               "lat": 15.878,
               "lon": 108.372
             }

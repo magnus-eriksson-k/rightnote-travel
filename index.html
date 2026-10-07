@@ -1053,7 +1053,19 @@ async function renderPhoto(ph){
 // ---- Item photos: sights, food and culture in the built-in guides ----
 // An item names a Commons file (img) or a Wikipedia article (wiki) whose lead image is used. Looked up in two batched calls,
 // credited like the city photo; thumbnails are saved for offline use when the city opens, the large photo once it's been viewed.
-const picKey=it=>it.img?"f:"+it.img:it.wiki?"w:"+it.wiki:null;
+const picKey=it=>it.img?"f:"+it.img:it.wiki?"w:"+it.wiki:it.near?"n:"+[].concat(it.near).join("|"):null;
+// For places with no Wikipedia article: the largest landscape photo on Commons taken within r metres (default 500)
+// whose file name has all the words of one of the near names, e.g. ["phuc kien","fujian"]
+async function commonsNear(it){
+  const r=await fetch("https://commons.wikimedia.org/w/api.php?"+new URLSearchParams({action:"query",format:"json",formatversion:2,origin:"*",
+    generator:"geosearch",ggscoord:`${it.lat}|${it.lon}`,ggsradius:it.r||500,ggsnamespace:6,ggslimit:100,prop:"imageinfo",iiprop:"size|mime"}),{signal:within(20000)});
+  if(!r.ok)throw new Error(r.status);
+  const j=await r.json(), names=[].concat(it.near).map(n=>norm(n).split(/\s+/));
+  const best=(j.query&&j.query.pages||[]).map(f=>({f,ii:f.imageinfo&&f.imageinfo[0],t:norm(f.title).replace(/[_-]/g," ")}))
+    .filter(({ii,t})=>ii&&ii.mime==="image/jpeg"&&ii.width>=800&&ii.width>=ii.height&&names.some(ws=>ws.every(w=>t.includes(w))))
+    .sort((a,b)=>b.ii.width*b.ii.height-a.ii.width*a.ii.height)[0];
+  return best&&best.f.title.replace(/^File:/,"");
+}
 const PIC_W=960, PIC_THUMB=330, PICS_V=5; // bump PICS_V to look up every city's item photos again
 const chunks=(a,n)=>a.length?[a.slice(0,n),...chunks(a.slice(n),n)]:[];
 async function fetchItemPics(items){
@@ -1066,6 +1078,9 @@ async function fetchItemPics(items){
     const img={}; (q.pages||[]).forEach(pg=>{if(pg.pageimage)img[pg.title]=pg.pageimage});
     part.forEach(t=>{let x=t;for(let i=0;i<3&&to[x];i++)x=to[x]; if(img[x])files["w:"+t]=img[x]});
   }
+  // places with no photo from Wikipedia: search Commons near them
+  await Promise.all(items.filter(it=>picKey(it)&&!files[picKey(it)]&&it.near&&isFinite(it.lat))
+    .map(async it=>{const f=await commonsNear(it);if(f)files[picKey(it)]=f}));
   const info={}; // file name -> photo
   // each file's imageinfo, keyed by the name we asked for (the API answers with normalised titles)
   const fileInfo=async(part,params)=>{
@@ -1246,7 +1261,9 @@ async function refreshCity(){
     const d=cityData(p.id); if(d.photo&&d.photo.src&&d.photo.src!==ph.src)dropPhoto(d.photo.src); d.photo=ph; d.badPhotos=bad.slice(-8); saveCityData(p.id,d);
   }).catch(()=>{}):null;
   const titles=v=>[v.wiki&&v.wiki.title,v.voy];
-  const stalePics=x=>!x||x.v!==PICS_V||Date.now()-x.at>(Object.values(x.map||{}).some(Boolean)?30*24:24)*HOUR; // none found: try again in a day
+  const picKeys=g?g.sections.flatMap(s=>s.items||[]).map(picKey).filter(Boolean):[];
+  const stalePics=x=>!x||x.v!==PICS_V||picKeys.some(k=>!(k in (x.map||{})))|| // a photo title was added or changed in the guide
+    Date.now()-x.at>(Object.values(x.map||{}).some(Boolean)?30*24:24)*HOUR; // none found: try again in a day
   if(g&&stalePics(saved.pics)&&picsBusy!==p.id){
     // drawn as soon as it's known, without waiting for the weather or the city photo
     picsBusy=p.id; if(place&&place.id===p.id)renderCity();
@@ -1400,7 +1417,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v42", opened=Date.now();
+const APP_VERSION="rightnote-v43", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
