@@ -136,6 +136,7 @@ button.back{font:inherit;background:none;border:0;padding:8px 0 8px 8px;margin:-
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
 
 .rate{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:.85rem;color:var(--muted)}
+.rate .rate-lbl{min-width:4.2em}
 .rate input{width:9.5em;font:600 .9rem var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px;text-align:right}
 .linkbtn{background:none;border:0;color:var(--accent-text);font:600 .85rem var(--body);cursor:pointer;padding:8px 4px}
 
@@ -384,16 +385,13 @@ button.item:active{background:var(--accent-soft)}
   </section>
 
   <section class="panel rate-panel" id="ratePanel" aria-labelledby="rateTitle">
-    <h2 id="rateTitle">Exchange rate</h2>
-    <span class="note" id="asof">Rate as of 3 Oct 2026</span>
-    <div class="rate">
-      <span id="rateLabel">1 AUD =</span>
-      <input id="rate" inputmode="decimal" aria-label="Exchange rate">
-      <span id="rateUnit">VND</span>
-      <button class="linkbtn" id="resetRate" type="button">Reset rate</button>
-      <button class="linkbtn" id="refreshRate" type="button">Refresh rate</button>
-    </div>
-    <p class="note" id="rateNote">Rates are mid-market; cash and card rates in Vietnam typically sit 1–2% either side. Edit the rate to match your bank or money changer.</p>
+    <h2 id="rateTitle">Exchange rates</h2>
+    <span class="note" id="asof">Rates as of 3 Oct 2026</span>
+    <!-- your home currency, then US$ (one row when home is US$); each can have its own custom rate -->
+    <div class="rate" id="rateHome"><span class="rate-lbl"></span><input class="rate-in" inputmode="decimal"><span>VND</span><button class="linkbtn rate-reset" type="button">Reset rate</button></div>
+    <div class="rate" id="rateUsd"><span class="rate-lbl"></span><input class="rate-in" inputmode="decimal"><span>VND</span><button class="linkbtn rate-reset" type="button">Reset rate</button></div>
+    <div class="rate"><button class="linkbtn" id="refreshRate" type="button">Refresh rates</button></div>
+    <p class="note">Rates are mid-market; cash and card rates in Vietnam typically sit 1–2% either side. Edit a rate to match your bank or money changer, or the US$ rate to match a vendor who quotes dollars but takes đồng.</p>
   </section>
 
   <section class="panel rate-panel" aria-labelledby="themeTitle">
@@ -495,7 +493,7 @@ $("homeSeg").innerHTML=Object.keys(CUR).filter(c=>c!=="VND").map(c=>`<button typ
 
 // đồng per 1 unit of c, using a custom rate when one is set; every conversion goes through đồng
 function vnd(c){return custom[c]>0?custom[c]:CUR[c].vnd}
-// the rate shown in Options: the US$ one while typing US$ (a vendor's rate), else your home currency's
+// the rate in the summary under the keypad: the US$ one while typing US$ (a vendor's rate), else your home currency's
 function rateCur(){return second==="VND"?base:second}
 
 function evaluate(s){
@@ -544,13 +542,15 @@ function render(deferPay){
   // the đồng amount in local shorthand; while typing US$ it's the đồng you'd pay, as on the How to pay card
   $("inHint").textContent=second==="VND"?vnShort(v):res!=="VND"&&payAmount()?"₫"+vnShort(payAmount()):"";
   const rc=rateCur(), r=vnd(rc);
-  $("rateLabel").textContent=`1 ${rc} =`; $("rateUnit").textContent="VND";
-  if(document.activeElement!==$("rate"))$("rate").value=r.toLocaleString("en-AU",{maximumFractionDigits:2});
-  $("resetRate").hidden=!(custom[rc]>0);
+  $("rateUsd").hidden=base==="USD";
+  [["rateHome",base],["rateUsd","USD"]].forEach(([id,c])=>{
+    const row=$(id), inp=row.querySelector("input"); row.dataset.cur=c;
+    row.querySelector(".rate-lbl").textContent=`1 ${c} =`; inp.setAttribute("aria-label",`Đồng per ${CUR[c].name}`);
+    if(document.activeElement!==inp)inp.value=vnd(c).toLocaleString("en-AU",{maximumFractionDigits:2});
+    row.querySelector(".rate-reset").hidden=!(custom[c]>0);
+  });
+  $("asof").textContent="Rates as of "+asOf;
   const status=custom[rc]>0?"Custom rate":"Rate as of "+asOf;
-  $("asof").textContent=status;
-  $("rateNote").textContent=second==="VND"?"Rates are mid-market; cash and card rates in Vietnam typically sit 1–2% either side. Edit the rate to match your bank or money changer."
-    :"You're typing a price in US$. If they'll take đồng at their own rate, enter it here to see what to hand over.";
   $("rateSum").innerHTML=`<span>1 ${rc} = ${fmt(r,"VND")} VND · ${status}</span><b>Change ›</b>`;
   renderRef();
   if(deferPay){
@@ -610,12 +610,16 @@ document.addEventListener("visibilitychange",()=>{
   if(document.hidden){hiddenAt=Date.now();return}
   if(second!=="VND"&&Date.now()-hiddenAt>30*60000){setSecond("VND");expr="";render()}
 });
-$("rate").addEventListener("input",e=>{
+$("ratePanel").addEventListener("input",e=>{
+  if(!e.target.matches(".rate-in"))return;
   const r=parseFloat(e.target.value.replace(/,/g,""));
-  if(r>0){custom[rateCur()]=r;save();render()}
+  if(r>0){custom[e.target.closest(".rate").dataset.cur]=r;save();render()}
 });
-$("rate").addEventListener("blur",()=>render());
-$("resetRate").addEventListener("click",()=>{delete custom[rateCur()];save();render()});
+$("ratePanel").addEventListener("focusout",e=>{if(e.target.matches(".rate-in"))render()});
+$("ratePanel").addEventListener("click",e=>{
+  const b=e.target.closest(".rate-reset"); if(!b)return;
+  delete custom[b.closest(".rate").dataset.cur]; save(); render();
+});
 $("ref").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b)return;
   if(b.dataset.note){goTo(`#n${b.dataset.note/1000}k`);return}
@@ -1452,11 +1456,11 @@ route();
     return {vnd:{AUD:j.aud.vnd,USD:j.aud.vnd/j.aud.usd},asOf:j.date};
   }
   $("refreshRate").addEventListener("click",async()=>{
-    const btn=$("refreshRate"); btn.disabled=true; $("asof").textContent="Updating rate…";
+    const btn=$("refreshRate"); btn.disabled=true; $("asof").textContent="Updating rates…";
     let c=null;
     for(const src of [fromErApi,fromJsdelivr]){try{const r=await src();if(ok(r.vnd.AUD,r.vnd.USD)){c=r;break}}catch(e){}}
     btn.disabled=false;
-    if(!c){render();$("asof").textContent="Offline · rate as of "+asOf;return}
+    if(!c){render();$("asof").textContent="Offline · rates as of "+asOf;return}
     c.vnd.AUD=Math.round(c.vnd.AUD*100)/100; c.vnd.USD=Math.round(c.vnd.USD*100)/100;
     custom={}; save();
     try{localStorage.setItem("rates",JSON.stringify(c))}catch(e){}
@@ -1468,7 +1472,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v49", opened=Date.now();
+const APP_VERSION="rightnote-v50", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
