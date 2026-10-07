@@ -75,6 +75,8 @@ h2{font-size:1rem;font-weight:700;margin:0}
 .out{font-size:1.75rem;font-weight:700;color:var(--accent-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .pill{flex:none;white-space:nowrap;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.85rem;color:var(--muted)}
 .hint{font-size:.8rem;color:var(--muted)}
+.pill.dong{display:flex;align-items:baseline;gap:6px;background:var(--accent-soft);border-color:transparent;color:var(--ink);font-size:1.2rem;font-weight:700;padding:4px 12px}
+.pill.dong small{font-size:.72rem;font-weight:600;color:var(--accent-text)}
 select{flex:none;font:600 .9rem var(--body);color:var(--ink);background:var(--key-op);border:0;border-radius:999px;padding:8px 12px;min-height:36px}
 .flash{animation:flash .6s ease-out}
 @keyframes flash{from{background:var(--accent-soft)}to{background:transparent}}
@@ -539,8 +541,12 @@ function render(deferPay){
   const len=amt.textContent.length; amt.classList.toggle("long",len>10&&len<=14); amt.classList.toggle("longer",len>14);
   $("baseAmt").textContent=isFinite(out)?CUR[res].sym+fmt(out,res):"—";
   $("baseAmt").classList.toggle("err",!isFinite(out));
-  // the đồng amount in local shorthand; while typing US$ it's the đồng you'd pay, as on the How to pay card
-  $("inHint").textContent=second==="VND"?vnShort(v):res!=="VND"&&payAmount()?"₫"+vnShort(payAmount()):"";
+  // the đồng amount in local shorthand;
+  // while typing US$ it's the đồng you'd pay (as on the How to pay card), shown larger so it stands out
+  const A=second==="VND"||res==="VND"?0:payAmount(), dongPill=A>0;
+  $("inHint").classList.toggle("dong",dongPill);
+  if(dongPill)$("inHint").innerHTML=A<1e7?`<small>in đồng</small>₫${A.toLocaleString("en-AU")}`:"₫"+vnShort(A); // short form keeps big amounts on one line
+  else $("inHint").textContent=second==="VND"?vnShort(v):"";
   const rc=rateCur(), r=vnd(rc);
   $("rateUsd").hidden=base==="USD";
   [["rateHome",base],["rateUsd","USD"]].forEach(([id,c])=>{
@@ -1472,7 +1478,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v50", opened=Date.now();
+const APP_VERSION="rightnote-v51", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
