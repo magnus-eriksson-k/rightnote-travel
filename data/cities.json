@@ -285,41 +285,114 @@
           ]
         },
         {
+          "h": "Sights",
+          "items": [
+            {
+              "t": "Hoàn Kiếm Lake",
+              "d": "The heart of the city, with the red Thê Húc bridge out to Ngọc Sơn Temple on its island. Best early in the morning, when locals exercise around the shore. The fee is for the temple; the lake is free.",
+              "wiki": "Hoàn Kiếm Lake",
+              "lat": 21.0287,
+              "lon": 105.8524,
+              "p": 50000
+            },
+            {
+              "t": "Old Quarter",
+              "d": "The tangle of streets north of the lake, each once named for the trade carried on there. Tube houses, street food and the Đồng Xuân market. Free to wander.",
+              "wiki": "Old Quarter, Hanoi",
+              "lat": 21.0341,
+              "lon": 105.8501
+            },
+            {
+              "t": "Temple of Literature",
+              "d": "Văn Miếu, built in 1070 to honour Confucius and later Vietnam's first university. Five quiet courtyards and stone steles on turtles naming past scholars.",
+              "wiki": "Temple of Literature, Hanoi",
+              "lat": 21.0293,
+              "lon": 105.8355,
+              "p": 70000
+            },
+            {
+              "t": "Hồ Chí Minh Mausoleum",
+              "d": "Hồ Chí Minh lies in state here. Free, mornings only, closed Mondays and Fridays and for a few weeks each year; dress code applies (see Customs). The One Pillar Pagoda is a short walk behind.",
+              "wiki": "Ho Chi Minh Mausoleum",
+              "lat": 21.0368,
+              "lon": 105.8346
+            },
+            {
+              "t": "Imperial Citadel of Thăng Long",
+              "d": "A UNESCO site: the seat of Vietnamese kings for eight centuries, with excavated palace foundations, the Đoan Môn gate and wartime bunkers.",
+              "wiki": "Imperial Citadel of Thăng Long",
+              "lat": 21.0352,
+              "lon": 105.8403,
+              "p": 100000
+            },
+            {
+              "t": "Hỏa Lò Prison",
+              "d": "Built by the French for Vietnamese prisoners, later the \"Hanoi Hilton\" for American pilots. Sobering but well presented; allow an hour.",
+              "wiki": "Hỏa Lò Prison",
+              "lat": 21.0254,
+              "lon": 105.8463,
+              "p": 50000
+            },
+            {
+              "t": "Vietnam Museum of Ethnology",
+              "d": "The best museum in town: the life and crafts of Vietnam's 54 ethnic groups, with full-size village houses in the garden. A Grab ride west of the centre; closed Mondays.",
+              "wiki": "Vietnam Museum of Ethnology",
+              "lat": 21.0405,
+              "lon": 105.7985,
+              "p": 40000
+            },
+            {
+              "t": "Trấn Quốc Pagoda",
+              "d": "Hà Nội's oldest pagoda, its tall red stupa on a small island in West Lake. Lovely at sunset. Free; cover shoulders and knees.",
+              "wiki": "Trấn Quốc Pagoda",
+              "lat": 21.048,
+              "lon": 105.8368
+            }
+          ]
+        },
+        {
           "h": "Food to try",
           "items": [
             {
               "t": "Phở bò",
               "d": "Beef noodle soup, the classic Hà Nội breakfast. The northern style has a clear broth and few herbs.",
+              "wiki": "Phở",
               "p": 50000
             },
             {
               "t": "Bún chả",
               "d": "Grilled pork patties and belly in a sweet-sour broth, with rice noodles and herbs. A lunchtime dish.",
+              "wiki": "Bún chả",
               "p": 50000
             },
             {
               "t": "Bánh cuốn",
               "d": "Silky steamed rice rolls filled with pork and wood-ear mushroom, with fish sauce for dipping.",
+              "wiki": "Bánh cuốn",
               "p": 40000
             },
             {
               "t": "Chả cá",
               "d": "Turmeric-marinated fish fried at the table with dill and spring onion. A Hà Nội speciality.",
+              "wiki": "Chả cá Lã Vọng",
               "p": 150000
             },
             {
               "t": "Bún đậu mắm tôm",
               "d": "Fried tofu, rice noodles and herbs with fermented shrimp paste. Love it or hate it.",
+              "wiki": "Bún đậu mắm tôm",
               "p": 50000
             },
             {
               "t": "Cà phê trứng",
               "d": "Egg coffee: yolk whipped with condensed milk on strong coffee. Invented in Hà Nội in the 1940s.",
+              "wiki": "Egg coffee",
               "p": 40000
             },
             {
               "t": "Cốm",
               "d": "Young green sticky rice, wrapped in lotus leaves. An autumn treat, best in September and October.",
+              "wiki": "Cốm",
               "p": 30000
             }
           ]
@@ -329,15 +402,18 @@
           "items": [
             {
               "t": "Water puppetry",
-              "d": "Múa rối nước: wooden puppets perform on a water stage to live chèo folk music. Thăng Long Theatre by Hoàn Kiếm Lake has several shows a day."
+              "d": "Múa rối nước: wooden puppets perform on a water stage to live chèo folk music. Thăng Long Theatre by Hoàn Kiếm Lake has several shows a day.",
+              "wiki": "Water puppetry"
             },
             {
               "t": "Ca trù",
-              "d": "Centuries-old chamber singing with a long-necked lute and wooden clappers, on UNESCO's list of heritage in need of protection. Small evening shows run in the Old Quarter."
+              "d": "Centuries-old chamber singing with a long-necked lute and wooden clappers, on UNESCO's list of heritage in need of protection. Small evening shows run in the Old Quarter.",
+              "wiki": "Ca trù"
             },
             {
               "t": "Xẩm",
-              "d": "Street ballads once sung by blind wandering musicians, revived on weekend evenings near Đồng Xuân market."
+              "d": "Street ballads once sung by blind wandering musicians, revived on weekend evenings near Đồng Xuân market.",
+              "wiki": "Xẩm"
             },
             {
               "t": "Walking streets",
@@ -345,7 +421,8 @@
             },
             {
               "t": "Bia hơi",
-              "d": "Fresh, light draught beer brewed daily, drunk on tiny plastic stools. Tạ Hiện street is the busiest corner."
+              "d": "Fresh, light draught beer brewed daily, drunk on tiny plastic stools. Tạ Hiện street is the busiest corner.",
+              "wiki": "Bia hơi"
             }
           ]
         },
