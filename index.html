@@ -62,6 +62,10 @@ h2{font-size:1rem;font-weight:700;margin:0}
 /* fixed heights so the keypad below never moves while you type */
 .label-row{display:flex;justify-content:space-between;gap:12px;font-size:.85rem;color:var(--muted);min-height:1.3rem}
 .price .label{font-weight:600;white-space:nowrap}
+/* the currency they ask in: tap to switch between đồng and US$ */
+.cur-btn{border:0;background:none;font:inherit;color:inherit;padding:8px 12px 8px 0;margin:-8px 0;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:8px}
+.cur-btn b{color:var(--ink)}
+.cur-btn .sw{border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:.8rem;color:var(--accent-text)}
 .expr{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .expr:empty,.hint:empty,.pill:empty{display:none}
 .amt{height:3.6rem;display:flex;align-items:flex-end;white-space:nowrap;font-size:3.2rem;font-weight:300;letter-spacing:-.02em;line-height:1.1}
@@ -280,14 +284,12 @@ button.item:active{background:var(--accent-soft)}
 
 <div class="view" id="calcView">
   <section class="price" id="panel" aria-label="Conversion">
-    <div class="label-row"><span class="label" id="second">They ask, in đồng</span><span class="expr" id="expr"></span></div>
+    <div class="label-row"><button type="button" class="label cur-btn" id="second">They ask, in đồng</button><span class="expr" id="expr"></span></div>
     <div class="amt" id="secondAmt">0</div>
     <div class="out-row">
       <span class="out" id="baseAmt">0</span>
       <span class="pill" id="inHint"></span>
-      <select id="base" aria-label="Your currency"></select>
     </div>
-    <div class="hint" id="hint"></div>
   </section>
 
   <div class="keys" id="keys">
@@ -375,6 +377,12 @@ button.item:active{background:var(--accent-soft)}
 </div>
 
 <div class="view" id="optionsView" hidden>
+  <section class="panel rate-panel" aria-labelledby="homeTitle">
+    <h2 id="homeTitle">Home currency</h2>
+    <div class="seg" id="homeSeg" role="radiogroup" aria-labelledby="homeTitle"></div>
+    <p class="note">Prices are shown in this currency too. When a price is in US$ and this is US$, you see the đồng amount instead.</p>
+  </section>
+
   <section class="panel rate-panel" id="ratePanel" aria-labelledby="rateTitle">
     <h2 id="rateTitle">Exchange rate</h2>
     <span class="note" id="asof">Rate as of 3 Oct 2026</span>
@@ -385,7 +393,7 @@ button.item:active{background:var(--accent-soft)}
       <button class="linkbtn" id="resetRate" type="button">Reset rate</button>
       <button class="linkbtn" id="refreshRate" type="button">Refresh rate</button>
     </div>
-    <p class="note">Rates are mid-market; cash and card rates in Vietnam typically sit 1–2% either side. Edit the rate to match your bank or money changer.</p>
+    <p class="note" id="rateNote">Rates are mid-market; cash and card rates in Vietnam typically sit 1–2% either side. Edit the rate to match your bank or money changer.</p>
   </section>
 
   <section class="panel rate-panel" aria-labelledby="themeTitle">
@@ -472,16 +480,23 @@ const pic=d=>backs[d]||photos[d];
 const $=id=>document.getElementById(id);
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
-// You always type in đồng for now (note photos exist only for đồng); the other side is selectable
-const second="VND"; let base=store.get("base");
+// second: the currency they ask in, đồng unless switched to US$ (it isn't saved, so the app always opens in đồng).
+// base: your home currency, set in Options. Notes are always paid in đồng (only đồng has photos).
+const ENTRY=["VND","USD"]; let second="VND", base=store.get("base");
 if(!CUR[base]||base==="VND")base="AUD";
-let expr="", custom=null; // custom rate overrides default for current pair
-try{custom=JSON.parse(store.get("custom")||"null")}catch(e){}
+// custom rates, as đồng per 1 unit: your money changer's for home, or a vendor's for US$
+let expr="", custom={};
+try{const c=JSON.parse(store.get("custom")||"null");
+  if(c&&c.pair)custom=/^[A-Z]{3}VND$/.test(c.pair)?{[c.pair.slice(0,3)]:c.r}:{}; // the older {pair,r} form
+  else if(c&&typeof c==="object")custom=c}catch(e){}
 
-$("base").innerHTML=Object.keys(CUR).filter(c=>c!=="VND").map(c=>`<option value="${c}">${c}</option>`).join("");
+$("homeSeg").style.gridTemplateColumns=`repeat(${Object.keys(CUR).length-1},minmax(0,1fr))`;
+$("homeSeg").innerHTML=Object.keys(CUR).filter(c=>c!=="VND").map(c=>`<button type="button" role="radio" data-home="${c}">${CUR[c].sym} ${CUR[c].name}</button>`).join("");
 
-function defaultRate(){return CUR[base].vnd/CUR[second].vnd}
-function rate(){return custom&&custom.pair===base+second?custom.r:defaultRate()}
+// đồng per 1 unit of c, using a custom rate when one is set; every conversion goes through đồng
+function vnd(c){return custom[c]>0?custom[c]:CUR[c].vnd}
+// the rate shown in Options: the US$ one while typing US$ (a vendor's rate), else your home currency's
+function rateCur(){return second==="VND"?base:second}
 
 function evaluate(s){
   const t=s.match(/\d*\.?\d+|\d+\.|[+\-*/]/g); if(!t)return 0;
@@ -514,23 +529,29 @@ function vnShort(n){ // how prices are written on Vietnamese menus and signs
 // While you type, the payment options wait until you stop for a moment, so they don't change on every key
 const PAY_DELAY=1500; let payTimer=null;
 function render(deferPay){
-  $("base").value=base;
+  document.querySelectorAll("#homeSeg button").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.home===base)));
+  const other=second==="VND"?"USD":"VND";
+  $("second").innerHTML=`They ask, in <b>${second==="VND"?"đồng":CUR[second].sym}</b><span class="sw" aria-hidden="true">⇄ ${other==="VND"?"đồng":CUR[other].sym}</span>`;
+  $("second").setAttribute("aria-label",`They ask in ${CUR[second].name}. Switch to ${CUR[other].name}`);
   const showExpr=/[+\-*/]/.test(expr.replace(/^-/,""));
-  // you type in the second currency; the result is in the base currency
-  const v=evaluate(expr), out=v/rate();
+  // you type in the second currency; the result is in your home currency, or in đồng when both are US$
+  const v=evaluate(expr), dong=v*vnd(second), res=second===base?"VND":base, out=dong/vnd(res);
   $("expr").textContent=showExpr?expr.replace(/\*/g,"×").replace(/\//g,"÷"):"";
   const amt=$("secondAmt"); amt.textContent=CUR[second].sym+(showExpr?fmt(v,second):typed(expr));
   const len=amt.textContent.length; amt.classList.toggle("long",len>10&&len<=14); amt.classList.toggle("longer",len>14);
-  $("baseAmt").textContent=isFinite(out)?CUR[base].sym+fmt(out,base):"—";
+  $("baseAmt").textContent=isFinite(out)?CUR[res].sym+fmt(out,res):"—";
   $("baseAmt").classList.toggle("err",!isFinite(out));
-  $("inHint").textContent=second==="VND"?vnShort(v):"";
-  $("hint").textContent=base==="VND"&&vnShort(out)?"≈ "+vnShort(out):"";
-  $("rateLabel").textContent=`1 ${base} =`; $("rateUnit").textContent=second;
-  if(document.activeElement!==$("rate")){const r=rate();$("rate").value=r>=100?r.toLocaleString("en-AU",{maximumFractionDigits:2}):r.toPrecision(6)}
-  $("resetRate").hidden=!(custom&&custom.pair===base+second);
-  const status=(custom&&custom.pair===base+second)?"Custom rate":"Rate as of "+asOf;
+  // the đồng amount in local shorthand; while typing US$ it's the đồng you'd pay, as on the How to pay card
+  $("inHint").textContent=second==="VND"?vnShort(v):res!=="VND"&&payAmount()?"₫"+vnShort(payAmount()):"";
+  const rc=rateCur(), r=vnd(rc);
+  $("rateLabel").textContent=`1 ${rc} =`; $("rateUnit").textContent="VND";
+  if(document.activeElement!==$("rate"))$("rate").value=r.toLocaleString("en-AU",{maximumFractionDigits:2});
+  $("resetRate").hidden=!(custom[rc]>0);
+  const status=custom[rc]>0?"Custom rate":"Rate as of "+asOf;
   $("asof").textContent=status;
-  $("rateSum").innerHTML=`<span>1 ${base} = ${fmt(rate(),"VND")} ${second} · ${status}</span><b>Change ›</b>`;
+  $("rateNote").textContent=second==="VND"?"Rates are mid-market; cash and card rates in Vietnam typically sit 1–2% either side. Edit the rate to match your bank or money changer."
+    :"You're typing a price in US$. If they'll take đồng at their own rate, enter it here to see what to hand over.";
+  $("rateSum").innerHTML=`<span>1 ${rc} = ${fmt(r,"VND")} VND · ${status}</span><b>Change ›</b>`;
   renderRef();
   if(deferPay){
     clearTimeout(payTimer); $("payCard").classList.add("pending");
@@ -541,8 +562,8 @@ function render(deferPay){
 // Note colours as CSS variables; the .tone class picks the shade that suits light or dark mode
 function tone(c1,c2){return c1?`--c1:${c1};--c2:${c2}`:""}
 function renderRef(){
-  // you always type in đồng for now, so this lists the đồng notes, then larger amounts
-  const r=rate();
+  // the đồng notes, then larger amounts, each with its value in your home currency
+  const r=vnd(base);
   $("ref").innerHTML=VND_NOTES.map(([d,c1,c2])=>{
     const val=`${CUR[base].sym}${fmt(d/r,base)}`;
     if(!c1)return `<button type="button" class="plain" data-v="${d}"><b>₫${fmt(d,"VND")}</b><span>${val}</span></button>`;
@@ -570,7 +591,7 @@ function typed(s){ // show what was typed, with thousands separators, keeping a 
   return (neg?"-":"")+Number(digits).toLocaleString("en-AU")+(f!==undefined?"."+f:"");
 }
 function trimNum(v,c){if(!isFinite(v))return "";const dp=CUR[c].dp;return String(Number(v.toFixed(dp)))}
-function save(){store.set("base",base);store.set("second",second);store.set("custom",JSON.stringify(custom))}
+function save(){store.set("base",base);store.set("custom",JSON.stringify(custom))}
 
 $("keys").addEventListener("click",e=>{const b=e.target.closest("button");if(b)press(b.dataset.k)});
 document.addEventListener("keydown",e=>{
@@ -579,20 +600,29 @@ document.addEventListener("keydown",e=>{
   const k=map[e.key]||e.key;
   if(/^[\d.+\-*/=]$/.test(k)||["back","C"].includes(k)){e.preventDefault();press(k)}
 });
-$("base").addEventListener("change",e=>{base=e.target.value;save();render()});
+$("homeSeg").addEventListener("click",e=>{const b=e.target.closest("[data-home]");if(b){base=b.dataset.home;save();render()}});
+// switching keeps what you typed, so a price entered in the wrong currency just changes currency
+function setSecond(c){if(c!==second){second=c;payOpen=undefined}}
+$("second").addEventListener("click",()=>{setSecond(second==="VND"?"USD":"VND");render()});
+// a US$ price is a one-off: after a while away, the app is back in đồng
+let hiddenAt=0;
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){hiddenAt=Date.now();return}
+  if(second!=="VND"&&Date.now()-hiddenAt>30*60000){setSecond("VND");expr="";render()}
+});
 $("rate").addEventListener("input",e=>{
   const r=parseFloat(e.target.value.replace(/,/g,""));
-  if(r>0){custom={pair:base+second,r};save();render()}
+  if(r>0){custom[rateCur()]=r;save();render()}
 });
 $("rate").addEventListener("blur",()=>render());
-$("resetRate").addEventListener("click",()=>{custom=null;save();render()});
+$("resetRate").addEventListener("click",()=>{delete custom[rateCur()];save();render()});
 $("ref").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b)return;
   if(b.dataset.note){goTo(`#n${b.dataset.note/1000}k`);return}
   goCalc(); loadAmount(+b.dataset.v);
 });
-function loadAmount(v){
-  expr=trimNum(v,second); render();
+function loadAmount(v,cur="VND"){
+  setSecond(cur); expr=trimNum(v,second); render();
   const p=$("panel"); p.classList.remove("flash"); void p.offsetWidth; p.classList.add("flash");
   p.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
 }
@@ -603,10 +633,8 @@ function openNote(d){
   $("dlgArt").style.background=`radial-gradient(circle at 75% 30%,rgba(255,255,255,.18),transparent 55%),linear-gradient(135deg,${row[1]},${row[2]})`;
   $("dlgDenom").textContent=d.toLocaleString("en-AU");
   $("dlgTitle").textContent=`₫${d.toLocaleString("en-AU")} note`;
-  const other=second==="VND"?base:second, amt=second==="VND"?d/rate():d;
-  $("dlgVal").textContent=other==="VND"?"":`≈ ${CUR[other].sym}${fmt(amt,other)}`;
+  $("dlgVal").textContent=`≈ ${CUR[base].sym}${fmt(d/vnd(base),base)}`;
   $("dlgBack").textContent=info.back||""; $("dlgColour").textContent=info.colour||"";
-  $("dlgUse").hidden=second!=="VND";
   $("dlgMsg").textContent="";
   showPhoto();
   $("noteDlg").hidden=false;
@@ -666,10 +694,9 @@ const PAY_NOTES=[500000,200000,100000,50000,20000,10000,5000,2000,1000]; // 1k�
 let payOpen; // the tab the user picked; the first option when unset or no longer offered
 function split(total,allowed){const out=[];let r=total;for(const n of allowed){const k=Math.floor(r/n);if(k){out.push([n,k]);r-=k*n}}return r===0?out:null}
 function count(parts){return parts.reduce((a,[,k])=>a+k,0)}
-function payAmount(){
-  const v=evaluate(expr), r=rate();
-  const vnd=second==="VND"?v:base==="VND"?v/r:NaN;
-  return isFinite(vnd)&&vnd>0?Math.ceil(Math.round(vnd)/1000)*1000:0;
+function payAmount(){ // the đồng to pay, rounded up to the smallest note; a US$ price is converted first
+  const d=evaluate(expr)*vnd(second);
+  return isFinite(d)&&d>0?Math.ceil(Math.round(d)/1000)*1000:0;
 }
 function ways(A){
   const out=[], fewest=split(A,PAY_NOTES);
@@ -695,7 +722,7 @@ function tile(n,k){
 function renderPay(){
   const A=payAmount();
   if(!A){$("payTitle").textContent="How to pay";$("payList").innerHTML=`<p class="note">Enter an amount to see which notes to hand over.</p>`;return}
-  $("payTitle").textContent=`Paying ₫${A.toLocaleString("en-AU")}`;
+  $("payTitle").textContent=`${second==="VND"?"Paying":"If paying in đồng:"} ₫${A.toLocaleString("en-AU")}`;
   const ws=ways(A), w=ws.find(x=>x.key===payOpen)||ws.find(x=>x.key==="exact");
   const tabs=ws.map(x=>{const n=count(x.parts);return `<button type="button" role="tab" class="tab" data-way="${x.key}" aria-selected="${x===w}" aria-controls="payPanel"><b>${x.title}</b><span>${n} note${n===1?"":"s"}</span></button>`}).join("");
   const kinds=w.parts.length, cols=kinds===1?1:kinds<=4?2:kinds<=6?3:kinds<=8?4:5; // one note fills the area
@@ -1177,7 +1204,7 @@ function loadThumbs(){
 function priceHTML(v,cur){
   // the local price, and what it is in your currency at the calculator's rate
   const loc=CUR[cur]?CUR[cur].sym+fmt(v,cur):`${v.toLocaleString("en-AU")} ${cur}`;
-  const r=cur===second?v/rate():CUR[cur]?v*CUR[cur].vnd/CUR[base].vnd:NaN;
+  const r=CUR[cur]?v*vnd(cur)/vnd(base):NaN;
   return `<span class="pr"><b>${loc}</b>${isFinite(r)&&cur!==base?`<span>${CUR[base].sym}${fmt(r,base)}</span>`:""}</span>`;
 }
 function creditHTML(ph){
@@ -1186,19 +1213,19 @@ function creditHTML(ph){
 }
 // An item with a photo or a place opens in place: the large photo and its credit, Map, and the price in the calculator
 function itemHTML(it,cur,pics,k){
-  const ph=pics[picKey(it)], calc=it.p!=null&&cur===second, mu=isFinite(it.lat)&&isFinite(it.lon)&&mapURL({name:it.t,lat:it.lat,lon:it.lon});
+  const ph=pics[picKey(it)], calc=it.p!=null&&ENTRY.includes(cur), mu=isFinite(it.lat)&&isFinite(it.lon)&&mapURL({name:it.t,lat:it.lat,lon:it.lon});
   const txt=`<span class="txt"><b>${esc(it.t)}</b>${it.d?`<span>${esc(it.d)}</span>`:""}</span>`, pr=it.p!=null?priceHTML(it.p,cur):"";
   if(ph||mu){
     const thumb=ph?`<img class="thumb" data-pic="${esc(ph.thumb)}" alt="">`:"";
     const map=mu?`<a class="btn" href="${esc(mu)}"${mu.startsWith("https:")?' target="_blank" rel="noopener"':""}>Map</a>`:"";
-    const use=calc?`<button type="button" class="btn primary" data-price="${it.p}">${esc(CUR[cur].sym+fmt(it.p,cur))} in calculator</button>`:"";
+    const use=calc?`<button type="button" class="btn primary" data-price="${it.p}" data-cur="${cur}">${esc(CUR[cur].sym+fmt(it.p,cur))} in calculator</button>`:"";
     return `<details class="item pic" data-k="${esc(k)}"><summary>${thumb}${txt}${pr}</summary><div class="more">
       ${ph?`<figure class="city-photo"><div class="ph-box loading"><img data-big="${esc(ph.src)}" alt="Photo of ${esc(it.t)}"></div><figcaption>${creditHTML(ph)}</figcaption></figure>`:""}
       ${map||use?`<div class="dlg-actions">${use}${map}</div>`:""}</div></details>`;
   }
   if(it.p==null)return `<div class="item">${txt}</div>`;
   // prices in the currency you type in open in the calculator
-  return calc?`<button type="button" class="item" data-price="${it.p}" aria-label="${esc(it.t)}, ${it.p.toLocaleString("en-AU")} ${cur}, open in calculator">${txt}${pr}</button>`
+  return calc?`<button type="button" class="item" data-price="${it.p}" data-cur="${cur}" aria-label="${esc(it.t)}, ${it.p.toLocaleString("en-AU")} ${cur}, open in calculator">${txt}${pr}</button>`
     :`<div class="item">${txt}${pr}</div>`;
 }
 function sectHTML(s,i,cur,pics={}){
@@ -1208,9 +1235,10 @@ function sectHTML(s,i,cur,pics={}){
   if(s.items){
     body+=`<div class="items">${s.items.map((it,j)=>itemHTML(it,cur,pics,s.h+"/"+j)).join("")}</div>`;
     const opens=s.items.some(it=>pics[picKey(it)]||isFinite(it.lat)), priced=s.items.some(it=>it.p!=null);
-    const notes=[cur===second&&priced&&`Rough guide prices (${esc(guide.checked)}).`,
-      opens?"Tap one for its photo"+(s.items.some(it=>isFinite(it.lat))?", map":"")+(cur===second&&priced?" and price in the calculator.":"."):
-      cur===second&&priced&&"Tap one to open it in the calculator."].filter(Boolean);
+    const inCalc=ENTRY.includes(cur)&&priced;
+    const notes=[inCalc&&`Rough guide prices (${esc(guide.checked)}).`,
+      opens?"Tap one for its photo"+(s.items.some(it=>isFinite(it.lat))?", map":"")+(inCalc?" and price in the calculator.":"."):
+      inCalc&&"Tap one to open it in the calculator."].filter(Boolean);
     if(notes.length)body+=`<p class="note">${notes.join(" ")}</p>`;
   }
   return `<details class="panel sect" data-k="${esc(s.h)}"${i===0?" open":""}><summary>${esc(s.h)}</summary><div class="sect-body">${body}</div></details>`;
@@ -1321,12 +1349,12 @@ function bigPic(d){
 $("cityBody").addEventListener("toggle",e=>{if(e.target.matches("details.pic")&&e.target.open)bigPic(e.target)},true);
 $("cityBody").addEventListener("click",e=>{
   const b=e.target.closest("[data-price]"); if(!b)return;
-  goCalc(); loadAmount(+b.dataset.price);
+  goCalc(); loadAmount(+b.dataset.price,b.dataset.cur);
 });
-// ---- Phrases: for the country you're in (from City), else the country of the currency you pay in ----
+// ---- Phrases: for the country you're in (from City), else the country whose notes you pay with (Vietnam) ----
 let phrOpen=null; // "group-item" of the phrase shown large
 function phraseCountry(){
-  const cs=guide.countries, cc=place&&cs[place.cc]&&cs[place.cc].phrases?place.cc:Object.keys(cs).find(k=>cs[k].cur===second&&cs[k].phrases);
+  const cs=guide.countries, cc=place&&cs[place.cc]&&cs[place.cc].phrases?place.cc:Object.keys(cs).find(k=>cs[k].cur==="VND"&&cs[k].phrases);
   return cc&&cs[cc];
 }
 const canSpeak="speechSynthesis" in window;
@@ -1430,7 +1458,7 @@ route();
     btn.disabled=false;
     if(!c){render();$("asof").textContent="Offline · rate as of "+asOf;return}
     c.vnd.AUD=Math.round(c.vnd.AUD*100)/100; c.vnd.USD=Math.round(c.vnd.USD*100)/100;
-    custom=null; save();
+    custom={}; save();
     try{localStorage.setItem("rates",JSON.stringify(c))}catch(e){}
     apply(c);
   });
@@ -1440,7 +1468,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v48", opened=Date.now();
+const APP_VERSION="rightnote-v49", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
@@ -1462,7 +1490,7 @@ if("serviceWorker" in navigator){
 (function(){
   let last=null; try{last=JSON.parse(localStorage.getItem("rates")||"null")}catch(e){}
   const today=new Date().toISOString().slice(0,10);
-  if(navigator.onLine&&(!last||last.asOf<today)&&!(custom&&custom.pair===base+second))$("refreshRate").click();
+  if(navigator.onLine&&(!last||last.asOf<today)&&!Object.keys(custom).length)$("refreshRate").click();
 })();
 </script>
 
