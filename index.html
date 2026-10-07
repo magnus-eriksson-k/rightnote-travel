@@ -193,6 +193,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .chips button[aria-current="true"]{background:var(--accent);color:var(--accent-ink)}
 .city-photo{margin:0;display:flex;flex-direction:column;gap:4px}
 .city-photo img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:18px;background:var(--key-op)}
+.city-photo img.wide{aspect-ratio:3/1} /* Wikivoyage banners are panoramas */
 .city-photo figcaption{font-size:.72rem;color:var(--muted);padding:0 4px;overflow-wrap:anywhere}
 .city-photo a{color:inherit}
 .wx{display:flex;flex-direction:column;gap:10px}
@@ -945,9 +946,9 @@ async function wp(params){
   if(!r.ok)throw new Error(r.status); return r.json();
 }
 const htmlText=h=>new DOMParser().parseFromString(h||"","text/html").body.textContent.replace(/\s+/g," ").trim();
-const PHOTO_V=2; // bump to re-check every saved photo result
-async function photoInfo(file){ // the file's thumbnail, author and license, or null when it can't be credited
-  const b=await wp({action:"query",titles:"File:"+file,prop:"imageinfo",iiprop:"url|extmetadata",iiurlwidth:800,
+const PHOTO_V=3; // bump to re-check every saved photo result
+async function photoInfo(file,width=800){ // the file's thumbnail, author and license, or null when it can't be credited
+  const b=await wp({action:"query",titles:"File:"+file,prop:"imageinfo",iiprop:"url|extmetadata",iiurlwidth:width,
     iiextmetadatafilter:"Artist|Credit|LicenseShortName|License|LicenseUrl|NonFree"});
   const ii=b.query&&b.query.pages&&b.query.pages[0]&&b.query.pages[0].imageinfo&&b.query.pages[0].imageinfo[0], m=ii&&ii.extmetadata||{};
   const v=k=>m[k]&&m[k].value, lic=htmlText(v("LicenseShortName"))||htmlText(v("License")).toUpperCase();
@@ -955,18 +956,46 @@ async function photoInfo(file){ // the file's thumbnail, author and license, or 
   return {at:Date.now(),v:PHOTO_V,src:ii.thumburl||ii.url,page:ii.descriptionurl,artist:htmlText(v("Artist"))||htmlText(v("Credit"))||"Unknown author",
     license:lic,licenseUrl:v("LicenseUrl")||""};
 }
-async function fetchPhoto(title){
-  // the article's lead image (free images only, by default), then the place's main image on Wikidata, which is always on Commons
-  const a=await wp({action:"query",titles:title,prop:"pageimages|pageprops",piprop:"name",ppprop:"wikibase_item"});
-  const pg=a.query&&a.query.pages&&a.query.pages[0]||{};
-  if(pg.pageimage){const ph=await photoInfo(pg.pageimage);if(ph)return ph}
-  const q=pg.pageprops&&pg.pageprops.wikibase_item;
-  if(q){
-    const r=await fetch("https://www.wikidata.org/w/api.php?"+new URLSearchParams({action:"wbgetclaims",entity:q,property:"P18",format:"json",origin:"*"}));
-    const c=r.ok&&await r.json(), snak=c&&c.claims&&c.claims.P18&&c.claims.P18[0]&&c.claims.P18[0].mainsnak;
-    const file=snak&&snak.datavalue&&snak.datavalue.value;
-    if(file&&file.replace(/ /g,"_")!==pg.pageimage){const ph=await photoInfo(file);if(ph)return ph}
+// Every source is a Wikimedia Commons file, so each photo is free to use and credited the same way. Tried in order:
+const PHOTO_SOURCES=[
+  async(p,wiki)=>{ // 1. the Wikipedia article's lead image (free images only, by default)
+    if(!wiki)return null;
+    const a=await wp({action:"query",titles:wiki,prop:"pageimages|pageprops",piprop:"name",ppprop:"wikibase_item"});
+    const pg=a.query&&a.query.pages&&a.query.pages[0]||{};
+    p.qid=pg.pageprops&&pg.pageprops.wikibase_item; // for the next source
+    return pg.pageimage&&photoInfo(pg.pageimage);
+  },
+  async p=>{ // 2. the place's main image on Wikidata
+    if(!p.qid)return null;
+    const r=await fetch("https://www.wikidata.org/w/api.php?"+new URLSearchParams({action:"wbgetclaims",entity:p.qid,property:"P18",format:"json",origin:"*"}));
+    if(!r.ok)throw new Error(r.status);
+    const c=await r.json(), snak=c.claims&&c.claims.P18&&c.claims.P18[0]&&c.claims.P18[0].mainsnak;
+    return snak&&snak.datavalue&&photoInfo(snak.datavalue.value);
+  },
+  async(p,wiki,voy)=>{ // 3. the Wikivoyage article's banner, a wide panorama of the place
+    if(!voy)return null;
+    const a=await wv({action:"query",titles:voy,redirects:1,prop:"pageprops",ppprop:"wpb_banner"});
+    const pg=a.query&&a.query.pages&&a.query.pages[0], file=pg&&pg.pageprops&&pg.pageprops.wpb_banner;
+    if(!file||/default/i.test(file))return null;
+    const ph=await photoInfo(file,2000); return ph&&{...ph,wide:true};
+  },
+  async p=>{ // 4. a landscape photo taken near the centre, with the place's name in its file name; the largest wins
+    const r=await fetch("https://commons.wikimedia.org/w/api.php?"+new URLSearchParams({action:"query",format:"json",formatversion:2,origin:"*",
+      generator:"geosearch",ggscoord:`${p.lat}|${p.lon}`,ggsradius:5000,ggsnamespace:6,ggslimit:50,prop:"imageinfo",iiprop:"size|mime"}));
+    if(!r.ok)throw new Error(r.status);
+    const j=await r.json(), n=norm(p.name);
+    const best=(j.query&&j.query.pages||[]).map(f=>({f,ii:f.imageinfo&&f.imageinfo[0]}))
+      .filter(({f,ii})=>ii&&ii.mime==="image/jpeg"&&ii.width>=1200&&ii.width>=ii.height*1.2&&norm(f.title).includes(n))
+      .sort((a,b)=>b.ii.width*b.ii.height-a.ii.width*a.ii.height)[0];
+    return best&&photoInfo(best.f.title.replace(/^File:/,""));
   }
+];
+async function fetchPhoto(p,wiki,voy){
+  const ctx={...p}; let failed=false;
+  for(const src of PHOTO_SOURCES){
+    try{const ph=await src(ctx,wiki,voy);if(ph)return ph}catch(e){failed=true}
+  }
+  if(failed)throw new Error("offline"); // don't save "no photo" when a source couldn't be reached
   return {at:Date.now(),v:PHOTO_V};
 }
 async function keepPhoto(src){try{const c=await caches.open(PHOTO_CACHE);if(!await c.match(src)){const r=await fetch(src,{mode:"cors"});if(r.ok)await c.put(src,r)}}catch(e){}}
@@ -980,7 +1009,7 @@ async function renderPhoto(ph){
   if(!place||place.id!==id){if(url!==ph.src)URL.revokeObjectURL(url);return} // moved on to another city meanwhile
   if(photoBlob)URL.revokeObjectURL(photoBlob); photoBlob=url!==ph.src?url:null;
   img.onerror=()=>{fig.hidden=true}; // offline and not saved yet
-  img.src=url; img.alt=`Photo of ${place.name}`;
+  img.src=url; img.alt=`Photo of ${place.name}`; img.classList.toggle("wide",!!ph.wide);
   const lic=ph.licenseUrl?`<a href="${esc(ph.licenseUrl)}" target="_blank" rel="noopener">${esc(ph.license)}</a>`:esc(ph.license);
   $("cityPhotoCredit").innerHTML=`Photo: <a href="${esc(ph.page)}" target="_blank" rel="noopener">${esc(ph.artist)}</a>, ${lic}, via Wikimedia Commons`;
   fig.hidden=false;
@@ -1051,14 +1080,15 @@ async function refreshCity(){
   if(!saved.wx||Date.now()-saved.wx.at>HOUR)jobs.push(fetchWeather(p).then(data=>{const d=cityData(p.id);d.wx={at:Date.now(),data};saveCityData(p.id,d)}).catch(()=>{}));
   const g=guideCity(p.id), stale=x=>!x||Date.now()-x.at>30*24*HOUR;
   const stalePhoto=x=>!x||x.v!==PHOTO_V||Date.now()-x.at>(x.src?30*24:24)*HOUR; // "no photo" is re-checked after a day
-  // the photo comes from the same Wikipedia article as the overview, so it's of the right place
-  const photo=title=>title&&stalePhoto(cityData(p.id).photo)?fetchPhoto(title).then(async ph=>{
+  // the photo comes from the same Wikipedia and Wikivoyage articles as the guide, so it's of the right place
+  const photo=(wiki,voy)=>stalePhoto(cityData(p.id).photo)?fetchPhoto(p,wiki,voy).then(async ph=>{
     if(ph.src)await keepPhoto(ph.src);
     const d=cityData(p.id); if(d.photo&&d.photo.src&&d.photo.src!==ph.src)dropPhoto(d.photo.src); d.photo=ph; saveCityData(p.id,d);
   }).catch(()=>{}):null;
-  if(g)jobs.push(photo(g.wiki));
-  else if(stale(saved.guide))jobs.push(fetchGuide(p).then(v=>{const d=cityData(p.id);d.guide=v;saveCityData(p.id,d);return photo(v.wiki&&v.wiki.title)}).catch(()=>{}));
-  else jobs.push(photo(saved.guide.wiki&&saved.guide.wiki.title));
+  const titles=v=>[v.wiki&&v.wiki.title,v.voy];
+  if(g)jobs.push(photo(g.wiki,g.voy));
+  else if(stale(saved.guide))jobs.push(fetchGuide(p).then(v=>{const d=cityData(p.id);d.guide=v;saveCityData(p.id,d);return photo(...titles(v))}).catch(()=>{}));
+  else jobs.push(photo(...titles(saved.guide)));
   if(!jobs.some(Boolean))return;
   await Promise.all(jobs);
   if(place&&place.id===p.id)renderCity();
