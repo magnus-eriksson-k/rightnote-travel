@@ -1052,7 +1052,7 @@ async function renderPhoto(ph){
 // An item names a Commons file (img) or a Wikipedia article (wiki) whose lead image is used. Looked up in two batched calls,
 // credited like the city photo; thumbnails are saved for offline use when the city opens, the large photo once it's been viewed.
 const picKey=it=>it.img?"f:"+it.img:it.wiki?"w:"+it.wiki:null;
-const PIC_W=960, PIC_THUMB=330;
+const PIC_W=960, PIC_THUMB=330, PICS_V=2; // bump PICS_V to look up every city's item photos again
 const chunks=(a,n)=>a.length?[a.slice(0,n),...chunks(a.slice(n),n)]:[];
 async function fetchItemPics(items){
   const files={}; // item key -> Commons file name
@@ -1064,27 +1064,34 @@ async function fetchItemPics(items){
     const img={}; (q.pages||[]).forEach(pg=>{if(pg.pageimage)img[pg.title]=pg.pageimage});
     part.forEach(t=>{let x=t;for(let i=0;i<3&&to[x];i++)x=to[x]; if(img[x])files["w:"+t]=img[x]});
   }
-  const info={}; // file title -> photo
-  for(const part of chunks([...new Set(Object.values(files))],50)){
-    const b=await wp({action:"query",titles:part.map(f=>"File:"+f).join("|"),prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:PIC_W,
-      iiextmetadatafilter:"Artist|Credit|LicenseShortName|License|LicenseUrl|NonFree"}), q=b.query||{};
+  const info={}; // file name -> photo
+  // each file's imageinfo, keyed by the name we asked for (the API answers with normalised titles)
+  const fileInfo=async(part,params)=>{
+    const b=await wp({action:"query",titles:part.map(f=>"File:"+f).join("|"),prop:"imageinfo",...params}), q=b.query||{};
     const to={}; (q.normalized||[]).forEach(x=>to[x.from]=x.to);
-    const got={};
-    (q.pages||[]).forEach(pg=>{
-      const ii=pg.imageinfo&&pg.imageinfo[0], m=ii&&ii.extmetadata||{}, v=k=>m[k]&&m[k].value;
+    const got={}; (q.pages||[]).forEach(pg=>{if(pg.imageinfo&&pg.imageinfo[0])got[pg.title]=pg.imageinfo[0]});
+    return Object.fromEntries(part.map(f=>{const t="File:"+f;return [f,got[to[t]||t]]}));
+  };
+  for(const part of chunks([...new Set(Object.values(files))],50)){
+    const small=await fileInfo(part,{iiprop:"url|mime|extmetadata",iiurlwidth:PIC_THUMB,
+      iiextmetadatafilter:"Artist|Credit|LicenseShortName|License|LicenseUrl|NonFree"});
+    const big=await fileInfo(part,{iiprop:"url",iiurlwidth:PIC_W});
+    for(const f of part){
+      const ii=small[f], m=ii&&ii.extmetadata||{}, v=k=>m[k]&&m[k].value;
       const lic=htmlText(v("LicenseShortName"))||htmlText(v("License")).toUpperCase();
-      if(!ii||String(v("NonFree"))==="true"||!lic||!/^image\/(jpeg|png|webp)/.test(ii.mime||"image/jpeg"))return; // only photos we can credit
-      const src=ii.thumburl||ii.url;
-      got[pg.title]={src,thumb:src.replace(`/${PIC_W}px-`,`/${PIC_THUMB}px-`),page:ii.descriptionurl,
+      info[f]=null;
+      if(!ii||String(v("NonFree"))==="true"||!lic||!/^image\/(jpeg|png|webp)/.test(ii.mime||"image/jpeg"))continue; // only photos we can credit
+      const thumb=ii.thumburl||ii.url, b=big[f];
+      info[f]={thumb,src:b&&(b.thumburl||b.url)||thumb,page:ii.descriptionurl,
         artist:htmlText(v("Artist"))||htmlText(v("Credit"))||"Unknown author",license:lic,licenseUrl:v("LicenseUrl")||""};
-    });
-    part.forEach(f=>{const t="File:"+f; info[f]=got[to[t]||t]||null});
+    }
   }
   const map={};
   for(const it of items){const k=picKey(it); if(k)map[k]=files[k]&&info[files[k]]||null}
-  // save the thumbnails now; a file the server refuses gets no photo
-  await Promise.all(Object.keys(map).map(async k=>{if(map[k]&&await keepPhoto(map[k].thumb)===false)map[k]=null}));
-  return {at:Date.now(),v:PHOTO_V,map};
+  // save the thumbnails now, a few at a time; any that fail are shown from the network and saved later
+  const todo=Object.values(map).filter(Boolean);
+  await Promise.all([0,1,2,3].map(async()=>{for(let ph;(ph=todo.shift());)await keepPhoto(ph.thumb)}));
+  return {at:Date.now(),v:PICS_V,map};
 }
 function picsOf(d){return Object.values(d&&d.pics&&d.pics.map||{}).filter(Boolean)}
 function dropPics(old,keep){ // removes saved files no longer used
@@ -1092,9 +1099,13 @@ function dropPics(old,keep){ // removes saved files no longer used
   picsOf(old).forEach(p=>[p.thumb,p.src].forEach(s=>{if(!used.has(s))dropPhoto(s)}));
 }
 let picBlobs=[];
-async function showPic(img){ // the saved copy when there is one, else the network
+async function showPic(img){ // the saved copy when there is one, else the network (and save it for next time)
   const src=img.dataset.pic; let url=src;
-  try{const r=await (await caches.open(PHOTO_CACHE)).match(src);if(r){url=URL.createObjectURL(await r.blob());picBlobs.push(url)}}catch(e){}
+  try{
+    const c=await caches.open(PHOTO_CACHE); let r=await c.match(src);
+    if(!r&&navigator.onLine&&await keepPhoto(src))r=await c.match(src);
+    if(r){url=URL.createObjectURL(await r.blob());picBlobs.push(url)}
+  }catch(e){}
   if(img.dataset.pic!==src)return;
   img.onerror=()=>img.classList.add("broken");
   img.src=url;
@@ -1213,7 +1224,8 @@ async function refreshCity(){
   }).catch(()=>{}):null;
   const titles=v=>[v.wiki&&v.wiki.title,v.voy];
   if(g)jobs.push(photo(g.wiki,g.voy));
-  if(g&&(stale(saved.pics)||saved.pics.v!==PHOTO_V))jobs.push(fetchItemPics(g.sections.flatMap(s=>s.items||[])).then(pics=>{
+  const stalePics=x=>!x||x.v!==PICS_V||Date.now()-x.at>(Object.values(x.map||{}).some(Boolean)?30*24:24)*HOUR; // none found: try again in a day
+  if(g&&stalePics(saved.pics))jobs.push(fetchItemPics(g.sections.flatMap(s=>s.items||[])).then(pics=>{
     const d=cityData(p.id); dropPics(d,{pics}); d.pics=pics; saveCityData(p.id,d);
   }).catch(()=>{}));
   else if(stale(saved.guide))jobs.push(fetchGuide(p).then(v=>{const d=cityData(p.id);d.guide=v;saveCityData(p.id,d);return photo(...titles(v))}).catch(()=>{}));
@@ -1233,7 +1245,6 @@ async function openCity(){
 function bigPic(d){
   const img=d.querySelector("img[data-big]"); if(!img||img.dataset.pic)return;
   img.dataset.pic=img.dataset.big; showPic(img);
-  if(navigator.onLine)keepPhoto(img.dataset.big);
 }
 $("cityBody").addEventListener("toggle",e=>{if(e.target.matches("details.pic")&&e.target.open)bigPic(e.target)},true);
 $("cityBody").addEventListener("click",e=>{
