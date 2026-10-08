@@ -194,12 +194,11 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 
 /* City: weather and a guide to where you are */
 .city-top{display:flex;flex-direction:column;gap:10px}
-.city-head{display:flex;flex-direction:column;gap:10px}
-.city-title{display:flex;flex-direction:column;gap:2px;min-width:0}
-.city-title h2{font-size:1.3rem;line-height:1.2}
-.city-acts{display:flex;gap:8px}
-.city-acts .btn{flex:1;justify-content:center}
-#locBtn,#mapBtn{gap:6px;padding:0 10px;min-height:42px;font-size:.88rem;border-radius:12px}
+.city-title{display:flex;flex-direction:column;gap:4px}
+.city-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 8px}
+.city-head h2{font-size:1.3rem;line-height:1.2;max-width:100%;overflow-wrap:anywhere}
+.city-acts{display:flex;gap:6px;flex:none;margin-left:auto}
+#locBtn,#mapBtn{gap:4px;padding:0 9px;min-height:36px;font-size:.8rem;border-radius:10px}
 #locBtn svg,#mapBtn svg{width:15px;height:15px}
 .city-find>summary{list-style:none;width:fit-content;display:flex;align-items:center;gap:6px;min-height:36px;font-size:.85rem;font-weight:600;color:var(--accent-text);cursor:pointer;touch-action:manipulation}
 .city-find>summary::-webkit-details-marker{display:none}
@@ -381,12 +380,15 @@ button.item:active{background:var(--accent-soft)}
 
 <div class="view" id="cityView" hidden>
   <section class="panel city-top" aria-labelledby="cityName">
+    <div class="city-title">
     <div class="city-head">
-      <div class="city-title"><h2 id="cityName">Where are you?</h2><span class="note" id="cityMeta"></span></div>
+      <h2 id="cityName">Where are you?</h2>
       <div class="city-acts">
       <button type="button" class="btn primary" id="locBtn" aria-label="Find the city you're in and show its guide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Find my city</button>
       <a class="btn" id="mapBtn" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg>City map</a>
       </div>
+    </div>
+    <span class="note" id="cityMeta"></span>
     </div>
     <div class="chips" id="cityChips"></div>
     <details class="city-find" id="cityFind">
@@ -1552,7 +1554,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v61", opened=Date.now();
+const APP_VERSION="rightnote-v62", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
