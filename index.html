@@ -205,6 +205,9 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .city-find>summary::after{content:"▾";color:var(--muted);transition:transform .2s}
 .city-find[open]>summary::after{transform:rotate(180deg)}
 .city-find .results{margin-top:8px}
+.pick-body{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.city-pick.none>summary{display:none}
+.city-pick.none>.pick-body{margin-top:0}
 .city-search{display:flex;gap:8px;margin-top:6px}
 .city-search input{flex:1;min-width:0;font:16px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 12px;min-height:44px}
 .results{display:flex;flex-direction:column;gap:4px}
@@ -390,6 +393,9 @@ button.item:active{background:var(--accent-soft)}
     </div>
     <span class="note" id="cityMeta"></span>
     </div>
+    <details class="city-find city-pick none" id="cityPick">
+    <summary>Change city</summary>
+    <div class="pick-body">
     <div class="chips" id="cityChips"></div>
     <details class="city-find" id="cityFind">
       <summary>Search for another city</summary>
@@ -398,6 +404,8 @@ button.item:active{background:var(--accent-soft)}
         <button type="submit" class="btn">Search</button>
       </form>
       <div class="results" id="cityResults"></div>
+    </details>
+    </div>
     </details>
     <p class="note" id="cityMsg" aria-live="polite"></p>
   </section>
@@ -894,11 +902,11 @@ function setPlace(p){
     r.slice(8).forEach(x=>{const d=cityData(x.id);if(d.photo&&d.photo.src)dropPhoto(d.photo.src);try{localStorage.removeItem("city:"+x.id)}catch(e){}});
     store.set("recent",JSON.stringify(r.slice(0,8)));
   }
-  $("cityResults").innerHTML=""; $("cityFind").open=false; renderCity(); refreshCity();
+  $("cityResults").innerHTML=""; $("cityFind").open=false; $("cityPick").open=false; renderCity(); refreshCity();
   window.scrollTo(0,0);
 }
 const msg=t=>{$("cityMsg").textContent=t||""};
-const openSearch=()=>{$("cityFind").open=true};
+const openSearch=()=>{$("cityPick").open=true;$("cityFind").open=true};
 
 // ---- Finding the city: GPS, then a curated city nearby or the town name from OpenStreetMap ----
 async function nominatim(path,params){
@@ -1350,6 +1358,8 @@ function renderMapBtn(){
 }
 function renderCity(){
   renderChips(); renderMapBtn();
+  // the guides and search fold away under "Change city" once a place is picked
+  $("cityPick").classList.toggle("none",!place); if(!place)$("cityPick").open=true;
   if(!place){
     $("cityName").textContent="Where are you?"; $("cityMeta").textContent="Tap Find my city to get the guide for where you are, or pick one below.";
     $("wxCard").hidden=true; $("cityPhoto").hidden=true; $("cityBody").innerHTML=""; delete $("cityBody").dataset.id; $("cityCredit").textContent=""; return;
@@ -1554,7 +1564,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v63", opened=Date.now();
+const APP_VERSION="rightnote-v64", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
