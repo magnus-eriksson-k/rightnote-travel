@@ -217,13 +217,22 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .city-photo figcaption{font-size:.72rem;color:var(--muted);padding:0 4px;overflow-wrap:anywhere}
 .city-photo a{color:inherit}
 .wx{display:flex;flex-direction:column;gap:10px}
-.wx-now{display:flex;align-items:center;gap:12px}
+.wx-now{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer;touch-action:manipulation}
+.wx-now .chev{margin-left:auto;flex:none;color:var(--muted);font-size:1rem}
+/* Hour by hour, opened from the current conditions (next 24 h) or a day tile (that day) */
+.wx-hours{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;margin-inline:-4px;padding:0 4px 2px}
+.wx-hours::-webkit-scrollbar{display:none}
+.wx-hours div{flex:none;min-width:50px;display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--key-op);border-radius:10px;padding:6px 4px;font-size:.78rem}
+.wx-hours .h{color:var(--muted)} .wx-hours .day .h{color:var(--accent-text);font-weight:700}
+.wx-hours .i{font-size:1.2rem;line-height:1.3} .wx-hours .r{color:var(--muted);font-size:.7rem}
 .wx-ico{font-size:2.8rem;line-height:1}
 .wx-t{font-size:2.4rem;font-weight:300;line-height:1}
 .wx-d{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);min-width:0}
 .wx-d b{color:var(--ink);font-size:.95rem}
 .wx-days{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;text-align:center;font-size:.8rem}
-.wx-days div{display:flex;flex-direction:column;gap:1px;background:var(--key-op);border-radius:10px;padding:6px 2px}
+.wx-days button{display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--key-op);border:0;border-radius:10px;padding:6px 2px;min-width:0;
+  color:var(--ink);font:inherit;cursor:pointer;touch-action:manipulation}
+.wx-days button[aria-expanded="true"]{box-shadow:inset 0 0 0 2px var(--accent)}
 .wx-days .i{font-size:1.3rem;line-height:1.3}
 .wx-days .r{color:var(--muted);font-size:.72rem}
 .wx-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;font-size:.78rem;color:var(--muted)}
@@ -957,6 +966,7 @@ function wx(code,day){
 async function fetchWeather(p){
   const u="https://api.open-meteo.com/v1/forecast?"+new URLSearchParams({latitude:p.lat,longitude:p.lon,timezone:"auto",forecast_days:5,
     current:"temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day",
+    hourly:"temperature_2m,weather_code,precipitation_probability,is_day",
     daily:"weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset"});
   const r=await fetch(u); if(!r.ok)throw new Error(r.status); return r.json();
 }
@@ -967,23 +977,48 @@ function localTime(p,w){ // the city's clock, from its time zone, or the forecas
   if(w&&"utc_offset_seconds" in w)return new Date(Date.now()+w.utc_offset_seconds*1000).toLocaleTimeString("en-AU",{...opt,timeZone:"UTC"});
   return "";
 }
+let wxSaved=null, wxOpen=null, wxAt=""; // wxOpen: null, "now" or a day index
 function renderWeather(saved){
   const w=saved&&saved.data, card=$("wxCard");
   if(!w||!w.current){card.hidden=true;return}
+  const at=w.latitude+","+w.longitude; if(at!==wxAt){wxAt=at;wxOpen=null} // another place: start closed
+  wxSaved=saved; const hasH=!!(w.hourly&&w.hourly.time);
   const c=w.current, d=w.daily, [ico,txt]=wx(c.weather_code,c.is_day), t=n=>Math.round(n)+"°";
   const hm=s=>s?s.slice(11,16):"";
   const days=d.time.slice(0,5).map((day,i)=>{
     const name=i?new Date(day+"T12:00:00Z").toLocaleDateString("en-AU",{weekday:"short",timeZone:"UTC"}):"Today", [di,dt]=wx(d.weather_code[i],1);
     const rain=d.precipitation_probability_max&&d.precipitation_probability_max[i];
-    return `<div aria-label="${name}: ${dt}, ${t(d.temperature_2m_max[i])} to ${t(d.temperature_2m_min[i])}"><span>${name}</span><span class="i" aria-hidden="true">${di}</span><b>${t(d.temperature_2m_max[i])}</b><span class="r">${t(d.temperature_2m_min[i])}${rain!=null?` · ${rain}%`:""}</span></div>`;
+    return `<button type="button" data-day="${i}" aria-expanded="${wxOpen===i}"${hasH?"":" disabled"} aria-label="${name}: ${dt}, ${t(d.temperature_2m_max[i])} to ${t(d.temperature_2m_min[i])}. Hour by hour"><span>${name}</span><span class="i" aria-hidden="true">${di}</span><b>${t(d.temperature_2m_max[i])}</b><span class="r">${t(d.temperature_2m_min[i])}${rain!=null?` · ${rain}%`:""}</span></button>`;
   }).join("");
   const uv=d.uv_index_max&&d.uv_index_max[0];
-  card.innerHTML=`<div class="wx-now"><span class="wx-ico" aria-hidden="true">${ico}</span><span class="wx-t">${t(c.temperature_2m)}</span>
-      <span class="wx-d"><b>${txt}</b><span>Feels like ${t(c.apparent_temperature)} · humidity ${c.relative_humidity_2m}%</span><span>Wind ${Math.round(c.wind_speed_10m)} km/h${uv!=null?` · UV ${Math.round(uv)}`:""}</span></span></div>
-    <div class="wx-days">${days}</div>
+  const hours=hasH&&wxOpen!==null?wxHours(w,wxOpen):"";
+  card.innerHTML=`<button type="button" class="wx-now" data-day="now" aria-expanded="${wxOpen==="now"}" aria-label="Now: ${txt}, ${t(c.temperature_2m)}. Next 24 hours"${hasH?"":" disabled"}><span class="wx-ico" aria-hidden="true">${ico}</span><span class="wx-t">${t(c.temperature_2m)}</span>
+      <span class="wx-d"><b>${txt}</b><span>Feels like ${t(c.apparent_temperature)} · humidity ${c.relative_humidity_2m}%</span><span>Wind ${Math.round(c.wind_speed_10m)} km/h${uv!=null?` · UV ${Math.round(uv)}`:""}</span></span>${hasH?`<span class="chev" aria-hidden="true">${wxOpen==="now"?"▴":"▾"}</span>`:""}</button>
+    ${wxOpen==="now"?hours:""}<div class="wx-days">${days}</div>${wxOpen!=="now"?hours:""}
     <div class="wx-foot"><span>Sunrise ${hm(d.sunrise[0])} · sunset ${hm(d.sunset[0])}</span><span>Updated ${ago(saved.at)}</span></div>`;
   card.hidden=false;
 }
+// The hours to show: the next 24 from the city's current hour, or one day's (today's from now on)
+function wxHours(w,open){
+  const h=w.hourly, t=n=>Math.round(n)+"°";
+  const now=new Date(Date.now()+(w.utc_offset_seconds||0)*1000).toISOString().slice(0,13); // the city's clock, "YYYY-MM-DDTHH"
+  let idx=h.time.map((x,i)=>i).filter(i=>h.time[i].slice(0,13)>=now);
+  if(open==="now")idx=idx.slice(0,24);
+  else{const day=w.daily.time[open];idx=(open?h.time.map((x,i)=>i):idx).filter(i=>h.time[i].startsWith(day))}
+  if(!idx.length)return `<p class="note">No hourly forecast saved for this. It updates next time you're online.</p>`;
+  const cells=idx.map((i,k)=>{
+    const s=h.time[i], hr=s.slice(11,16), isNow=!k&&s.slice(0,13)===now, p=h.precipitation_probability&&h.precipitation_probability[i];
+    const c=isNow&&w.current, [ic,tx]=c?wx(c.weather_code,c.is_day):wx(h.weather_code[i],h.is_day?h.is_day[i]:1), temp=c?c.temperature_2m:h.temperature_2m[i]; // "Now" matches the conditions above
+    const label=isNow?"Now":hr==="00:00"&&open==="now"?new Date(s.slice(0,10)+"T12:00:00Z").toLocaleDateString("en-AU",{weekday:"short",timeZone:"UTC"}):hr;
+    return `<div${label!==hr&&label!=="Now"?' class="day"':""} role="listitem" aria-label="${label==="Now"?"Now":label!==hr?label+" "+hr:hr}: ${tx}, ${t(temp)}${p!=null?`, ${p}% rain`:""}"><span class="h">${label}</span><span class="i" aria-hidden="true">${ic}</span><b>${t(temp)}</b><span class="r">${p!=null?p+"%":""}</span></div>`;
+  }).join("");
+  return `<div class="wx-hours" role="list" aria-label="Hour by hour">${cells}</div>`;
+}
+$("wxCard").addEventListener("click",e=>{
+  const b=e.target.closest("[data-day]"); if(!b||!wxSaved)return;
+  const k=b.dataset.day==="now"?"now":+b.dataset.day;
+  wxOpen=wxOpen===k?null:k; renderWeather(wxSaved);
+});
 
 // ---- Online guide for other cities: Wikipedia's summary and the useful Wikivoyage sections ----
 const VOY_SECTIONS=[["Understand","About the city"],["Eat","Food"],["Drink","Drink and nightlife"],["Buy","Shopping and money"],["Respect","Customs"],["Stay safe","Watch out for"]];
@@ -1339,7 +1374,7 @@ function renderCity(){
 async function refreshCity(){
   if(!place||!navigator.onLine)return;
   const p=place, saved=cityData(p.id), jobs=[];
-  if(!saved.wx||Date.now()-saved.wx.at>HOUR)jobs.push(fetchWeather(p).then(data=>{const d=cityData(p.id);d.wx={at:Date.now(),data};saveCityData(p.id,d)}).catch(()=>{}));
+  if(!saved.wx||Date.now()-saved.wx.at>HOUR||!(saved.wx.data&&saved.wx.data.hourly))jobs.push(fetchWeather(p).then(data=>{const d=cityData(p.id);d.wx={at:Date.now(),data};saveCityData(p.id,d)}).catch(()=>{}));
   const g=guideCity(p.id), stale=x=>!x||Date.now()-x.at>30*24*HOUR;
   const stalePhoto=x=>!x||x.v!==PHOTO_V||Date.now()-x.at>(x.src?30*24:24)*HOUR; // "no photo" is re-checked after a day
   // the photo comes from the same Wikipedia and Wikivoyage articles as the guide, so it's of the right place
@@ -1504,7 +1539,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v56", opened=Date.now();
+const APP_VERSION="rightnote-v57", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
