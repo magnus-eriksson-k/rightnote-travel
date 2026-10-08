@@ -539,15 +539,16 @@ function render(deferPay){
   $("secondLbl").textContent=home?"Your money":"They ask";
   $("second").innerHTML=sides().map(c=>`<button type="button" role="radio" data-cur="${c}" aria-checked="${c===second}" aria-label="${CUR[c].name}">${CUR[c].sym}</button>`).join("");
   const showExpr=/[+\-*/]/.test(expr.replace(/^-/,""));
-  // you type in the second currency; the result is in your home currency, or in đồng when both are US$
-  const v=evaluate(expr), dong=v*vnd(second), res=second===base?"VND":base, out=dong/vnd(res);
+  // you type in the second currency; the result is in your home currency, in US$ when typing your home money,
+  // or in đồng when both are US$
+  const v=evaluate(expr), dong=v*vnd(second), res=second!==base?base:base==="USD"?"VND":"USD", out=dong/vnd(res);
   $("expr").textContent=showExpr?expr.replace(/\*/g,"×").replace(/\//g,"÷"):"";
   const amt=$("secondAmt"); amt.textContent=CUR[second].sym+(showExpr?fmt(v,second):typed(expr));
   const len=amt.textContent.length; amt.classList.toggle("long",len>10&&len<=14); amt.classList.toggle("longer",len>14);
   $("baseAmt").textContent=isFinite(out)?CUR[res].sym+fmt(out,res):"—";
   $("baseAmt").classList.toggle("err",!isFinite(out));
   // the đồng amount in local shorthand;
-  // while typing US$ it's the đồng you'd pay (as on the How to pay card), shown larger so it stands out
+  // while typing US$ or your home money it's the đồng you'd pay (as on the How to pay card), shown larger so it stands out
   const A=second==="VND"||res==="VND"?0:payAmount(), dongPill=A>0;
   $("inHint").classList.toggle("dong",dongPill);
   if(dongPill)$("inHint").innerHTML=A<1e7?`<small>in đồng</small>₫${A.toLocaleString("en-AU")}`:"₫"+vnShort(A); // short form keeps big amounts on one line
@@ -1484,7 +1485,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v53", opened=Date.now();
+const APP_VERSION="rightnote-v54", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
