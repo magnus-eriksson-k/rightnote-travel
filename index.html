@@ -172,6 +172,12 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .photo{width:100%;max-width:100%;border-radius:10px}
 .sides{display:flex;flex-direction:column;gap:10px}
 .sides figure{margin:0}
+.ph-wrap{position:relative;display:block;border-radius:10px;overflow:hidden}
+.ph-wrap .photo{display:block;transition:opacity .2s}
+.ph-wrap.loading{aspect-ratio:2.1/1;background:var(--key-op)} /* the last note's photo stays hidden until the new one is in */
+.ph-wrap.loading .photo{position:absolute;inset:0;height:100%;object-fit:contain;opacity:0}
+.ph-wrap.loading::after{content:"";position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;
+  border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
 .sides figcaption{font-size:.8rem;font-weight:600;color:var(--muted);margin-top:4px}
 .dlg h3{font-size:1.15rem;margin:0}
 .dlg .val{font-weight:700;color:var(--accent-text);margin:0}
@@ -327,8 +333,8 @@ button.item:active{background:var(--accent-soft)}
   <div class="dlg">
     <div class="big-note" id="dlgArt" aria-hidden="true"><span class="win"></span><span class="u">đồng</span><span class="d" id="dlgDenom"></span><span class="tag">Colour guide, not the real design</span></div>
     <div class="sides" id="dlgSides" hidden>
-      <figure id="dlgBackFig"><img class="photo" id="dlgPhotoBack" alt=""><figcaption>Back</figcaption></figure>
-      <figure id="dlgFrontFig"><img class="photo" id="dlgPhoto" alt=""><figcaption>Front</figcaption></figure>
+      <figure id="dlgBackFig"><span class="ph-wrap"><img class="photo" id="dlgPhotoBack" alt=""></span><figcaption>Back</figcaption></figure>
+      <figure id="dlgFrontFig"><span class="ph-wrap"><img class="photo" id="dlgPhoto" alt=""></span><figcaption>Front</figcaption></figure>
     </div>
     <h3 id="dlgTitle"></h3>
     <p class="val" id="dlgVal"></p>
@@ -659,7 +665,19 @@ function openNote(d){
 }
 function showPhoto(){
   const id=photos[openDenom], bk=backs[openDenom], label=`₫${openDenom.toLocaleString("en-AU")} note`;
-  const side=(img,fig,src,alt)=>{if(src){img.src=photoSrc(src);img.alt=alt}else img.removeAttribute("src");fig.hidden=!src};
+  const side=(img,fig,src,alt)=>{
+    const box=img.parentNode;
+    if(src){
+      const u=photoSrc(src);
+      if(img.getAttribute("src")!==u){ // a spinner, not the previous note, until the new photo loads
+        box.classList.add("loading");
+        img.onload=img.onerror=()=>{if(img.getAttribute("src")===u)box.classList.remove("loading")};
+        img.src=u;
+      }
+      img.alt=alt;
+    }else{img.removeAttribute("src");box.classList.remove("loading")}
+    fig.hidden=!src;
+  };
   side($("dlgPhotoBack"),$("dlgBackFig"),bk,`Back of the ${label}`);
   side($("dlgPhoto"),$("dlgFrontFig"),id,`Front of the ${label}`);
   $("dlgSides").hidden=!(id||bk); $("dlgArt").hidden=!!(id||bk);
@@ -1485,7 +1503,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v54", opened=Date.now();
+const APP_VERSION="rightnote-v55", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
