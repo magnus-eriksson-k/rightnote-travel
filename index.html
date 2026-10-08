@@ -62,10 +62,13 @@ h2{font-size:1rem;font-weight:700;margin:0}
 /* fixed heights so the keypad below never moves while you type */
 .label-row{display:flex;justify-content:space-between;gap:12px;font-size:.85rem;color:var(--muted);min-height:1.3rem}
 .price .label{font-weight:600;white-space:nowrap}
-/* the currency they ask in: tap to switch between đồng and US$ */
-.cur-btn{border:0;background:none;font:inherit;color:inherit;padding:8px 12px 8px 0;margin:-8px 0;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:8px}
-.cur-btn b{color:var(--ink)}
-.cur-btn .sw{border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:.8rem;color:var(--accent-text)}
+/* the currency you type in: a switch of đồng, US$ and your home currency */
+.cur-pick{display:flex;align-items:center;gap:8px;margin:-8px 0}
+.cur-pick .label{min-width:6.4em} /* "They ask" and "Your money" take the same room, so the switch stays put */
+.cur-seg{display:flex;gap:2px;background:var(--key-op);border-radius:10px;padding:3px}
+.cur-seg button{min-height:34px;min-width:46px;padding:0 10px;border:0;border-radius:8px;background:none;color:var(--ink);font:600 .85rem var(--body);cursor:pointer;touch-action:manipulation}
+.cur-seg button[aria-checked="true"]{background:var(--accent);color:var(--accent-ink)}
+.label-row:has(.cur-pick){align-items:center;min-height:calc(1.3rem + 4px)}
 .expr{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .expr:empty,.hint:empty,.pill:empty{display:none}
 .amt{height:3.6rem;display:flex;align-items:flex-end;white-space:nowrap;font-size:3.2rem;font-weight:300;letter-spacing:-.02em;line-height:1.1}
@@ -287,7 +290,7 @@ button.item:active{background:var(--accent-soft)}
 
 <div class="view" id="calcView">
   <section class="price" id="panel" aria-label="Conversion">
-    <div class="label-row"><button type="button" class="label cur-btn" id="second">They ask, in đồng</button><span class="expr" id="expr"></span></div>
+    <div class="label-row"><div class="cur-pick"><span class="label" id="secondLbl">They ask</span><div class="cur-seg" id="second" role="radiogroup" aria-labelledby="secondLbl"></div></div><span class="expr" id="expr"></span></div>
     <div class="amt" id="secondAmt">0</div>
     <div class="out-row">
       <span class="out" id="baseAmt">0</span>
@@ -484,8 +487,7 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 // It isn't saved, so the app always opens in đồng. base: your home currency, set in Options.
 // Notes are always paid in đồng (only đồng has photos).
 const ENTRY=["VND","USD"]; let second="VND", base=store.get("base");
-const sides=()=>ENTRY.includes(base)?ENTRY:[...ENTRY,base]; // the label cycles through these
-const curName=c=>c==="VND"?"đồng":CUR[c].sym;
+const sides=()=>ENTRY.includes(base)?ENTRY:[...ENTRY,base]; // the buttons of the currency switch
 if(!CUR[base]||base==="VND")base="AUD";
 // custom rates, as đồng per 1 unit: your money changer's for home, or a vendor's for US$
 let expr="", custom={};
@@ -533,9 +535,9 @@ function vnShort(n){ // how prices are written on Vietnamese menus and signs
 const PAY_DELAY=1500; let payTimer=null;
 function render(deferPay){
   document.querySelectorAll("#homeSeg button").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.home===base)));
-  const sd=sides(), other=sd[(sd.indexOf(second)+1)%sd.length], home=second===base&&!ENTRY.includes(base);
-  $("second").innerHTML=`${home?"Your money":"They ask"}, in <b>${curName(second)}</b><span class="sw" aria-hidden="true">⇄ ${curName(other)}</span>`;
-  $("second").setAttribute("aria-label",`${home?"Typing your money":"They ask"} in ${CUR[second].name}. Switch to ${CUR[other].name}`);
+  const home=second===base&&!ENTRY.includes(base);
+  $("secondLbl").textContent=home?"Your money":"They ask";
+  $("second").innerHTML=sides().map(c=>`<button type="button" role="radio" data-cur="${c}" aria-checked="${c===second}" aria-label="${CUR[c].name}">${CUR[c].sym}</button>`).join("");
   const showExpr=/[+\-*/]/.test(expr.replace(/^-/,""));
   // you type in the second currency; the result is in your home currency, or in đồng when both are US$
   const v=evaluate(expr), dong=v*vnd(second), res=second===base?"VND":base, out=dong/vnd(res);
@@ -613,7 +615,7 @@ $("homeSeg").addEventListener("click",e=>{const b=e.target.closest("[data-home]"
   base=b.dataset.home;if(!sides().includes(second))setSecond("VND");save();render()}});
 // switching keeps what you typed, so a price entered in the wrong currency just changes currency
 function setSecond(c){if(c!==second){second=c;payOpen=undefined}}
-$("second").addEventListener("click",()=>{const sd=sides();setSecond(sd[(sd.indexOf(second)+1)%sd.length]);render()});
+$("second").addEventListener("click",e=>{const b=e.target.closest("[data-cur]");if(b){setSecond(b.dataset.cur);render()}});
 // a US$ or home-currency amount is a one-off: after a while away, the app is back in đồng
 let hiddenAt=0;
 document.addEventListener("visibilitychange",()=>{
@@ -1482,7 +1484,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v52", opened=Date.now();
+const APP_VERSION="rightnote-v53", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
