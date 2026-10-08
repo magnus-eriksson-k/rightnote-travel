@@ -219,11 +219,11 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .wx{display:flex;flex-direction:column;gap:10px}
 .wx-now{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer;touch-action:manipulation}
 .wx-now .chev{margin-left:auto;flex:none;color:var(--muted);font-size:1rem}
-/* Hour by hour, opened from the current conditions (next 24 h) or a day tile (that day) */
+/* Hour by hour for one day, opened from its tile (or, for today, the current conditions) */
 .wx-hours{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;margin-inline:-4px;padding:0 4px 2px}
 .wx-hours::-webkit-scrollbar{display:none}
 .wx-hours div{flex:none;min-width:50px;display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--key-op);border-radius:10px;padding:6px 4px;font-size:.78rem}
-.wx-hours .h{color:var(--muted)} .wx-hours .day .h{color:var(--accent-text);font-weight:700}
+.wx-hours .h{color:var(--muted)}
 .wx-hours .i{font-size:1.2rem;line-height:1.3} .wx-hours .r{color:var(--muted);font-size:.7rem}
 .wx-ico{font-size:2.8rem;line-height:1}
 .wx-t{font-size:2.4rem;font-weight:300;line-height:1}
@@ -980,7 +980,7 @@ function localTime(p,w){ // the city's clock, from its time zone, or the forecas
   if(w&&"utc_offset_seconds" in w)return new Date(Date.now()+w.utc_offset_seconds*1000).toLocaleTimeString("en-AU",{...opt,timeZone:"UTC"});
   return "";
 }
-let wxSaved=null, wxOpen=null, wxAt=""; // wxOpen: null, "now" or a day index
+let wxSaved=null, wxOpen=null, wxAt=""; // wxOpen: null or the day index whose hours are open
 function renderWeather(saved){
   const w=saved&&saved.data, card=$("wxCard");
   if(!w||!w.current){card.hidden=true;return}
@@ -995,31 +995,29 @@ function renderWeather(saved){
   }).join("");
   const uv=d.uv_index_max&&d.uv_index_max[0];
   const hours=hasH&&wxOpen!==null?wxHours(w,wxOpen):"";
-  card.innerHTML=`<button type="button" class="wx-now" data-day="now" aria-expanded="${wxOpen==="now"}" aria-label="Now: ${txt}, ${t(c.temperature_2m)}. Next 24 hours"${hasH?"":" disabled"}><span class="wx-ico" aria-hidden="true">${ico}</span><span class="wx-t">${t(c.temperature_2m)}</span>
-      <span class="wx-d"><b>${txt}</b><span>Feels ${t(c.apparent_temperature)} · humidity ${c.relative_humidity_2m}%</span><span>Wind ${Math.round(c.wind_speed_10m)} km/h${uv!=null?` · UV ${Math.round(uv)}`:""}</span></span>${hasH?`<span class="chev" aria-hidden="true">${wxOpen==="now"?"▴":"▾"}</span>`:""}</button>
-    ${wxOpen==="now"?hours:""}<div class="wx-days">${days}</div>${wxOpen!=="now"?hours:""}
+  card.innerHTML=`<button type="button" class="wx-now" data-day="0" aria-expanded="${wxOpen===0}" aria-label="Now: ${txt}, ${t(c.temperature_2m)}. Today hour by hour"${hasH?"":" disabled"}><span class="wx-ico" aria-hidden="true">${ico}</span><span class="wx-t">${t(c.temperature_2m)}</span>
+      <span class="wx-d"><b>${txt}</b><span>Feels ${t(c.apparent_temperature)} · humidity ${c.relative_humidity_2m}%</span><span>Wind ${Math.round(c.wind_speed_10m)} km/h${uv!=null?` · UV ${Math.round(uv)}`:""}</span></span>${hasH?`<span class="chev" aria-hidden="true">${wxOpen===0?"▴":"▾"}</span>`:""}</button>
+    <div class="wx-days">${days}</div>${hours}
     <div class="wx-foot"><span>Sunrise ${hm(d.sunrise[0])} · sunset ${hm(d.sunset[0])}</span><span>Updated ${ago(saved.at)}</span></div>`;
   card.hidden=false;
 }
-// The hours to show: the next 24 from the city's current hour, or one day's (today's from now on)
+// One day's hours (today's from the city's current hour); the current conditions open today's, like its tile
 function wxHours(w,open){
   const h=w.hourly, t=n=>Math.round(n)+"°";
   const now=new Date(Date.now()+(w.utc_offset_seconds||0)*1000).toISOString().slice(0,13); // the city's clock, "YYYY-MM-DDTHH"
-  let idx=h.time.map((x,i)=>i).filter(i=>h.time[i].slice(0,13)>=now);
-  if(open==="now")idx=idx.slice(0,24);
-  else{const day=w.daily.time[open];idx=(open?h.time.map((x,i)=>i):idx).filter(i=>h.time[i].startsWith(day))}
+  const day=w.daily.time[open], idx=h.time.map((x,i)=>i).filter(i=>h.time[i].startsWith(day)&&(open||h.time[i].slice(0,13)>=now));
   if(!idx.length)return `<p class="note">No hourly forecast saved for this. It updates next time you're online.</p>`;
   const cells=idx.map((i,k)=>{
     const s=h.time[i], hr=s.slice(11,16), isNow=!k&&s.slice(0,13)===now, p=h.precipitation_probability&&h.precipitation_probability[i];
     const c=isNow&&w.current, [ic,tx]=c?wx(c.weather_code,c.is_day):wx(h.weather_code[i],h.is_day?h.is_day[i]:1), temp=c?c.temperature_2m:h.temperature_2m[i]; // "Now" matches the conditions above
-    const label=isNow?"Now":hr==="00:00"&&open==="now"?new Date(s.slice(0,10)+"T12:00:00Z").toLocaleDateString("en-AU",{weekday:"short",timeZone:"UTC"}):hr;
-    return `<div${label!==hr&&label!=="Now"?' class="day"':""} role="listitem" aria-label="${label==="Now"?"Now":label!==hr?label+" "+hr:hr}: ${tx}, ${t(temp)}${p!=null?`, ${p}% rain`:""}"><span class="h">${label}</span><span class="i" aria-hidden="true">${ic}</span><b>${t(temp)}</b><span class="r">${p!=null?p+"%":""}</span></div>`;
+    const label=isNow?"Now":hr;
+    return `<div role="listitem" aria-label="${label}: ${tx}, ${t(temp)}${p!=null?`, ${p}% rain`:""}"><span class="h">${label}</span><span class="i" aria-hidden="true">${ic}</span><b>${t(temp)}</b><span class="r">${p!=null?p+"%":""}</span></div>`;
   }).join("");
   return `<div class="wx-hours" role="list" aria-label="Hour by hour">${cells}</div>`;
 }
 $("wxCard").addEventListener("click",e=>{
   const b=e.target.closest("[data-day]"); if(!b||!wxSaved)return;
-  const k=b.dataset.day==="now"?"now":+b.dataset.day;
+  const k=+b.dataset.day;
   wxOpen=wxOpen===k?null:k; renderWeather(wxSaved);
 });
 
@@ -1542,7 +1540,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v58", opened=Date.now();
+const APP_VERSION="rightnote-v59", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
