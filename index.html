@@ -480,9 +480,12 @@ const pic=d=>backs[d]||photos[d];
 const $=id=>document.getElementById(id);
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
-// second: the currency they ask in, đồng unless switched to US$ (it isn't saved, so the app always opens in đồng).
-// base: your home currency, set in Options. Notes are always paid in đồng (only đồng has photos).
+// second: the currency you type in: đồng, US$ (they ask in), or your home currency (to see what it buys in đồng).
+// It isn't saved, so the app always opens in đồng. base: your home currency, set in Options.
+// Notes are always paid in đồng (only đồng has photos).
 const ENTRY=["VND","USD"]; let second="VND", base=store.get("base");
+const sides=()=>ENTRY.includes(base)?ENTRY:[...ENTRY,base]; // the label cycles through these
+const curName=c=>c==="VND"?"đồng":CUR[c].sym;
 if(!CUR[base]||base==="VND")base="AUD";
 // custom rates, as đồng per 1 unit: your money changer's for home, or a vendor's for US$
 let expr="", custom={};
@@ -530,9 +533,9 @@ function vnShort(n){ // how prices are written on Vietnamese menus and signs
 const PAY_DELAY=1500; let payTimer=null;
 function render(deferPay){
   document.querySelectorAll("#homeSeg button").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.home===base)));
-  const other=second==="VND"?"USD":"VND";
-  $("second").innerHTML=`They ask, in <b>${second==="VND"?"đồng":CUR[second].sym}</b><span class="sw" aria-hidden="true">⇄ ${other==="VND"?"đồng":CUR[other].sym}</span>`;
-  $("second").setAttribute("aria-label",`They ask in ${CUR[second].name}. Switch to ${CUR[other].name}`);
+  const sd=sides(), other=sd[(sd.indexOf(second)+1)%sd.length], home=second===base&&!ENTRY.includes(base);
+  $("second").innerHTML=`${home?"Your money":"They ask"}, in <b>${curName(second)}</b><span class="sw" aria-hidden="true">⇄ ${curName(other)}</span>`;
+  $("second").setAttribute("aria-label",`${home?"Typing your money":"They ask"} in ${CUR[second].name}. Switch to ${CUR[other].name}`);
   const showExpr=/[+\-*/]/.test(expr.replace(/^-/,""));
   // you type in the second currency; the result is in your home currency, or in đồng when both are US$
   const v=evaluate(expr), dong=v*vnd(second), res=second===base?"VND":base, out=dong/vnd(res);
@@ -546,7 +549,7 @@ function render(deferPay){
   const A=second==="VND"||res==="VND"?0:payAmount(), dongPill=A>0;
   $("inHint").classList.toggle("dong",dongPill);
   if(dongPill)$("inHint").innerHTML=A<1e7?`<small>in đồng</small>₫${A.toLocaleString("en-AU")}`:"₫"+vnShort(A); // short form keeps big amounts on one line
-  else $("inHint").textContent=second==="VND"?vnShort(v):"";
+  else $("inHint").textContent=vnShort(second==="VND"?v:out);
   const rc=rateCur(), r=vnd(rc);
   $("rateUsd").hidden=base==="USD";
   [["rateHome",base],["rateUsd","USD"]].forEach(([id,c])=>{
@@ -606,11 +609,12 @@ document.addEventListener("keydown",e=>{
   const k=map[e.key]||e.key;
   if(/^[\d.+\-*/=]$/.test(k)||["back","C"].includes(k)){e.preventDefault();press(k)}
 });
-$("homeSeg").addEventListener("click",e=>{const b=e.target.closest("[data-home]");if(b){base=b.dataset.home;save();render()}});
+$("homeSeg").addEventListener("click",e=>{const b=e.target.closest("[data-home]");if(b){if(second===base&&!ENTRY.includes(second))second=b.dataset.home; // typing in home money follows the new home
+  base=b.dataset.home;if(!sides().includes(second))setSecond("VND");save();render()}});
 // switching keeps what you typed, so a price entered in the wrong currency just changes currency
 function setSecond(c){if(c!==second){second=c;payOpen=undefined}}
-$("second").addEventListener("click",()=>{setSecond(second==="VND"?"USD":"VND");render()});
-// a US$ price is a one-off: after a while away, the app is back in đồng
+$("second").addEventListener("click",()=>{const sd=sides();setSecond(sd[(sd.indexOf(second)+1)%sd.length]);render()});
+// a US$ or home-currency amount is a one-off: after a while away, the app is back in đồng
 let hiddenAt=0;
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden){hiddenAt=Date.now();return}
@@ -732,7 +736,7 @@ function tile(n,k){
 function renderPay(){
   const A=payAmount();
   if(!A){$("payTitle").textContent="How to pay";$("payList").innerHTML=`<p class="note">Enter an amount to see which notes to hand over.</p>`;return}
-  $("payTitle").textContent=`${second==="VND"?"Paying":"If paying in đồng:"} ₫${A.toLocaleString("en-AU")}`;
+  $("payTitle").textContent=`${second==="VND"?"Paying":second===base&&!ENTRY.includes(base)?`${CUR[base].sym}${fmt(evaluate(expr),base)} in đồng:`:"If paying in đồng:"} ₫${A.toLocaleString("en-AU")}`;
   const ws=ways(A), w=ws.find(x=>x.key===payOpen)||ws.find(x=>x.key==="exact");
   const tabs=ws.map(x=>{const n=count(x.parts);return `<button type="button" role="tab" class="tab" data-way="${x.key}" aria-selected="${x===w}" aria-controls="payPanel"><b>${x.title}</b><span>${n} note${n===1?"":"s"}</span></button>`}).join("");
   const kinds=w.parts.length, cols=kinds===1?1:kinds<=4?2:kinds<=6?3:kinds<=8?4:5; // one note fills the area
@@ -1478,7 +1482,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v51", opened=Date.now();
+const APP_VERSION="rightnote-v52", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
