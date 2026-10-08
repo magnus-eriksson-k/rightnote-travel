@@ -229,6 +229,9 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .wx-t{font-size:2.4rem;font-weight:300;line-height:1}
 .wx-d{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);min-width:0}
 .wx-d b{color:var(--ink);font-size:.95rem}
+.wx-d span{white-space:nowrap} /* each detail stays on one line */
+@media (max-width:370px){.wx-now{gap:8px}.wx-ico{font-size:2.2rem}.wx-t{font-size:2rem}.wx-d{font-size:.8rem}}
+@media (max-width:340px){.wx-ico{font-size:1.9rem}.wx-t{font-size:1.75rem}.wx-d{font-size:.76rem}}
 .wx-days{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;text-align:center;font-size:.8rem}
 .wx-days button{display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--key-op);border:0;border-radius:10px;padding:6px 2px;min-width:0;
   color:var(--ink);font:inherit;cursor:pointer;touch-action:manipulation}
@@ -993,7 +996,7 @@ function renderWeather(saved){
   const uv=d.uv_index_max&&d.uv_index_max[0];
   const hours=hasH&&wxOpen!==null?wxHours(w,wxOpen):"";
   card.innerHTML=`<button type="button" class="wx-now" data-day="now" aria-expanded="${wxOpen==="now"}" aria-label="Now: ${txt}, ${t(c.temperature_2m)}. Next 24 hours"${hasH?"":" disabled"}><span class="wx-ico" aria-hidden="true">${ico}</span><span class="wx-t">${t(c.temperature_2m)}</span>
-      <span class="wx-d"><b>${txt}</b><span>Feels like ${t(c.apparent_temperature)} · humidity ${c.relative_humidity_2m}%</span><span>Wind ${Math.round(c.wind_speed_10m)} km/h${uv!=null?` · UV ${Math.round(uv)}`:""}</span></span>${hasH?`<span class="chev" aria-hidden="true">${wxOpen==="now"?"▴":"▾"}</span>`:""}</button>
+      <span class="wx-d"><b>${txt}</b><span>Feels ${t(c.apparent_temperature)} · humidity ${c.relative_humidity_2m}%</span><span>Wind ${Math.round(c.wind_speed_10m)} km/h${uv!=null?` · UV ${Math.round(uv)}`:""}</span></span>${hasH?`<span class="chev" aria-hidden="true">${wxOpen==="now"?"▴":"▾"}</span>`:""}</button>
     ${wxOpen==="now"?hours:""}<div class="wx-days">${days}</div>${wxOpen!=="now"?hours:""}
     <div class="wx-foot"><span>Sunrise ${hm(d.sunrise[0])} · sunset ${hm(d.sunset[0])}</span><span>Updated ${ago(saved.at)}</span></div>`;
   card.hidden=false;
@@ -1539,7 +1542,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v57", opened=Date.now();
+const APP_VERSION="rightnote-v58", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
