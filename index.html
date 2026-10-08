@@ -200,7 +200,12 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .city-acts{display:flex;gap:6px;flex:none}
 #locBtn,#mapBtn{gap:4px;padding:0 10px;min-height:36px;font-size:.82rem;border-radius:10px}
 #locBtn svg,#mapBtn svg{width:15px;height:15px}
-.city-search{display:flex;gap:8px}
+.city-find>summary{list-style:none;width:fit-content;display:flex;align-items:center;gap:6px;min-height:36px;font-size:.85rem;font-weight:600;color:var(--accent-text);cursor:pointer;touch-action:manipulation}
+.city-find>summary::-webkit-details-marker{display:none}
+.city-find>summary::after{content:"▾";color:var(--muted);transition:transform .2s}
+.city-find[open]>summary::after{transform:rotate(180deg)}
+.city-find .results{margin-top:8px}
+.city-search{display:flex;gap:8px;margin-top:6px}
 .city-search input{flex:1;min-width:0;font:16px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 12px;min-height:44px}
 .results{display:flex;flex-direction:column;gap:4px}
 .results:empty,.chips:empty,.city-top .note:empty{display:none}
@@ -378,16 +383,19 @@ button.item:active{background:var(--accent-soft)}
     <div class="city-head">
       <div class="city-title"><h2 id="cityName">Where are you?</h2><span class="note" id="cityMeta"></span></div>
       <div class="city-acts">
-      <button type="button" class="btn primary" id="locBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Locate me</button>
-      <a class="btn" id="mapBtn" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg>Map</a>
+      <button type="button" class="btn primary" id="locBtn" aria-label="Find the city you're in and show its guide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Find my city</button>
+      <a class="btn" id="mapBtn" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg>City map</a>
       </div>
     </div>
-    <form class="city-search" id="cityForm" role="search">
-      <input type="search" id="cityQ" placeholder="Search for a city" aria-label="Search for a city" enterkeyhint="search" autocomplete="off">
-      <button type="submit" class="btn">Search</button>
-    </form>
-    <div class="results" id="cityResults"></div>
     <div class="chips" id="cityChips"></div>
+    <details class="city-find" id="cityFind">
+      <summary>Search for another city</summary>
+      <form class="city-search" id="cityForm" role="search">
+        <input type="search" id="cityQ" placeholder="Town or city name" aria-label="Search for a city" enterkeyhint="search" autocomplete="off">
+        <button type="submit" class="btn">Search</button>
+      </form>
+      <div class="results" id="cityResults"></div>
+    </details>
     <p class="note" id="cityMsg" aria-live="polite"></p>
   </section>
   <figure class="city-photo" id="cityPhoto" hidden><img id="cityImg" alt=""><figcaption id="cityPhotoCredit"></figcaption></figure>
@@ -883,10 +891,11 @@ function setPlace(p){
     r.slice(8).forEach(x=>{const d=cityData(x.id);if(d.photo&&d.photo.src)dropPhoto(d.photo.src);try{localStorage.removeItem("city:"+x.id)}catch(e){}});
     store.set("recent",JSON.stringify(r.slice(0,8)));
   }
-  $("cityResults").innerHTML=""; renderCity(); refreshCity();
+  $("cityResults").innerHTML=""; $("cityFind").open=false; renderCity(); refreshCity();
   window.scrollTo(0,0);
 }
 const msg=t=>{$("cityMsg").textContent=t||""};
+const openSearch=()=>{$("cityFind").open=true};
 
 // ---- Finding the city: GPS, then a curated city nearby or the town name from OpenStreetMap ----
 async function nominatim(path,params){
@@ -900,7 +909,7 @@ function fromOsm(o,lat,lon){
   return {id:norm(name+"-"+cc).replace(/[^a-z0-9]+/g,"-"),name,country:a.country||"",cc,lat:+(lat??o.lat),lon:+(lon??o.lon)};
 }
 function locate(quiet){
-  if(!navigator.geolocation){if(!quiet)msg("This browser can't share your location. Search for a city instead.");return}
+  if(!navigator.geolocation){if(!quiet){msg("This browser can't share your location. Search for a city instead.");openSearch()}return}
   if(!quiet)msg("Finding where you are…");
   $("locBtn").disabled=true;
   navigator.geolocation.getCurrentPosition(async pos=>{
@@ -914,12 +923,13 @@ function locate(quiet){
       msg(""); setPlace({...p,gps:true});
     }catch(e){
       msg(navigator.onLine?"Couldn't name this place. Try searching for it.":"You're offline. Without a connection the app can only recognise the cities with a built-in guide.");
+      if(navigator.onLine)openSearch();
     }
     $("locBtn").disabled=false;
   },err=>{
     $("locBtn").disabled=false;
-    if(!quiet)msg(err.code===1?"Location is blocked for this app. Allow it in your browser's site settings, or search for a city."
-      :"Couldn't get a location fix. Try again outdoors, or search for a city.");
+    if(!quiet){msg(err.code===1?"Location is blocked for this app. Allow it in your browser's site settings, or search for a city."
+      :"Couldn't get a location fix. Try again outdoors, or search for a city.");openSearch()}
   },{enableHighAccuracy:false,timeout:20000,maximumAge:10*60*1000});
 }
 $("locBtn").addEventListener("click",()=>locate(false));
@@ -948,6 +958,7 @@ $("cityForm").addEventListener("submit",async e=>{
   cityResults=found;
   $("cityResults").innerHTML=found.map((f,i)=>`<button type="button" data-i="${i}"><b>${esc(f.name)}</b><span>${esc(f.sub||f.country)}</span></button>`).join("");
 });
+$("cityFind").querySelector("summary").addEventListener("click",()=>{if(!$("cityFind").open)setTimeout(()=>$("cityQ").focus(),0)});
 $("cityResults").addEventListener("click",e=>{
   const b=e.target.closest("[data-i]"); if(!b)return;
   const {sub,...p}=cityResults[+b.dataset.i]; $("cityQ").value=""; setPlace(p);
@@ -1331,13 +1342,13 @@ function mapURL(p){
 function renderMapBtn(){
   const b=$("mapBtn"), ok=place&&isFinite(place.lat)&&isFinite(place.lon);
   b.hidden=!ok; if(!ok)return;
-  b.href=mapURL(place); b.setAttribute("aria-label",`Show ${place.name} on a map`);
+  b.href=mapURL(place); b.setAttribute("aria-label",`Open ${place.name} in your map app`);
   if(b.href.startsWith("https:")){b.target="_blank";b.rel="noopener"}else{b.removeAttribute("target");b.removeAttribute("rel")}
 }
 function renderCity(){
   renderChips(); renderMapBtn();
   if(!place){
-    $("cityName").textContent="Where are you?"; $("cityMeta").textContent="Tap Locate me, search, or pick a guide below.";
+    $("cityName").textContent="Where are you?"; $("cityMeta").textContent="Tap Find my city to get the guide for where you are, or pick one below.";
     $("wxCard").hidden=true; $("cityPhoto").hidden=true; $("cityBody").innerHTML=""; delete $("cityBody").dataset.id; $("cityCredit").textContent=""; return;
   }
   const saved=cityData(place.id), g=guideCity(place.id);
@@ -1540,7 +1551,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v59", opened=Date.now();
+const APP_VERSION="rightnote-v60", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
