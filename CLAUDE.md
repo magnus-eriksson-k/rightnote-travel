@@ -49,7 +49,7 @@ There is no build step, framework or dependencies. Deploying means pushing to `m
   - "Refresh rate" tries `open.er-api.com/v6/latest/AUD`, then the jsDelivr `@fawazahmed0/currency-api` as a fallback.
   - Results are sanity-checked against plausible VND ranges and cached in `localStorage["rates"]`.
   - The app refreshes automatically once a day when online, unless a custom rate is active.
-- **Views:** five in-page views. Pay, Phrases and City are switched in the header; Options opens from the gear icon at the right of the header (tapping it again closes it).
+- **Views:** five in-page views. Pay, Phrases and City are switched in the header; Options opens from the gear icon at the right of the header (tapping it again closes it). The header runs edge to edge with a line under it; the views are underlined text tabs (the gear too), so they look different from the filled switches such as ₫ | US$ | A$.
   - Pay (`#calcView`, the calculator): the price, keypad, payment tabs and a one-line rate summary that opens Options. "See all notes ›" on the How to pay card opens Notes.
   - Notes: a sub-page of Pay (the Pay tab stays highlighted, "‹ Pay" goes back): the note grid (with 1M/2M/5M amounts to load) and the note card.
   - Phrases: phrases for the current City's country, else the country whose `cur` is VND. Groups come from `countries.<CC>.phrases` in `data/cities.json` (`t` local text, `say` rough pronunciation, `en`, optional `note`; groups may have a `note`). Tapping a phrase shows it large inline, to hold up to someone; "🔊 Hear it" uses `speechSynthesis` with a voice matching the country's `lang`, and is hidden when the phone has none.

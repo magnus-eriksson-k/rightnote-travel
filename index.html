@@ -31,17 +31,18 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums}
 .wrap{max-width:440px;margin:0 auto;padding-inline:16px;padding-block:16px 32px;display:flex;flex-direction:column;gap:14px}
-header{display:flex;justify-content:space-between;align-items:center;gap:6px;padding-top:4px}
+/* The header runs edge to edge with a line under it, so it reads apart from the controls below */
+header{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-inline:-16px;padding:4px 12px 0 16px;border-bottom:1px solid var(--line)}
 h1{font-size:.95rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--accent-text);margin:0}
-/* Three views: Calculator and Notes from the header switch, Options (rate and appearance) from the gear */
-.views{display:flex;gap:2px;background:var(--key-op);border-radius:999px;padding:3px}
+/* Pay, Phrases and City are underlined tabs, Options the gear: unlike the filled switches in the views */
+.views{display:flex;gap:4px}
 .hdr-r{display:flex;align-items:center;gap:2px}
-.gear{flex:none;width:42px;height:42px;border:0;border-radius:999px;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
-.gear[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
-.views button{border:0;background:none;color:var(--ink);font:700 .85rem var(--body);border-radius:999px;padding:0 10px;min-height:38px;cursor:pointer;touch-action:manipulation}
-.views button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.gear{flex:none;width:42px;height:46px;border:0;border-bottom:3px solid transparent;border-radius:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+.gear[aria-current="page"]{color:var(--accent-text);border-bottom-color:var(--accent)}
+.views button{border:0;border-bottom:3px solid transparent;background:none;color:var(--ink);font:700 .85rem var(--body);border-radius:0;padding:0 8px;min-height:46px;cursor:pointer;touch-action:manipulation}
+.views button[aria-current="page"]{color:var(--accent-text);border-bottom-color:var(--accent)}
 @media (max-width:400px){h1{font-size:.82rem;letter-spacing:0}.views button{padding:0 8px;font-size:.8rem}.gear{width:38px}}
-@media (max-width:350px){.wrap{padding-inline:12px}h1{font-size:.75rem}.views button{padding:0 6px;font-size:.76rem}.gear{width:34px}}
+@media (max-width:350px){.wrap{padding-inline:12px}header{margin-inline:-12px;padding-inline:12px 8px}h1{font-size:.75rem}.views button{padding:0 6px;font-size:.76rem}.gear{width:34px}}
 .view{display:flex;flex-direction:column;gap:14px}
 .rate-sum{align-self:stretch;display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;background:none;border:0;padding:6px 2px;min-height:44px;font:inherit;font-size:.85rem;color:var(--muted);text-align:left;cursor:pointer}
 .rate-sum b{color:var(--accent-text)}
@@ -1503,7 +1504,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v55", opened=Date.now();
+const APP_VERSION="rightnote-v56", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
