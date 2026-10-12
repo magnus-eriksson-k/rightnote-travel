@@ -1432,10 +1432,6 @@ async function refreshCity(){
 }
 async function openCity(){
   await loadGuide(); renderCity(); refreshCity();
-  // with location already allowed, follow the phone when the last fix is over an hour old
-  if((!place||place.gps&&Date.now()-place.at>HOUR)&&navigator.permissions){
-    try{const s=await navigator.permissions.query({name:"geolocation"});if(s.state==="granted")locate(true)}catch(e){}
-  }
 }
 // the large photo loads when its item is opened, and is saved for offline use
 function bigPic(d){
@@ -1564,7 +1560,7 @@ route();
 // ---- Updates ----
 // Must match VERSION in sw.js. Home-screen apps are often resumed rather than reopened, so check for a new
 // version each time the app comes back, and switch to it at once just after opening, or else when you leave the app.
-const APP_VERSION="rightnote-v64", opened=Date.now();
+const APP_VERSION="rightnote-v65", opened=Date.now();
 async function showVersion(){
   let saved=""; try{saved=(await caches.keys()).find(k=>/^rightnote-v\d+$/.test(k))||""}catch(e){}
   const n=v=>v.replace("rightnote-v","");
